@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.joseph.fyp.EditSoundActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/osc_sawtooth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sawtooth" />
+
+                <CheckBox
+                    android:id="@+id/osc_sine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sine" />
+
+                <CheckBox
+                    android:id="@+id/osc_square"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Square" />
+
+                <CheckBox
+                    android:id="@+id/osc_triangle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Triangle" />
+            </GridLayout>
+
+            <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+                <RadioGroup>
+
+                <RadioButton
+                    android:id="@+id/radio_hipass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HiPass" />
+
+                <RadioButton
+                    android:id="@+id/radio_lowpass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LowPass" />
+
+                </RadioGroup>
+
+            </GridLayout>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <SeekBar
+                    android:id="@+id/filter_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </GridLayout>
+
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">>
+
+            <Button
+                android:id="@+id/play_test_pitch_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play Test Pitch" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button" />
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button" />
+        </GridLayout>
+
+
+        </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
