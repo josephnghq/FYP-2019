@@ -62,11 +62,22 @@ public class Synth
     private FilterLowPass mLowPassFilter = new FilterLowPass();
     private FilterHighPass mHighPassFilter = new FilterHighPass();
 
+    private double env_attack_duration = 0.6;
+    private double env_decay_duration = 0.3;
+    private double env_sustain_duration = 1;
+    private double env_release_duration = 1.3;
+
+    private double env_attack_value = 0.4;
+    private double env_decay_value = 0.25;
+    private double env_sustain_value = 0.2;
+    private double env_release_value = 0;
+
+
     private  double[] envVol =
-            { 0.6 , 0.4,
-                    0.3 , 0.25,
-                    1 , 0.2,
-                    1.3 , 0
+            {       env_attack_duration , env_attack_value,
+                    env_decay_duration , env_decay_value,
+                    env_sustain_duration , env_sustain_value,
+                    env_release_duration , env_release_value
             };
 
 
@@ -358,6 +369,24 @@ public class Synth
 
     }
 
+
+
+    public void setADSR(double attack, double decay, double sustain, double release){
+
+        double[] envVol =
+                {       attack , env_attack_value,
+                        decay , env_decay_value,
+                        sustain , env_sustain_value,
+                        release , env_release_value
+                };
+
+
+        envForVol = new SegmentedEnvelope(envVol);
+
+
+
+
+    }
 
 
 
