@@ -87,16 +87,16 @@
                 android:text="Play Test Pitch" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/play_osc_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Play" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/end_osc_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Stop" />
         </GridLayout>
 
         <LinearLayout
@@ -147,7 +147,57 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/textview_attack_lvl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Attack Level" />
+
+            <SeekBar
+                android:id="@+id/env_attack_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textview_decay_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Decay Level" />
+
+            <SeekBar
+                android:id="@+id/env_decay_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_sustain_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sustain Level" />
+
+            <SeekBar
+                android:id="@+id/env_sustain_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_release_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Release Level" />
+
+            <SeekBar
+                android:id="@+id/env_release_lvl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
+
+
+
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

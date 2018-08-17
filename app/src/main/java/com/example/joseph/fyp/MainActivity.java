@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Intent editSoundIntent = new Intent(this, EditSoundActivity.class);
+        final Intent XYPadActivity = new Intent(this, XYPadActivity.class);
 
 
 
@@ -28,6 +29,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 startActivity(editSoundIntent);
+
+            }
+        });
+
+        final Button btn2 = (Button)findViewById(R.id.button2);
+
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(XYPadActivity);
 
             }
         });

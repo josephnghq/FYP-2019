@@ -4,25 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.joseph.fyp.MainActivity">
+    tools:context="com.example.joseph.fyp.XYPadActivity">
 
-    <GridLayout
+    <RelativeLayout
+        android:id="@+id/XY_relative_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="195dp"
+        tools:layout_editor_absoluteY="340dp">
 
-        <Button
-            android:id="@+id/button"
+        <ImageView
+            android:id="@+id/XY_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edit sound"
-             />
+            app:srcCompat="@android:drawable/btn_star" />
+    </RelativeLayout>
 
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X Y Pad"
-            />
-    </GridLayout>
+
 
 </android.support.constraint.ConstraintLayout>

@@ -19,6 +19,10 @@ public class EditSoundActivity extends AppCompatActivity {
     private CheckBox oscSqrRadioButton;
     private Synth mSynth;
     private Button btnPlayTestPitch;
+    private Button btnPlay;
+    private Button btnStop;
+
+
     private RadioButton radioHighPass;
     private RadioButton radioLowPass;
     private SeekBar filterValue;
@@ -26,6 +30,13 @@ public class EditSoundActivity extends AppCompatActivity {
     private SeekBar seekBarDecay;
     private SeekBar seekBarSustain;
     private SeekBar seekBarRelease;
+
+    private SeekBar seekBarAttackLevel;
+    private SeekBar seekBarDecayLevel;
+    private SeekBar seekBarSustainLevel;
+    private SeekBar seekBarReleaseLevel;
+
+
 
     private double durationAttack = 0.5;
     private double durationDecay = 0.5;
@@ -49,6 +60,23 @@ public class EditSoundActivity extends AppCompatActivity {
                 mSynth.Dmin();
             }
         });
+        btnPlay = (Button)findViewById(R.id.play_osc_button);
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSynth.playOsc();
+            }
+        });
+        btnStop = (Button)findViewById(R.id.end_osc_button);
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSynth.releaseOsc();
+            }
+        });
+
+
+
 
         oscSawRadioButton = (CheckBox)findViewById(R.id.osc_sawtooth);
         oscSawRadioButton.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +221,7 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
+
                 mSynth.setFilterValue(progress);
 
 
@@ -216,7 +245,7 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                double value = progress / 100;
+                double value = (double)progress / 100;
                 durationAttack = value;
                 mSynth.setADSR(value,durationDecay,durationSustain,durationRelease);
 
@@ -243,7 +272,7 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                double value = progress / 100;
+                double value = (double)progress / 100;
                 durationDecay = value;
                 mSynth.setADSR(durationAttack,value,durationSustain,durationRelease);
 
@@ -269,7 +298,7 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                double value = progress / 100;
+                double value =(double) progress / 100;
                 durationSustain = value;
                 mSynth.setADSR(durationAttack,durationDecay,value,durationRelease);
 
@@ -294,11 +323,104 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                double value = progress / 100;
+                double value = (double)progress / 100;
                 durationRelease = value;
                 mSynth.setADSR(durationAttack,durationDecay,durationSustain,value);
 
 
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBarAttackLevel = (SeekBar) findViewById(R.id.env_attack_lvl);
+        seekBarAttackLevel.setMax(100);
+        seekBarAttackLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setEnv_attack_value(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+
+        seekBarDecayLevel = (SeekBar) findViewById(R.id.env_decay_lvl);
+        seekBarDecayLevel.setMax(100);
+        seekBarDecayLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setEnv_decay_value(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBarSustainLevel = (SeekBar) findViewById(R.id.env_sustain_lvl);
+        seekBarSustainLevel.setMax(100);
+        seekBarSustainLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setEnv_sustain_value(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBarReleaseLevel = (SeekBar) findViewById(R.id.env_release_lvl);
+        seekBarReleaseLevel.setMax(100);
+        seekBarReleaseLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setEnv_release_value(value);
 
             }
 
