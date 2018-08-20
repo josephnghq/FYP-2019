@@ -18,6 +18,9 @@ public class XYPadActivity extends AppCompatActivity {
     private RelativeLayout XYLayout;
     private ImageView XYImg;
     private Synth mSynth;
+    private int width = 0;
+    private int height = 0;
+
 
 
     @Override
@@ -29,6 +32,10 @@ public class XYPadActivity extends AppCompatActivity {
         mSynth.selectHighPass();
         mSynth.setfreqQ(6);
         XYLayout = (RelativeLayout) findViewById(R.id.XY_relative_layout);
+
+
+
+
         XYImg = (ImageView) findViewById(R.id.XY_image);
         XYImg.setOnTouchListener(onTouchListener());
 
@@ -36,6 +43,68 @@ public class XYPadActivity extends AppCompatActivity {
 
 
     private void startPlayOsc(){
+
+
+
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+
+         width = XYLayout.getWidth();
+         height = XYLayout.getHeight();
+
+        super.onWindowFocusChanged(hasFocus);
+    }
+
+
+    private void CMajorScale(int x){
+
+        int divider = width/8;
+
+
+        if(x <= divider){
+            mSynth.setFrequencyWithPorta(Constants.NoteCFreq);
+        }
+        else if (x > divider && x < divider*2){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteDFreq);
+
+        }
+        else if (x > divider*2 && x < divider*3){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteEfreq);
+
+        }
+        else if (x > divider*3 && x < divider*4){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteFfreq);
+
+        }
+        else if (x > divider*4 && x < divider*5){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteGfreq);
+
+        }
+        else if (x > divider*5 && x < divider*6){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteAfreq);
+
+        }
+
+        else if (x > divider*6 && x < divider*7){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteBfreq);
+
+        }
+        else if (x > divider*7 && x < divider*8){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteC2freq);
+
+        }
+
+
 
 
 
@@ -75,11 +144,13 @@ public class XYPadActivity extends AppCompatActivity {
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         v.setLayoutParams(layoutParams);
-                        mSynth.setFrequency(x-xDelta);
-                        mSynth.setFilterValue(y-yDelta);
+                        CMajorScale(x);
+                        mSynth.setFilterValue(y);
 
-                        Log.i("FYP" , "x - xDelta is " + (x - xDelta));
-                        Log.i("FYP" , "y - yDelta is " + (y - yDelta));
+
+
+
+
 
 
                         break;

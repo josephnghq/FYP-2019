@@ -71,7 +71,7 @@ public class EditSoundActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSynth.releaseOsc();
+                mSynth.setFrequencyWithPorta(110);
             }
         });
 

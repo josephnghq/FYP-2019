@@ -16,6 +16,9 @@ import com.jsyn.unitgen.SquareOscillator;
 import com.jsyn.unitgen.TriangleOscillator;
 import com.jsyn.unitgen.VariableRateMonoReader;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Joseph on 7/12/2018.
  */
@@ -47,6 +50,13 @@ public class Synth
 
     private InterpolatingDelay[] mDelays = new InterpolatingDelay[4];
     private FilterLowPass[] mDelaysFilter = new FilterLowPass[4];
+
+
+    private double FREQUENCY_NOW = 440;
+    private double freqDiff = 0;
+
+    private boolean ENABLE_PORTA = true;
+
 
 
 
@@ -499,6 +509,8 @@ public class Synth
         this.env_release_value = env_release_value;
     }
 
+
+
     public void playTestPitch(){
 
 
@@ -619,26 +631,171 @@ public class Synth
     }
 
 
-
-    public void setFrequency(int frequency){
-
+    public void setFrequencyWithPorta(double frequency){
 
 
-        mOscSaw.frequency.set(frequency);
-        mOscSaw2.frequency.set(frequency + 10);
-        mOscSaw3.frequency.set(frequency - 10);
 
-        mOscSine.frequency.set(frequency);
-        mOscSine2.frequency.set(frequency);
-        mOscSine3.frequency.set(frequency);
+        freqDiff = 0;
 
-        mOscSqr.frequency.set(frequency);
-        mOscSqr2.frequency.set(frequency);
-        mOscSqr3.frequency.set(frequency);
+        if(ENABLE_PORTA) {
 
-        mOscTri.frequency.set(frequency);
-        mOscTri2.frequency.set(frequency);
-        mOscTri3.frequency.set(frequency);
+            final Timer tim = new Timer();
+
+            if (frequency <= FREQUENCY_NOW) {
+
+                freqDiff = FREQUENCY_NOW - frequency;
+                TimerTask porta = new TimerTask() {
+                    @Override
+                    public void run() {
+
+
+
+                        mOscSaw.frequency.set(FREQUENCY_NOW);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 10);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 10);
+
+                        mOscSine.frequency.set(FREQUENCY_NOW);
+                        mOscSine2.frequency.set(FREQUENCY_NOW);
+                        mOscSine3.frequency.set(FREQUENCY_NOW);
+
+                        mOscSqr.frequency.set(FREQUENCY_NOW);
+                        mOscSqr2.frequency.set(FREQUENCY_NOW);
+                        mOscSqr3.frequency.set(FREQUENCY_NOW);
+
+                        mOscTri.frequency.set(FREQUENCY_NOW);
+                        mOscTri2.frequency.set(FREQUENCY_NOW);
+                        mOscTri3.frequency.set(FREQUENCY_NOW);
+
+                        FREQUENCY_NOW--;
+                        freqDiff--;
+                        if(freqDiff <= 0.0){
+
+                            tim.cancel();
+
+
+                        }
+
+                    }
+                };
+
+                tim.schedule(porta,0,1);
+
+
+
+
+
+
+            }
+
+            if (frequency > FREQUENCY_NOW) {
+
+                freqDiff = frequency - FREQUENCY_NOW;
+
+                TimerTask porta = new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        mOscSaw.frequency.set(FREQUENCY_NOW);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 10);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 10);
+
+                        mOscSine.frequency.set(FREQUENCY_NOW);
+                        mOscSine2.frequency.set(FREQUENCY_NOW);
+                        mOscSine3.frequency.set(FREQUENCY_NOW);
+
+                        mOscSqr.frequency.set(FREQUENCY_NOW);
+                        mOscSqr2.frequency.set(FREQUENCY_NOW);
+                        mOscSqr3.frequency.set(FREQUENCY_NOW);
+
+                        mOscTri.frequency.set(FREQUENCY_NOW);
+                        mOscTri2.frequency.set(FREQUENCY_NOW);
+                        mOscTri3.frequency.set(FREQUENCY_NOW);
+
+                        FREQUENCY_NOW++;
+                        freqDiff--;
+
+                        Log.i("FYP" ,String.valueOf(freqDiff));
+
+                        if(freqDiff <= 0.0){
+
+                            Log.i("FYP" ,"Cancelling slide up");
+
+                            tim.cancel();
+
+
+                        }
+
+                    }
+                };
+
+
+                tim.schedule(porta,0,1);
+
+               /* for (int i = 0; i < (int) freqDiff; i++) {
+
+
+                    mOscSaw.frequency.set(FREQUENCY_NOW);
+                    mOscSaw2.frequency.set(FREQUENCY_NOW + 10);
+                    mOscSaw3.frequency.set(FREQUENCY_NOW - 10);
+
+                    mOscSine.frequency.set(FREQUENCY_NOW);
+                    mOscSine2.frequency.set(FREQUENCY_NOW);
+                    mOscSine3.frequency.set(FREQUENCY_NOW);
+
+                    mOscSqr.frequency.set(FREQUENCY_NOW);
+                    mOscSqr2.frequency.set(FREQUENCY_NOW);
+                    mOscSqr3.frequency.set(FREQUENCY_NOW);
+
+                    mOscTri.frequency.set(FREQUENCY_NOW);
+                    mOscTri2.frequency.set(FREQUENCY_NOW);
+                    mOscTri3.frequency.set(FREQUENCY_NOW);
+
+                    FREQUENCY_NOW++;
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }*/
+
+
+            }
+
+
+        }
+
+
+
+
+    }
+
+
+
+
+    public void setFrequency(double frequency){
+
+
+
+
+
+
+            mOscSaw.frequency.set(frequency);
+            mOscSaw2.frequency.set(frequency + 10);
+            mOscSaw3.frequency.set(frequency - 10);
+
+            mOscSine.frequency.set(frequency);
+            mOscSine2.frequency.set(frequency);
+            mOscSine3.frequency.set(frequency);
+
+            mOscSqr.frequency.set(frequency);
+            mOscSqr2.frequency.set(frequency);
+            mOscSqr3.frequency.set(frequency);
+
+            mOscTri.frequency.set(frequency);
+            mOscTri2.frequency.set(frequency);
+            mOscTri3.frequency.set(frequency);
 
 
 
