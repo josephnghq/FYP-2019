@@ -6,10 +6,19 @@
     android:layout_height="match_parent"
     tools:context="com.example.joseph.fyp.EditSoundActivity">
 
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
 
 
 
@@ -75,29 +84,6 @@
                     android:layout_height="wrap_content" />
             </GridLayout>
 
-
-        <GridLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">>
-
-            <Button
-                android:id="@+id/play_test_pitch_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Play Test Pitch" />
-
-            <Button
-                android:id="@+id/play_osc_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Play" />
-
-            <Button
-                android:id="@+id/end_osc_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stop" />
-        </GridLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -195,9 +181,136 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/textview_attack_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter Attack" />
+
+            <SeekBar
+                android:id="@+id/env_attack_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textview_decay_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Decay" />
+
+            <SeekBar
+                android:id="@+id/env_decay_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_sustain_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Sustain" />
+
+            <SeekBar
+                android:id="@+id/env_sustain_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_release_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Release" />
+
+            <SeekBar
+                android:id="@+id/env_release_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textview_attack_lvl_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter ttack Level" />
+
+            <SeekBar
+                android:id="@+id/env_attack_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textview_decay_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Decay Level" />
+
+            <SeekBar
+                android:id="@+id/env_decay_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_sustain_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Sustain Level" />
+
+            <SeekBar
+                android:id="@+id/env_sustain_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_release_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filter Release Level" />
+
+            <SeekBar
+                android:id="@+id/env_release_lvl_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+        <CheckBox
+            android:id="@+id/delay_enable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delay" />
+
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">>
+
+            <Button
+                android:id="@+id/play_test_pitch_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play Test Pitch" />
+
+            <Button
+                android:id="@+id/play_osc_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play" />
+
+            <Button
+                android:id="@+id/end_osc_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop" />
+        </GridLayout>
 
 
     </LinearLayout>
+
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

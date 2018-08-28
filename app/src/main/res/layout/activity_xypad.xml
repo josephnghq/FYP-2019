@@ -6,6 +6,110 @@
     android:layout_height="match_parent"
     tools:context="com.example.joseph.fyp.XYPadActivity">
 
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="4dp">
+
+        <TextView
+            android:id="@+id/C1"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="C1" />
+
+        <TextView
+            android:id="@+id/Db"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Db" />
+
+        <TextView
+            android:id="@+id/D"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="D" />
+
+        <TextView
+            android:id="@+id/Eb"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Eb" />
+
+        <TextView
+            android:id="@+id/E"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="E" />
+
+        <TextView
+            android:id="@+id/F"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="F" />
+
+        <TextView
+            android:id="@+id/Gb"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gb" />
+
+        <TextView
+            android:id="@+id/G"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="G" />
+
+        <TextView
+            android:id="@+id/Ab"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ab" />
+
+        <TextView
+            android:id="@+id/A"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="A" />
+
+        <TextView
+            android:id="@+id/Bb"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bb" />
+
+        <TextView
+            android:id="@+id/B"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="B" />
+
+        <TextView
+            android:id="@+id/C"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="C" />
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/XY_relative_layout"
         android:layout_width="match_parent"

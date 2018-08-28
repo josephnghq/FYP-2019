@@ -1,14 +1,12 @@
 package com.example.joseph.fyp;
 
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import com.jsyn.unitgen.Delay;
 
 
 public class XYPadActivity extends AppCompatActivity {
@@ -26,9 +24,11 @@ public class XYPadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_xypad);
 
         mSynth = new Synth();
+        mSynth.disableFilterEnv();
         mSynth.selectHighPass();
         mSynth.setfreqQ(6);
         XYLayout = (RelativeLayout) findViewById(R.id.XY_relative_layout);
@@ -61,49 +61,73 @@ public class XYPadActivity extends AppCompatActivity {
 
     private void CMajorScale(int x){
 
-        int divider = width/8;
+        int divider = width/13;
 
 
         if(x <= divider){
-            mSynth.setFrequencyWithPorta(Constants.NoteCFreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteC4);
         }
         else if (x > divider && x < divider*2){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteDFreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteD4b);
 
         }
         else if (x > divider*2 && x < divider*3){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteEfreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteD4);
 
         }
         else if (x > divider*3 && x < divider*4){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteFfreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteE4b);
 
         }
         else if (x > divider*4 && x < divider*5){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteGfreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteE4);
 
         }
         else if (x > divider*5 && x < divider*6){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteAfreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteF4);
 
         }
 
         else if (x > divider*6 && x < divider*7){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteBfreq);
+            mSynth.setFrequencyWithPorta(Constants.NoteG4b);
 
         }
         else if (x > divider*7 && x < divider*8){
 
-            mSynth.setFrequencyWithPorta(Constants.NoteC2freq);
+            mSynth.setFrequencyWithPorta(Constants.NoteG4);
 
         }
+        else if (x > divider*8 && x < divider*9){
 
+            mSynth.setFrequencyWithPorta(Constants.NoteA4b);
+
+        }
+        else if (x > divider*9 && x < divider*10){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteA4);
+
+        }
+        else if (x > divider*10 && x < divider*11){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteB4b);
+
+        }
+        else if (x > divider*11 && x < divider*12){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteB4);
+
+        }
+        else if (x > divider*12 && x < divider*13){
+
+            mSynth.setFrequencyWithPorta(Constants.NoteC5);
+
+        }
 
 
 

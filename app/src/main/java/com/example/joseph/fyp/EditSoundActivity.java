@@ -17,6 +17,8 @@ public class EditSoundActivity extends AppCompatActivity {
     private CheckBox oscSineRadioButton;
     private CheckBox oscTriRadioButton;
     private CheckBox oscSqrRadioButton;
+    private CheckBox delayCheckbox;
+
     private Synth mSynth;
     private Button btnPlayTestPitch;
     private Button btnPlay;
@@ -38,10 +40,29 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
+
+    private SeekBar seekBarAttackFilter;
+    private SeekBar seekBarDecayFilter;
+    private SeekBar seekBarSustainFilter;
+    private SeekBar seekBarReleaseFilter;
+
+
+    private SeekBar seekBarAttackFilterLevel;
+    private SeekBar seekBarDecayFilterLevel;
+    private SeekBar seekBarSustainFilterLevel;
+    private SeekBar seekBarReleaseFilterLevel;
+
+
     private double durationAttack = 0.5;
     private double durationDecay = 0.5;
     private double durationSustain = 0.5;
     private double durationRelease = 0.5;
+
+
+    private double durationAttackFilter = 0.5;
+    private double durationDecayFilter = 0.5;
+    private double durationSustainFilter = 0.5;
+    private double durationReleaseFilter = 0.5;
 
 
 
@@ -166,6 +187,28 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+        delayCheckbox = (CheckBox)findViewById(R.id.delay_enable);
+        delayCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                boolean checked = delayCheckbox.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableDelay();
+
+                }
+                else{
+                    mSynth.disableDelay();
+                }
+
+
+            }
+        });
+
         radioLowPass = (RadioButton)findViewById(R.id.radio_lowpass);
         radioLowPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,6 +255,9 @@ public class EditSoundActivity extends AppCompatActivity {
 
             }
         });
+
+
+
 
 
         filterValue = (SeekBar)findViewById(R.id.filter_value);
@@ -434,6 +480,162 @@ public class EditSoundActivity extends AppCompatActivity {
 
             }
         });
+
+
+        seekBarAttackFilter = (SeekBar) findViewById(R.id.env_attack_filter);
+        seekBarAttackFilter.setMax(500);
+        seekBarAttackFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress / 100;
+                durationAttackFilter = value;
+                mSynth.setADSRFilter(value,durationDecayFilter,durationSustainFilter,durationReleaseFilter);
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+        seekBarDecayFilter = (SeekBar) findViewById(R.id.env_decay_filter);
+        seekBarDecayFilter.setMax(500);
+        seekBarDecayFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress / 100;
+                durationDecayFilter = value;
+                mSynth.setADSRFilter(durationAttackFilter,value,durationSustainFilter,durationReleaseFilter);
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBarSustainFilter = (SeekBar) findViewById(R.id.env_sustain_filter);
+        seekBarSustainFilter.setMax(500);
+        seekBarSustainFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress / 100;
+                durationSustainFilter = value;
+                mSynth.setADSRFilter(durationAttackFilter,durationDecayFilter,value,durationReleaseFilter);
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBarReleaseFilter = (SeekBar) findViewById(R.id.env_release_filter);
+        seekBarReleaseFilter.setMax(500);
+        seekBarReleaseFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress / 100;
+                durationReleaseFilter = value;
+                mSynth.setADSRFilter(durationAttackFilter,durationDecayFilter,durationSustainFilter,value);
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBarAttackFilterLevel = (SeekBar) findViewById(R.id.env_attack_lvl_filter);
+        seekBarAttackFilterLevel.setMax(20000);
+        seekBarAttackFilterLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                mSynth.setEnv_attack_value_filter(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+        seekBarDecayFilterLevel = (SeekBar) findViewById(R.id.env_decay_filter);
+        seekBarDecayFilterLevel.setMax(20000);
+        seekBarDecayFilterLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                mSynth.setEnv_attack_value_filter(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+
+
 
 
 

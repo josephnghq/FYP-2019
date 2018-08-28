@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.jsyn.JSyn;
 import com.jsyn.data.SegmentedEnvelope;
-import com.jsyn.unitgen.Delay;
 import com.jsyn.unitgen.FilterHighPass;
 import com.jsyn.unitgen.FilterLowPass;
 import com.jsyn.unitgen.FixedRateMonoWriter;
@@ -39,7 +38,7 @@ public class Synth
 
 
 
-    public double DELAY_TIME = 0.5;
+    public double DELAY_TIME = 0.3;
 
     //give 4 delay voices, delays are connected from the output of filters, and output of delay goes straight into line out
    /* private InterpolatingDelay mDelayVoice1 = new InterpolatingDelay();
@@ -48,8 +47,8 @@ public class Synth
     private InterpolatingDelay mDelayVoice4 = new InterpolatingDelay();*/
 
 
-    private InterpolatingDelay[] mDelays = new InterpolatingDelay[4];
-    private FilterLowPass[] mDelaysFilter = new FilterLowPass[4];
+    private InterpolatingDelay[] mDelays = new InterpolatingDelay[7];
+    private FilterLowPass[] mDelaysFilter = new FilterLowPass[7];
 
 
     private double FREQUENCY_NOW = 440;
@@ -100,6 +99,15 @@ public class Synth
 
 
 
+    private double env_attack_duration_filter = 0.3;
+    private double env_decay_duration_filter = 0.5;
+    private double env_sustain_duration_filter = 0.3;
+    private double env_release_duration_filter = 0.1;
+
+    private double env_attack_value_filter = 16000;
+    private double env_decay_value_filter = 8000;
+    private double env_sustain_value_filter = 3000;
+    private double env_release_value_filter = 2500;
 /*
     private InterpolatingDelay mDelayUnit = new InterpolatingDelay();
 */
@@ -117,10 +125,21 @@ public class Synth
 
 
 
+    private  double[] envFilter =
+            {       env_attack_duration_filter , env_attack_value_filter,
+                    env_decay_duration_filter , env_decay_value_filter,
+                    env_sustain_duration_filter , env_sustain_value_filter,
+                    env_release_duration_filter , env_release_value_filter
+            };
+
+
+
+
 
     private SegmentedEnvelope envForVol = new SegmentedEnvelope(envVol);
     private VariableRateMonoReader envPlayer = new VariableRateMonoReader();
-    private FixedRateMonoWriter delayWriter = new FixedRateMonoWriter();
+    private SegmentedEnvelope envForFilter = new SegmentedEnvelope(envFilter);
+    private VariableRateMonoReader envPlayerFilter = new VariableRateMonoReader();
 
 
 
@@ -155,6 +174,7 @@ public class Synth
         mSynth.add(mLowPassFilter);
         mSynth.add(mHighPassFilter);
         mSynth.add(envPlayer);
+        mSynth.add(envPlayerFilter);
        // mSynth.add(mDelayUnit);
 
 
@@ -164,10 +184,12 @@ public class Synth
 
             mDelaysFilter[i] = new FilterLowPass();
             mDelaysFilter[i].frequency.set(20000);
-            mDelaysFilter[i].amplitude.set(1.0 / (mDelays.length + 1));
+            mDelaysFilter[i].amplitude.set(   (0.6 / (i + 1) ) - 0      );
+
+           // Log.i("FYP" , "delay amp is " + String.valueOf((0.6 / (i + 1) ) - 0 ) + " " + i);
 
             mDelays[i] = new InterpolatingDelay();
-            mDelays[i].allocate(88200);
+            mDelays[i].allocate(132300);
             mSynth.add(mDelays[i]);
             mSynth.add(mDelaysFilter[i]);
 
@@ -193,6 +215,10 @@ public class Synth
 
         mLowPassFilter.frequency.set(value);
         mHighPassFilter.frequency.set(value);
+
+
+        Log.i("FYP" , "low pass is " + mLowPassFilter.frequency.get());
+        Log.i("FYP" , "high pass is " + mHighPassFilter.frequency.get());
 
 
     }
@@ -325,6 +351,8 @@ public class Synth
         disableTri();
         }
 
+
+
         envPlayer.output.connect(mOscSaw.amplitude);
         envPlayer.output.connect(mOscSaw2.amplitude);
         envPlayer.output.connect(mOscSaw3.amplitude);
@@ -343,6 +371,10 @@ public class Synth
         envPlayer.output.connect(mOscTri2.amplitude);
         envPlayer.output.connect(mOscTri3.amplitude);
 
+
+
+      envPlayerFilter.output.connect(mLowPassFilter.frequency);
+      envPlayerFilter.output.connect(mHighPassFilter.frequency);
 
 
 
@@ -493,6 +525,40 @@ public class Synth
 
     }
 
+    public void setADSRFilter(double attack, double decay, double sustain, double release){
+
+        double[] envFilter =
+                {       attack , env_attack_value_filter,
+                        decay , env_decay_value_filter,
+                        sustain , env_sustain_value_filter,
+                        release , env_release_value_filter
+                };
+
+
+        envForFilter = new SegmentedEnvelope(envFilter);
+
+
+
+
+    }
+
+
+    public void setEnv_attack_value_filter(double env_attack_value_filter) {
+        this.env_attack_value_filter = env_attack_value_filter;
+    }
+
+    public void setEnv_decay_value_filter(double env_decay_value_filter) {
+        this.env_decay_value_filter = env_decay_value_filter;
+    }
+
+    public void setEnv_sustain_value_filter(double env_sustain_value_filter) {
+        this.env_sustain_value_filter = env_sustain_value_filter;
+    }
+
+    public void setEnv_release_value_filter(double env_release_value_filter) {
+        this.env_release_value_filter = env_release_value_filter;
+    }
+
     public void setEnv_attack_value(double env_attack_value) {
         this.env_attack_value = env_attack_value;
     }
@@ -515,9 +581,9 @@ public class Synth
 
 
 
-        mOscSaw.frequency.set(Constants.NoteCFreq);
-        mOscSaw2.frequency.set(Constants.NoteEfreq);
-        mOscSaw3.frequency.set(Constants.NoteGfreq);
+        mOscSaw.frequency.set(Constants.NoteC4);
+        mOscSaw2.frequency.set(Constants.NoteE4);
+        mOscSaw3.frequency.set(Constants.NoteG4);
 
         mOscSaw.amplitude.set(0.8);
         mOscSaw2.amplitude.set(0.8);
@@ -557,6 +623,17 @@ public class Synth
     }
 
 
+    public void disableFilterEnv(){
+
+        envPlayerFilter.output.disconnect(mLowPassFilter.frequency);
+        envPlayerFilter.output.disconnect(mHighPassFilter.frequency);
+
+        envPlayerFilter.setEnabled(false);
+
+
+
+
+    }
 
 
 
@@ -568,27 +645,36 @@ public class Synth
 
 
 
-            mOscSaw.frequency.set(Constants.NoteDFreq);
-            mOscSaw2.frequency.set(Constants.NoteFfreq);
-            mOscSaw3.frequency.set(Constants.NoteAfreq);
+            mOscSaw.frequency.set(Constants.NoteD4);
+            mOscSaw2.frequency.set(Constants.NoteF4);
+            mOscSaw3.frequency.set(Constants.NoteA4);
 
-            mOscSine.frequency.set(Constants.NoteDFreq);
-            mOscSine2.frequency.set(Constants.NoteFfreq);
-            mOscSine3.frequency.set(Constants.NoteAfreq);
+            mOscSine.frequency.set(Constants.NoteD4);
+            mOscSine2.frequency.set(Constants.NoteF4);
+            mOscSine3.frequency.set(Constants.NoteA4);
 
-            mOscSqr.frequency.set(Constants.NoteDFreq);
-            mOscSqr2.frequency.set(Constants.NoteFfreq);
-            mOscSqr3.frequency.set(Constants.NoteAfreq);
+            mOscSqr.frequency.set(Constants.NoteD4);
+            mOscSqr2.frequency.set(Constants.NoteF4);
+            mOscSqr3.frequency.set(Constants.NoteA4);
 
-            mOscTri.frequency.set(Constants.NoteDFreq);
-            mOscTri2.frequency.set(Constants.NoteFfreq);
-            mOscTri3.frequency.set(Constants.NoteAfreq);
+            mOscTri.frequency.set(Constants.NoteD4);
+            mOscTri2.frequency.set(Constants.NoteF4);
+            mOscTri3.frequency.set(Constants.NoteA4);
+
+
+            mLowPassFilter.frequency.set(0);
+            mHighPassFilter.frequency.set(0);
+
+            envPlayerFilter.dataQueue.clear();
+
+           envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
+         //  envPlayerFilter.start();
 
 
 
              envPlayer.dataQueue.clear();
             envPlayer.dataQueue.queue(envForVol, 0, 4 );
-            envPlayer.start();
+          //  envPlayer.start();
 
 
 
@@ -605,9 +691,9 @@ public class Synth
 
 
 
-                mOscSaw.frequency.set(Constants.NoteDFreq);
-                mOscSaw2.frequency.set(Constants.NoteFfreq);
-                mOscSaw3.frequency.set(Constants.NoteGfreq);
+                mOscSaw.frequency.set(Constants.NoteD4);
+                mOscSaw2.frequency.set(Constants.NoteF4);
+                mOscSaw3.frequency.set(Constants.NoteG4);
 
                 mOscSaw.amplitude.set(0.8);
                 mOscSaw2.amplitude.set(0.8);
@@ -651,8 +737,8 @@ public class Synth
 
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 10);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 10);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.5);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.5);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
@@ -696,8 +782,8 @@ public class Synth
                     public void run() {
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 10);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 10);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.5);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.5);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
@@ -767,6 +853,28 @@ public class Synth
         }
 
 
+
+
+    }
+
+
+
+    public void enableDelay(){
+
+
+        for(int i = 0 ; i < mDelays.length; i++){
+            mDelays[i].setEnabled(true);
+        }
+
+
+    }
+
+    public void disableDelay(){
+
+
+        for(int i = 0 ; i < mDelays.length; i++){
+            mDelays[i].setEnabled(false);
+        }
 
 
     }
