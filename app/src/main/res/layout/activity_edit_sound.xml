@@ -238,7 +238,7 @@
                 android:id="@+id/textview_attack_lvl_filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Filter ttack Level" />
+                android:text="Filter Attack Level" />
 
             <SeekBar
                 android:id="@+id/env_attack_lvl_filter"

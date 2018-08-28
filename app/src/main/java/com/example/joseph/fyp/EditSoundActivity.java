@@ -610,14 +610,36 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
-        seekBarDecayFilterLevel = (SeekBar) findViewById(R.id.env_decay_filter);
+        seekBarDecayFilterLevel = (SeekBar) findViewById(R.id.env_decay_lvl_filter);
         seekBarDecayFilterLevel.setMax(20000);
         seekBarDecayFilterLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
                 double value = (double)progress;
-                mSynth.setEnv_attack_value_filter(value);
+                mSynth.setEnv_decay_value_filter(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBarSustainFilterLevel = (SeekBar) findViewById(R.id.env_sustain_lvl_filter);
+        seekBarSustainFilterLevel.setMax(20000);
+        seekBarSustainFilterLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                mSynth.setEnv_sustain_value_filter(value);
 
             }
 
@@ -633,6 +655,27 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
 
+        seekBarReleaseFilterLevel = (SeekBar) findViewById(R.id.env_release_lvl_filter);
+        seekBarReleaseFilterLevel.setMax(20000);
+        seekBarReleaseFilterLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                mSynth.setEnv_release_value_filter(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
 

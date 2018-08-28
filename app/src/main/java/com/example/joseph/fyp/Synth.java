@@ -234,12 +234,12 @@ public class Synth
 
 
         mLowPassFilter.frequency.set(20000);
-        mLowPassFilter.Q.set(0.2);
+        mLowPassFilter.Q.set(2.5);
         mLowPassFilter.output.connect( 0, mOut.input, 0 ); /* Left side */
         mLowPassFilter.output.connect( 0, mOut.input, 1 );
 
         mHighPassFilter.frequency.set(0);
-        mHighPassFilter.Q.set(0.2);
+        mHighPassFilter.Q.set(2.5);
         mHighPassFilter.output.connect(0,mOut.input , 0);
         mHighPassFilter.output.connect(0,mOut.input , 1);
 
@@ -737,8 +737,8 @@ public class Synth
 
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.5);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.5);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.2);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.2);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
@@ -782,8 +782,8 @@ public class Synth
                     public void run() {
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.5);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.5);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.2);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.2);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
