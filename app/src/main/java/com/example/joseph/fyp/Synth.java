@@ -39,6 +39,7 @@ public class Synth
 
 
     public double DELAY_TIME = 0.3;
+    private int num_of_delay_voices = 7;
 
     //give 4 delay voices, delays are connected from the output of filters, and output of delay goes straight into line out
    /* private InterpolatingDelay mDelayVoice1 = new InterpolatingDelay();
@@ -47,16 +48,18 @@ public class Synth
     private InterpolatingDelay mDelayVoice4 = new InterpolatingDelay();*/
 
 
-    private InterpolatingDelay[] mDelays = new InterpolatingDelay[7];
-    private FilterLowPass[] mDelaysFilter = new FilterLowPass[7];
+    private InterpolatingDelay[] mDelays = new InterpolatingDelay[num_of_delay_voices];
+    private FilterLowPass[] mDelaysFilter = new FilterLowPass[num_of_delay_voices];
 
 
     private double FREQUENCY_NOW = 440;
     private double freqDiff = 0;
 
     private boolean ENABLE_PORTA = true;
-
-
+    private boolean DELAY_ENABLED = true;
+    private boolean ENABLE_LOW_PASS = true;
+    private boolean ENABLE_HIGH_PASS = false;
+    private boolean ENABLE_FILTER_ADSR = true;
 
 
     private SawtoothOscillatorBL mOscSaw = new SawtoothOscillatorBL();
@@ -108,6 +111,10 @@ public class Synth
     private double env_decay_value_filter = 8000;
     private double env_sustain_value_filter = 3000;
     private double env_release_value_filter = 2500;
+
+
+    private double detuneValue = 0.2;
+
 /*
     private InterpolatingDelay mDelayUnit = new InterpolatingDelay();
 */
@@ -140,6 +147,8 @@ public class Synth
     private VariableRateMonoReader envPlayer = new VariableRateMonoReader();
     private SegmentedEnvelope envForFilter = new SegmentedEnvelope(envFilter);
     private VariableRateMonoReader envPlayerFilter = new VariableRateMonoReader();
+
+
 
 
 
@@ -200,6 +209,60 @@ public class Synth
     }
 
 
+    public Synth(SynthData sd){
+
+            loadData(sd);
+
+
+        mSynth.add(mOscSine);
+        mSynth.add(mOscSine2);
+        mSynth.add(mOscSine3);
+
+        mSynth.add(mOscSqr);
+        mSynth.add(mOscSqr2);
+        mSynth.add(mOscSqr3);
+
+        mSynth.add(mOscTri);
+        mSynth.add(mOscTri2);
+        mSynth.add(mOscTri3);
+
+        mSynth.add(mOscSaw);
+        mSynth.add(mOscSaw2);
+        mSynth.add(mOscSaw3);
+
+
+
+        mSynth.add(mOut);
+        mSynth.add(mLowPassFilter);
+        mSynth.add(mHighPassFilter);
+        mSynth.add(envPlayer);
+        mSynth.add(envPlayerFilter);
+        // mSynth.add(mDelayUnit);
+
+
+
+        for(int i = 0 ; i < mDelays.length ; i++){
+
+
+            mDelaysFilter[i] = new FilterLowPass();
+            mDelaysFilter[i].frequency.set(20000);
+            mDelaysFilter[i].amplitude.set(   (0.6 / (i + 1) ) - 0      );
+
+            // Log.i("FYP" , "delay amp is " + String.valueOf((0.6 / (i + 1) ) - 0 ) + " " + i);
+
+            mDelays[i] = new InterpolatingDelay();
+            mDelays[i].allocate(132300);
+            mSynth.add(mDelays[i]);
+            mSynth.add(mDelaysFilter[i]);
+
+        }
+
+        setupCircuit();
+
+
+
+    }
+
     public void setOscToSine(){
 
     disableSaw();
@@ -243,6 +306,14 @@ public class Synth
         mHighPassFilter.output.connect(0,mOut.input , 0);
         mHighPassFilter.output.connect(0,mOut.input , 1);
 
+        if(!ENABLE_LOW_PASS){
+
+            selectHighPass();
+
+        }
+        if(!ENABLE_HIGH_PASS){
+            selectLowPass();
+        }
 
 
       /*  mOscSaw.amplitude.set(0);
@@ -285,6 +356,7 @@ public class Synth
 
 
         }
+
 
 
 
@@ -378,6 +450,11 @@ public class Synth
 
 
 
+        if(!ENABLE_FILTER_ADSR){
+            disableFilterEnv();
+        }
+
+
        /* envPlayer.output.connect(mOscSine.amplitude);
         envPlayer.output.connect(mOscSine2.amplitude);
         envPlayer.output.connect(mOscSine3.amplitude);
@@ -403,6 +480,11 @@ public class Synth
             mDelays[i].start();
 
 
+        }
+
+
+        if(!DELAY_ENABLED){
+            disableDelay();
         }
 
 
@@ -605,9 +687,22 @@ public class Synth
     public void playOsc(){
 
 
+
+        if(envPlayerFilter.isEnabled()) {
+            mLowPassFilter.frequency.set(0);
+            mHighPassFilter.frequency.set(0);
+
+        }
+        envPlayerFilter.dataQueue.clear();
+
+        envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
+
         envPlayer.dataQueue.clear();
-        envPlayer.dataQueue.queue(envForVol , 0 , 3);
-        envPlayer.dataQueue.queueLoop(envForVol , 1 , 2);
+
+        envPlayer.dataQueue.queue(envForVol, 0, 4 );
+
+       // envPlayer.dataQueue.queue(envForVol , 0 , 3);
+       // envPlayer.dataQueue.queueLoop(envForVol , 1 , 2);
 
 
 
@@ -617,11 +712,27 @@ public class Synth
 
     public void releaseOsc(){
 
+
+
         envPlayer.dataQueue.queue(envForVol , 3 , 1);
 
 
     }
 
+
+
+
+    public void enableFilterEnv(){
+
+
+
+        envPlayerFilter.output.connect(mLowPassFilter.frequency);
+        envPlayerFilter.output.connect(mHighPassFilter.frequency);
+
+        envPlayerFilter.setEnabled(true);
+
+
+    }
 
     public void disableFilterEnv(){
 
@@ -636,6 +747,53 @@ public class Synth
     }
 
 
+
+    public void D(){
+        {
+
+
+
+
+
+            mOscSaw.frequency.set(Constants.NoteD4);
+            mOscSaw2.frequency.set(Constants.NoteD4 + detuneValue);
+            mOscSaw3.frequency.set(Constants.NoteD4 - detuneValue);
+
+            mOscSine.frequency.set(Constants.NoteD4);
+            mOscSine2.frequency.set(Constants.NoteD4 + detuneValue);
+            mOscSine3.frequency.set(Constants.NoteD4 - detuneValue);
+
+            mOscSqr.frequency.set(Constants.NoteD4);
+            mOscSqr2.frequency.set(Constants.NoteD4 + detuneValue);
+            mOscSqr3.frequency.set(Constants.NoteD4 - detuneValue);
+
+            mOscTri.frequency.set(Constants.NoteD4);
+            mOscTri2.frequency.set(Constants.NoteD4 + detuneValue);
+            mOscTri3.frequency.set(Constants.NoteD4 - detuneValue);
+
+
+            if(envPlayerFilter.isEnabled()) {
+                mLowPassFilter.frequency.set(0);
+                mHighPassFilter.frequency.set(0);
+
+            }
+            envPlayerFilter.dataQueue.clear();
+
+            envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
+            //  envPlayerFilter.start();
+
+
+
+            envPlayer.dataQueue.clear();
+            envPlayer.dataQueue.queue(envForVol, 0, 4 );
+            //  envPlayer.start();
+
+
+
+
+
+        }
+    }
 
 
     public void Dmin(){
@@ -662,9 +820,10 @@ public class Synth
             mOscTri3.frequency.set(Constants.NoteA4);
 
 
-            mLowPassFilter.frequency.set(0);
-            mHighPassFilter.frequency.set(0);
-
+            if(envPlayerFilter.isEnabled()) {
+                mLowPassFilter.frequency.set(0);
+                mHighPassFilter.frequency.set(0);
+            }
             envPlayerFilter.dataQueue.clear();
 
            envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
@@ -721,6 +880,8 @@ public class Synth
 
 
 
+
+
         freqDiff = 0;
 
         if(ENABLE_PORTA) {
@@ -737,8 +898,8 @@ public class Synth
 
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.2);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.2);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
@@ -782,8 +943,8 @@ public class Synth
                     public void run() {
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);
-                        mOscSaw2.frequency.set(FREQUENCY_NOW + 0.2);
-                        mOscSaw3.frequency.set(FREQUENCY_NOW - 0.2);
+                        mOscSaw2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
                         mOscSine2.frequency.set(FREQUENCY_NOW);
@@ -862,6 +1023,10 @@ public class Synth
     public void enableDelay(){
 
 
+
+        DELAY_ENABLED = true;
+
+
         for(int i = 0 ; i < mDelays.length; i++){
             mDelays[i].setEnabled(true);
         }
@@ -871,6 +1036,8 @@ public class Synth
 
     public void disableDelay(){
 
+
+        DELAY_ENABLED = false;
 
         for(int i = 0 ; i < mDelays.length; i++){
             mDelays[i].setEnabled(false);
@@ -890,8 +1057,8 @@ public class Synth
 
 
             mOscSaw.frequency.set(frequency);
-            mOscSaw2.frequency.set(frequency + 10);
-            mOscSaw3.frequency.set(frequency - 10);
+            mOscSaw2.frequency.set(frequency + detuneValue);
+            mOscSaw3.frequency.set(frequency - detuneValue);
 
             mOscSine.frequency.set(frequency);
             mOscSine2.frequency.set(frequency);
@@ -921,6 +1088,147 @@ public class Synth
 
 
     }
+
+
+    public void setDetuneValue(double detuneValue) {
+        this.detuneValue = detuneValue;
+    }
+
+    public void loadData(SynthData sd){
+
+
+        env_attack_duration = sd.env_attack_duration;
+        env_decay_duration = sd.env_decay_duration;
+        env_sustain_duration = sd.env_sustain_duration;
+        env_release_duration = sd.env_release_duration;
+
+        env_attack_value = sd.env_attack_value;
+        env_decay_value = sd.env_decay_value;
+        env_sustain_value = sd.env_sustain_value;
+        env_release_value = sd.env_release_value;
+
+
+        ENABLE_FILTER_ADSR = sd.enable_filter_adsr;
+
+        ENABLE_PORTA = sd.enable_porta;
+
+
+
+        env_attack_duration_filter = sd.env_attack_duration_filter;
+        env_decay_duration_filter = sd.env_decay_duration_filter;
+        env_sustain_duration_filter = sd.env_sustain_duration_filter;
+        env_release_duration_filter = sd.env_release_duration_filter;
+
+        env_attack_value_filter = sd.env_attack_value_filter;
+        env_decay_duration_filter = sd.env_decay_duration_filter;
+        env_sustain_duration_filter = sd.env_sustain_duration_filter;
+        env_release_duration_filter = sd.env_release_duration_filter;
+
+        DELAY_TIME = sd.DELAY_TIME;
+        num_of_delay_voices = sd.num_of_delay_voices;
+        DELAY_ENABLED = sd.enable_delay;
+        DisableSaw = sd.DisableSaw;
+        DisableSine = sd.DisableSine;
+        DisableSqr = sd.DisableSqr;
+        DisableTri = sd.DisableTri;
+        ENABLE_LOW_PASS = sd.enableLowPass;
+        ENABLE_HIGH_PASS = sd.enableHighPass;
+
+        setADSR(env_attack_duration,env_decay_duration,env_sustain_duration,env_release_duration);
+        setADSRFilter(env_attack_duration_filter,env_decay_duration_filter,env_sustain_value_filter,env_release_duration_filter);
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+    public SynthData saveData(){
+
+
+    SynthData sd = new SynthData();
+
+    sd.env_attack_duration = env_attack_duration;
+    sd.env_decay_duration = env_decay_duration;
+    sd.env_sustain_duration = env_sustain_duration;
+    sd.env_release_duration = env_release_duration;
+
+    sd.env_attack_value = env_attack_value;
+    sd.env_decay_value = env_decay_value;
+    sd.env_sustain_value = env_sustain_value;
+    sd.env_release_value = env_release_value;
+
+    sd.enable_filter_adsr = envPlayerFilter.isEnabled();
+    sd.enable_porta = ENABLE_PORTA;
+    sd.enable_delay = DELAY_ENABLED;
+
+    sd.env_attack_duration_filter = env_attack_duration_filter;
+    sd.env_decay_duration_filter = env_decay_duration_filter;
+    sd.env_sustain_duration_filter = env_sustain_duration_filter;
+    sd.env_release_duration_filter = env_release_duration_filter;
+
+    sd.env_attack_value_filter = env_attack_value_filter;
+    sd.env_decay_duration_filter = env_decay_duration_filter;
+    sd.env_sustain_duration_filter = env_sustain_duration_filter;
+    sd.env_release_duration_filter = env_release_duration_filter;
+
+    sd.DELAY_TIME = DELAY_TIME;
+    sd.num_of_delay_voices = num_of_delay_voices;
+    sd.DisableSaw = DisableSaw;
+    sd.DisableSine = DisableSine;
+    sd.DisableSqr = DisableSqr;
+    sd.DisableTri = DisableTri;
+
+    sd.enableLowPass = mLowPassFilter.isEnabled();
+    sd.enableHighPass = mHighPassFilter.isEnabled();
+
+    return sd;
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

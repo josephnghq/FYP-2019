@@ -1,12 +1,26 @@
 package com.example.joseph.fyp;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 
 
 public class XYPadActivity extends AppCompatActivity {
@@ -18,6 +32,11 @@ public class XYPadActivity extends AppCompatActivity {
     private Synth mSynth;
     private int width = 0;
     private int height = 0;
+    SharedPreferences sharedPref;
+    private GsonBuilder builder = new GsonBuilder();
+    private Gson gson;
+
+    private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
 
 
 
@@ -27,11 +46,65 @@ public class XYPadActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_xypad);
 
+        sharedPref=  this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        gson = builder.create();
+
+        String gsonString = sharedPref.getString(getString(R.string.preference_file_key) , "");
+
+
+        if(gsonString.length()>0){
+            listOfSynthData = gson.fromJson(gsonString,new TypeToken<ArrayList<SynthData>>(){}.getType());
+        }
+
+
+        ArrayList<String> synthDataTitles = new ArrayList<String>();
+        for(int i = 0 ; i < listOfSynthData.size(); i++){
+
+            synthDataTitles.add(listOfSynthData.get(i).title);
+
+
+        }
+
+
+
+
+
+
+
+
+
+
         mSynth = new Synth();
         mSynth.disableFilterEnv();
         mSynth.selectHighPass();
         mSynth.setfreqQ(6);
+
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
+        alertDialog.setView(convertView);
+        alertDialog.setTitle("List");
+        ListView lv = (ListView) convertView.findViewById(R.id.listView1);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,synthDataTitles);
+        lv.setAdapter(adapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                mSynth = new Synth(listOfSynthData.get(position));
+
+
+            }
+        });
+        alertDialog.show();
+
+
         XYLayout = (RelativeLayout) findViewById(R.id.XY_relative_layout);
+
 
 
 

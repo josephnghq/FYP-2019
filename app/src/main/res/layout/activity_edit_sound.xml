@@ -74,15 +74,44 @@
 
             </GridLayout>
 
-            <GridLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/detune_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Detune" />
+
+                <SeekBar
+                    android:id="@+id/detune"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/filter_q_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Q Value" />
+
+                <SeekBar
+                    android:id="@+id/filter_q_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/filter_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Frequency" />
 
                 <SeekBar
                     android:id="@+id/filter_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-            </GridLayout>
+            </LinearLayout>
 
 
         <LinearLayout
@@ -285,6 +314,12 @@
             android:text="Delay" />
 
 
+        <CheckBox
+            android:id="@+id/enable_filter_adsr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Filter ADSR" />
+
         <GridLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">>
@@ -306,6 +341,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Stop" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save" />
         </GridLayout>
 
 

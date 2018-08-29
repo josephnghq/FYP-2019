@@ -1,5 +1,7 @@
 package com.example.joseph.fyp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +10,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class EditSoundActivity extends AppCompatActivity {
 
@@ -18,15 +27,20 @@ public class EditSoundActivity extends AppCompatActivity {
     private CheckBox oscTriRadioButton;
     private CheckBox oscSqrRadioButton;
     private CheckBox delayCheckbox;
+    private CheckBox filterADSRCheckbox;
+
 
     private Synth mSynth;
     private Button btnPlayTestPitch;
     private Button btnPlay;
     private Button btnStop;
+    private Button btnSave;
 
 
     private RadioButton radioHighPass;
     private RadioButton radioLowPass;
+    private SeekBar detune;
+    private SeekBar filterQ;
     private SeekBar filterValue;
     private SeekBar seekBarAttack;
     private SeekBar seekBarDecay;
@@ -65,20 +79,42 @@ public class EditSoundActivity extends AppCompatActivity {
     private double durationReleaseFilter = 0.5;
 
 
+    private GsonBuilder builder = new GsonBuilder();
+    private Gson gson;
+
+    private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
 
 
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_sound);
+        sharedPref=  this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
+        gson = builder.create();
+        String gsonString = sharedPref.getString(getString(R.string.preference_file_key) , "");
+
+        if(gsonString.length()>0){
+            listOfSynthData = gson.fromJson(gsonString,new TypeToken<ArrayList<SynthData>>(){}.getType());
+        }
+
+
+        Log.i("FYP" , "Length of listOfSynthData is " + String.valueOf(listOfSynthData.size()));
+
+        Log.i("FYP" , gsonString);
+
+
         mSynth = new Synth();
         btnPlayTestPitch = (Button)findViewById(R.id.play_test_pitch_button);
         btnPlayTestPitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSynth.Dmin();
+                mSynth.D();
             }
         });
         btnPlay = (Button)findViewById(R.id.play_osc_button);
@@ -93,6 +129,19 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mSynth.setFrequencyWithPorta(110);
+            }
+        });
+
+        btnSave = (Button)findViewById(R.id.save_button);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SynthData sd;
+                sd = mSynth.saveData();
+                listOfSynthData.add(sd);
+                editor.putString(getString(R.string.preference_file_key), gson.toJson(listOfSynthData));
+                editor.commit();
+
             }
         });
 
@@ -209,6 +258,45 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+
+        filterADSRCheckbox = (CheckBox)findViewById(R.id.enable_filter_adsr);
+        filterADSRCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                boolean checked = filterADSRCheckbox.isChecked();
+                if(checked){
+
+
+                    mSynth.enableFilterEnv();
+
+
+
+                }
+                else{
+
+                    mSynth.disableFilterEnv();
+
+                }
+
+
+
+
+
+
+
+
+
+
+            }
+        });
+
+
+
+
+
         radioLowPass = (RadioButton)findViewById(R.id.radio_lowpass);
         radioLowPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,6 +345,53 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
 
+        detune = (SeekBar)findViewById(R.id.detune);
+        detune.setMax(15);
+        detune.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/10;
+                mSynth.setDetuneValue(value);
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        filterQ = (SeekBar)findViewById(R.id.filter_q_value);
+        filterQ.setMax(15);
+        filterQ.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+
+
+                double value = (double)progress/10;
+                mSynth.setfreqQ(value);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
 
@@ -286,7 +421,7 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
         seekBarAttack = (SeekBar)findViewById(R.id.env_attack);
-        seekBarAttack.setMax(500);
+        seekBarAttack.setMax(400);
         seekBarAttack.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -313,7 +448,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         seekBarDecay = (SeekBar)findViewById(R.id.env_decay);
-        seekBarDecay.setMax(500);
+        seekBarDecay.setMax(400);
         seekBarDecay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -339,7 +474,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         seekBarSustain = (SeekBar)findViewById(R.id.env_sustain);
-        seekBarSustain.setMax(500);
+        seekBarSustain.setMax(400);
         seekBarSustain.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -364,7 +499,7 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
         seekBarRelease = (SeekBar)findViewById(R.id.env_release);
-        seekBarRelease.setMax(500);
+        seekBarRelease.setMax(400);
         seekBarRelease.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -483,7 +618,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         seekBarAttackFilter = (SeekBar) findViewById(R.id.env_attack_filter);
-        seekBarAttackFilter.setMax(500);
+        seekBarAttackFilter.setMax(400);
         seekBarAttackFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -510,7 +645,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         seekBarDecayFilter = (SeekBar) findViewById(R.id.env_decay_filter);
-        seekBarDecayFilter.setMax(500);
+        seekBarDecayFilter.setMax(400);
         seekBarDecayFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -535,7 +670,7 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
         seekBarSustainFilter = (SeekBar) findViewById(R.id.env_sustain_filter);
-        seekBarSustainFilter.setMax(500);
+        seekBarSustainFilter.setMax(400);
         seekBarSustainFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -561,7 +696,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         seekBarReleaseFilter = (SeekBar) findViewById(R.id.env_release_filter);
-        seekBarReleaseFilter.setMax(500);
+        seekBarReleaseFilter.setMax(400);
         seekBarReleaseFilter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
