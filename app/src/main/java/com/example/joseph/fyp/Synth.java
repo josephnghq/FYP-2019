@@ -258,7 +258,7 @@ public class Synth
         }
 
         setupCircuit();
-
+     //   disableFilterEnv();
 
 
     }
@@ -516,6 +516,7 @@ public class Synth
 
     public void disableSaw(){
 
+        DisableSaw = true;
     mOscSaw.setEnabled(false);
     mOscSaw2.setEnabled(false);
     mOscSaw3.setEnabled(false);
@@ -526,6 +527,7 @@ public class Synth
 
     public void disableSqr(){
 
+        DisableSqr = true;
         mOscSqr.setEnabled(false);
         mOscSqr2.setEnabled(false);
         mOscSqr3.setEnabled(false);
@@ -535,6 +537,7 @@ public class Synth
 
     public void disableSine(){
 
+        DisableSine = true;
         mOscSine.setEnabled(false);
         mOscSine2.setEnabled(false);
         mOscSine3.setEnabled(false);
@@ -545,6 +548,7 @@ public class Synth
 
     public void disableTri(){
 
+        DisableTri = true;
         mOscTri.setEnabled(false);
         mOscTri2.setEnabled(false);
         mOscTri3.setEnabled(false);
@@ -554,6 +558,7 @@ public class Synth
 
     public void enableSaw(){
 
+        DisableSaw = false;
         mOscSaw.setEnabled(true);
         mOscSaw2.setEnabled(true);
         mOscSaw3.setEnabled(true);
@@ -562,6 +567,7 @@ public class Synth
 
     public void enableSine(){
 
+        DisableSine = false;
         mOscSine.setEnabled(true);
         mOscSine2.setEnabled(true);
         mOscSine3.setEnabled(true);
@@ -572,6 +578,7 @@ public class Synth
 
     public void enableSqr(){
 
+        DisableSqr = false;
         mOscSqr.setEnabled(true);
         mOscSqr2.setEnabled(true);
         mOscSqr3.setEnabled(true);
@@ -580,7 +587,7 @@ public class Synth
 
     public void enableTri(){
 
-
+        DisableTri = false;
         mOscTri.setEnabled(true);
         mOscTri2.setEnabled(true);
         mOscTri3.setEnabled(true);
@@ -591,6 +598,16 @@ public class Synth
 
 
     public void setADSR(double attack, double decay, double sustain, double release){
+
+
+        env_attack_duration = attack;
+        env_decay_duration = decay;
+        env_sustain_duration = sustain;
+        env_release_duration = release;
+
+
+
+
 
         double[] envVol =
                 {       attack , env_attack_value,
@@ -608,6 +625,27 @@ public class Synth
     }
 
     public void setADSRFilter(double attack, double decay, double sustain, double release){
+
+
+
+        Log.i("fyp" , "attack is " + attack);
+        Log.i("fyp" , "decay is " + decay);
+        Log.i("fyp" , "sustain is " + sustain);
+        Log.i("fyp" , "release is " + release);
+
+
+
+        Log.i("fyp" , "attack value is " + env_attack_value_filter);
+        Log.i("fyp" , "decay is " + env_decay_value_filter);
+        Log.i("fyp" , "sustain is " + env_sustain_value_filter);
+        Log.i("fyp" , "release is " + env_release_value_filter);
+
+
+        env_attack_duration_filter = attack;
+        env_decay_duration_filter = decay;
+        env_sustain_duration_filter = sustain;
+        env_release_duration_filter = release;
+
 
         double[] envFilter =
                 {       attack , env_attack_value_filter,
@@ -697,12 +735,15 @@ public class Synth
 
         envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
 
+     //   mLowPassFilter.frequency.set(20000);
+      //  mHighPassFilter.frequency.set(20000);
+
         envPlayer.dataQueue.clear();
 
-        envPlayer.dataQueue.queue(envForVol, 0, 4 );
+       // envPlayer.dataQueue.queue(envForVol, 0, 4 );
 
-       // envPlayer.dataQueue.queue(envForVol , 0 , 3);
-       // envPlayer.dataQueue.queueLoop(envForVol , 1 , 2);
+        envPlayer.dataQueue.queue(envForVol , 0 , 3);
+        envPlayer.dataQueue.queueLoop(envForVol , 1 , 2);
 
 
 
@@ -732,6 +773,10 @@ public class Synth
         envPlayerFilter.setEnabled(true);
 
 
+    }
+
+    public Boolean isFilterEnvEnabled(){
+        return envPlayerFilter.isEnabled();
     }
 
     public void disableFilterEnv(){
@@ -1120,9 +1165,9 @@ public class Synth
         env_release_duration_filter = sd.env_release_duration_filter;
 
         env_attack_value_filter = sd.env_attack_value_filter;
-        env_decay_duration_filter = sd.env_decay_duration_filter;
-        env_sustain_duration_filter = sd.env_sustain_duration_filter;
-        env_release_duration_filter = sd.env_release_duration_filter;
+        env_decay_value_filter = sd.env_decay_value_filter;
+        env_sustain_value_filter = sd.env_sustain_value_filter;
+        env_release_value_filter = sd.env_release_value_filter;
 
         DELAY_TIME = sd.DELAY_TIME;
         num_of_delay_voices = sd.num_of_delay_voices;
@@ -1174,9 +1219,9 @@ public class Synth
     sd.env_release_duration_filter = env_release_duration_filter;
 
     sd.env_attack_value_filter = env_attack_value_filter;
-    sd.env_decay_duration_filter = env_decay_duration_filter;
-    sd.env_sustain_duration_filter = env_sustain_duration_filter;
-    sd.env_release_duration_filter = env_release_duration_filter;
+    sd.env_decay_value_filter = env_decay_value_filter;
+    sd.env_sustain_value_filter = env_sustain_value_filter;
+    sd.env_release_value_filter = env_release_value_filter;
 
     sd.DELAY_TIME = DELAY_TIME;
     sd.num_of_delay_voices = num_of_delay_voices;

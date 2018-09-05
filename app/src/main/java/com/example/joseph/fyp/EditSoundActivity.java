@@ -1,13 +1,17 @@
 package com.example.joseph.fyp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 
@@ -84,6 +88,8 @@ public class EditSoundActivity extends AppCompatActivity {
 
     private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
 
+    private String title = "";
+
 
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
@@ -137,10 +143,12 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SynthData sd;
-                sd = mSynth.saveData();
+                buildAlertDialog();
+             /*   sd = mSynth.saveData();
+                sd.title = title;
                 listOfSynthData.add(sd);
                 editor.putString(getString(R.string.preference_file_key), gson.toJson(listOfSynthData));
-                editor.commit();
+                editor.commit();*/
 
             }
         });
@@ -370,7 +378,7 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
         filterQ = (SeekBar)findViewById(R.id.filter_q_value);
-        filterQ.setMax(15);
+        filterQ.setMax(85);
         filterQ.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -818,4 +826,42 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
     }
+
+
+    public void buildAlertDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter synth name");
+         final EditText et = new EditText(this);
+
+        builder.setView(et);
+        builder.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                title = et.getText().toString();
+                SynthData sd;
+                sd = mSynth.saveData();
+                sd.title = title;
+                listOfSynthData.add(sd);
+                editor.putString(getString(R.string.preference_file_key), gson.toJson(listOfSynthData));
+                editor.commit();
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+
+    }
+
+
+
+
+
+
+
+
+
 }

@@ -242,7 +242,9 @@ public class XYPadActivity extends AppCompatActivity {
                         layoutParams.bottomMargin = 0;
                         v.setLayoutParams(layoutParams);
                         CMajorScale(x);
-                        mSynth.setFilterValue(y);
+
+                        if(!mSynth.isFilterEnvEnabled())
+                        mSynth.setFilterValue(y*5);
 
 
 
