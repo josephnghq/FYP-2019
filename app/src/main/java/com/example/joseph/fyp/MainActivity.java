@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent editSoundIntent = new Intent(this, EditSoundActivity.class);
         final Intent XYPadActivity = new Intent(this, XYPadActivity.class);
 
+        final Intent OpenCVTestActivity = new Intent(this, OpenCVTestActivity.class);
 
 
         final Button btn = (Button)findViewById(R.id.button);
@@ -40,6 +41,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 startActivity(XYPadActivity);
+
+            }
+        });
+
+
+        final Button btn3 = (Button)findViewById(R.id.button3);
+
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(OpenCVTestActivity);
 
             }
         });
