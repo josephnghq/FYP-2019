@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -28,6 +29,14 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
     private BaseLoaderCallback mLoaderCallback;
 
+    private double hue_start = 0;
+    private double hue_stop = 255;
+    private double sat_start = 0;
+    private double sat_stop = 255;
+    private double val_start = 0;
+    private double val_stop = 255;
+
+
 
 
     @Override
@@ -38,9 +47,11 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.HelloOpenCvView);
 
+        setupBars();
+
 
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-          mOpenCvCameraView.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener() {
+        mOpenCvCameraView.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener() {
             @Override
             public void onCameraViewStarted(int width, int height) {
 
@@ -73,22 +84,39 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
 
+                //hue , sat, value
+                Scalar minValues = new Scalar(hue_start ,sat_start , val_start);
+                Scalar maxValues = new Scalar(hue_stop,sat_stop,val_stop);
+
+
+               // Scalar minValues = new Scalar(0,0,0);
+             //   Scalar maxValues = new Scalar(150,150,150);
+                Core.inRange(mask,minValues,maxValues,mask);
+
+
+
+
+
+
+
                 Mat dilateElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
                 Mat erodeElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
 
 
 
-                Imgproc.erode(mask, morphOutput, erodeElement);
-                Imgproc.erode(mask, morphOutput, erodeElement);
+       /*         Imgproc.erode(mask, morphOutput, erodeElement);
+                Imgproc.erode(morphOutput, morphOutput, erodeElement);
 
-                Imgproc.dilate(mask, morphOutput, dilateElement);
-                Imgproc.dilate(mask, morphOutput, dilateElement);
+                Imgproc.dilate(morphOutput, morphOutput, dilateElement);
+                Imgproc.dilate(morphOutput, morphOutput, dilateElement);*/
 
 
                  Mat hierarchy = new Mat();
+/*
 
-                 Imgproc.cvtColor(morphOutput , morphOutput , Imgproc.COLOR_HSV2BGR);
+               Imgproc.cvtColor(morphOutput , morphOutput , Imgproc.COLOR_HSV2BGR);
                 Imgproc.cvtColor(morphOutput , morphOutput , Imgproc.COLOR_BGR2GRAY);
+
 
                 ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
@@ -105,14 +133,17 @@ public class OpenCVTestActivity extends AppCompatActivity {
                     {
 
 
-                        Imgproc.drawContours(inputFrame, contours, idx, new Scalar(250, 0, 0));
-                        Log.i("FYP" , "THere was a contour");
+                        Imgproc.drawContours(morphOutput, contours, idx, new Scalar(250, 0, 0));
+                        //Log.i("FYP" , "THere was a contour");
                     }
                 }
 
-              //  inputFrame = morphOutput.clone();
+*/
 
 
+
+                inputFrame = mask.clone();
+                hierarchy.release();
                 dilateElement.release();
                 erodeElement.release();
                 blurredImage.release();
@@ -154,5 +185,151 @@ public class OpenCVTestActivity extends AppCompatActivity {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0, this, mLoaderCallback);
     }
+
+
+
+    private void setupBars(){
+
+
+        SeekBar hueStartSb = (SeekBar) findViewById(R.id.seekBar_hue_start);
+        hueStartSb.setMax(180);
+        hueStartSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                hue_start = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        SeekBar hueStopSB = (SeekBar) findViewById(R.id.seekBar_hue_stop);
+        hueStopSB.setMax(180);
+        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                hue_stop = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        SeekBar satStart = (SeekBar) findViewById(R.id.seekBar_sat_start);
+        hueStopSB.setMax(255);
+        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                sat_start = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        SeekBar satStop = (SeekBar) findViewById(R.id.seekBar_sat_stop);
+        hueStopSB.setMax(255);
+        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                sat_stop = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        SeekBar valStart = (SeekBar) findViewById(R.id.seekBar_val_start);
+        hueStopSB.setMax(255);
+        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                val_start = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        SeekBar valStop = (SeekBar) findViewById(R.id.seekBar_val_stop);
+        hueStopSB.setMax(255);
+        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress;
+                val_stop = value;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+    }
+
+
+
 
 }
