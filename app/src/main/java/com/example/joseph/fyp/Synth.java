@@ -921,6 +921,19 @@ public class Synth
     }
 
 
+    public void mute(){
+
+        if(mOut.isEnabled())
+        mOut.setEnabled(false);
+
+        else{
+            mOut.setEnabled(true);
+        }
+
+
+    }
+
+
     public void setFrequencyWithPorta(double frequency){
 
 
@@ -1006,11 +1019,11 @@ public class Synth
                         FREQUENCY_NOW++;
                         freqDiff--;
 
-                        Log.i("FYP" ,String.valueOf(freqDiff));
+                    //    Log.i("FYP" ,String.valueOf(freqDiff));
 
                         if(freqDiff <= 0.0){
 
-                            Log.i("FYP" ,"Cancelling slide up");
+                     //       Log.i("FYP" ,"Cancelling slide up");
 
                             tim.cancel();
 
