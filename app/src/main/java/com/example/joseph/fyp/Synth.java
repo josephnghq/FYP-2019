@@ -1077,6 +1077,14 @@ public class Synth
     }
 
 
+    public void destory(){
+
+        mSynth.stop();
+
+
+
+    }
+
 
     public void enableDelay(){
 

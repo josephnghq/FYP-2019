@@ -3,6 +3,7 @@ package com.example.joseph.fyp;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
@@ -14,6 +15,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -34,8 +36,13 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
     private BaseLoaderCallback mLoaderCallback;
 
-
-
+    private boolean              mIsColorSelected = false;
+    private Scalar               mBlobColorRgba;
+    private Scalar               mBlobColorHsv;
+    private ColorBlobDetector    mDetector;
+    private Mat                  mSpectrum;
+    private Size                 SPECTRUM_SIZE;
+    private Scalar               CONTOUR_COLOR;
 
     private double hue_start = 119;
     private double hue_stop = 149;
@@ -51,6 +58,10 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
     private Mat mIntermediateMat;
+
+    private Mat mRgba;
+
+
 
 
 
@@ -85,6 +96,14 @@ public class OpenCVTestActivity extends AppCompatActivity {
             @Override
             public void onCameraViewStarted(int width, int height) {
 
+
+                mDetector = new ColorBlobDetector();
+                mSpectrum = new Mat();
+                mBlobColorRgba = new Scalar(255);
+                mBlobColorHsv = new Scalar(255);
+                SPECTRUM_SIZE = new Size(200, 64);
+                CONTOUR_COLOR = new Scalar(255,0,0,255);
+
             }
 
             @Override
@@ -99,12 +118,55 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                // mIntermediateMat = new Mat();
 
+                mRgba = inputFrame;
 
-                System.gc();
+                Core.flip(mRgba,mRgba,1);
 
-                //Core.flip(inputFrame,inputFrame,1);
+                List<MatOfPoint> contours = mDetector.getContours();
+                Size sizeRgba = mRgba.size();
 
-                Size sizeRgba = inputFrame.size();
+
+                height = (int)sizeRgba.height;
+                width = (int)sizeRgba.width;
+
+                if (mIsColorSelected) {
+                    mDetector.process(mRgba);
+                    Log.e("FYP", "Contours count: " + contours.size());
+                    Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+
+                    Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+                    colorLabel.setTo(mBlobColorRgba);
+
+                    Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+                    mSpectrum.copyTo(spectrumLabel);
+                }
+
+                List<Moments> mu = new ArrayList<Moments>(contours.size());
+                for (int i = 0; i < contours.size(); i++) {
+                    mu.add(i, Imgproc.moments(contours.get(i), false));
+                    Moments p = mu.get(i);
+                    int x = (int) (p.get_m10() / p.get_m00());
+                    int y = (int) (p.get_m01() / p.get_m00());
+
+                    Log.i("FYP" , "For contour number " + i + " x is at " + x);
+                    Log.i("FYP" , "For contour number " + i + " y is at " + y);
+
+                    CPentatonic(x);
+
+                    if(!mSynth.isFilterEnvEnabled())
+                        mSynth.setFilterValue(y*5);
+
+                    Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(255,49,0,255));
+                }
+
+
+                return mRgba;
+
+                /*System.gc();
+
+                Core.flip(mRgba,mRgba,1);
+
+                Size sizeRgba = mRgba.size();
 
                 height = (int)sizeRgba.height;
                 width = (int)sizeRgba.width;
@@ -120,14 +182,14 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
                //Mat returner = new Mat();
-                                Mat blurredImage = new Mat();
+                 Mat blurredImage = new Mat();
                // Mat hsvImage = new Mat();
                 Mat mask = new Mat();
                 Mat morphOutput = new Mat();
 
 
 // remove some noise
-                Imgproc.blur(inputFrame, blurredImage, new Size(7, 7));
+                Imgproc.blur(mRgba, blurredImage, new Size(7, 7));
 
 // convert the frame to HSV
 
@@ -184,7 +246,7 @@ public class OpenCVTestActivity extends AppCompatActivity {
                     {
 
 
-                        Imgproc.drawContours(inputFrame, contours, idx, new Scalar(0, 255, 0));
+                        Imgproc.drawContours(mRgba, contours, idx, new Scalar(0, 255, 0));
                         //Log.i("FYP" , "THere was a contour");
                     }
                 }
@@ -204,17 +266,17 @@ public class OpenCVTestActivity extends AppCompatActivity {
                     if(!mSynth.isFilterEnvEnabled())
                         mSynth.setFilterValue(y*5);
 
-                    Imgproc.circle(inputFrame, new Point(x, y), 4, new Scalar(255,49,0,255));
+                    Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(255,49,0,255));
                 }
 
-              /*  Mat rgbaInnerWindow = new Mat(inputFrame , new Rect(0, 0 ,width,height));
+              *//*  Mat rgbaInnerWindow = new Mat(inputFrame , new Rect(0, 0 ,width,height));
                 Imgproc.resize(morphOutput,morphOutput,rgbaInnerWindow.size());
-                morphOutput.copyTo(rgbaInnerWindow);*/
+                morphOutput.copyTo(rgbaInnerWindow);*//*
 
 
 
 
-/*
+*//*
                 Mat rgbaInnerWindow;
 
 
@@ -229,9 +291,9 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                 mIntermediateMat.release();
                 rgbaInnerWindow.release();
-*/
+*//*
 
-            /*   Mat corner = inputFrame.submat(top, top + height, left, left + width);
+            *//*   Mat corner = inputFrame.submat(top, top + height, left, left + width);
                Imgproc.resize(mask,mask,corner.size());
 
 
@@ -240,7 +302,7 @@ public class OpenCVTestActivity extends AppCompatActivity {
                 Imgproc.resize(mask,mask,mZoomWindow.size());
 
                 mask.copyTo(mZoomWindow);
-                Imgproc.resize(mZoomWindow, zoomCorner, zoomCorner.size(), 0, 0, Imgproc.INTER_LINEAR_EXACT);*/
+                Imgproc.resize(mZoomWindow, zoomCorner, zoomCorner.size(), 0, 0, Imgproc.INTER_LINEAR_EXACT);*//*
               //  Size wsize = mZoomWindow.size();
                // Imgproc.rectangle(mZoomWindow, new Point(1, 1), new Point(wsize.width - 2, wsize.height - 2), new Scalar(255, 0, 0, 255), 2);
 
@@ -257,9 +319,9 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                // Imgproc.rectangle(mask, new Point(1, 1), new Point(mask.size().width - 2, mask.size().height - 2), new Scalar(255, 0, 0, 255), 2);
 
-/*                hierarchy.release();
+*//*                hierarchy.release();
                 dilateElement.release();
-                erodeElement.release();*/
+                erodeElement.release();*//*
 
                 hierarchy.release();
                 blurredImage.release();
@@ -269,7 +331,7 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
 
-                return inputFrame;
+                return mRgba;*/
             }
         });
 
@@ -296,7 +358,85 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
     }
 
-    private Mat overtrayImage( Mat background, Mat foreground ) {
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        int cols = mRgba.cols();
+        int rows = mRgba.rows();
+
+        int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
+        int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
+
+        int x = (int) event.getX() - xOffset;
+        int y = (int) event.getY() - yOffset;
+
+        Log.i("FYP", "Touch image coordinates: (" + x + ", " + y + ")");
+
+        if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
+
+
+        Rect touchedRect = new Rect();
+
+        touchedRect.x = (x>4) ? x-4 : 0;
+        touchedRect.y = (y>4) ? y-4 : 0;
+
+        touchedRect.width = (x+4 < cols) ? x + 4 - touchedRect.x : cols - touchedRect.x;
+        touchedRect.height = (y+4 < rows) ? y + 4 - touchedRect.y : rows - touchedRect.y;
+
+        Mat touchedRegionRgba = mRgba.submat(touchedRect);
+
+        Mat touchedRegionHsv = new Mat();
+        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+
+        // Calculate average color of touched region
+        mBlobColorHsv = Core.sumElems(touchedRegionHsv);
+        int pointCount = touchedRect.width*touchedRect.height;
+        for (int i = 0; i < mBlobColorHsv.val.length; i++)
+            mBlobColorHsv.val[i] /= pointCount;
+
+        mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
+
+        Log.i("FYP", "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
+                ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
+
+        mDetector.setHsvColor(mBlobColorHsv);
+
+        Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+        mIsColorSelected = true;
+
+        touchedRegionRgba.release();
+        touchedRegionHsv.release();
+
+
+
+
+
+
+
+
+
+
+
+
+        return false;
+
+
+
+
+
+
+    }
+
+    private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
+        Mat pointMatRgba = new Mat();
+        Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
+        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
+
+        return new Scalar(pointMatRgba.get(0, 0));
+    }
+
+    private Mat overtrayImage(Mat background, Mat foreground ) {
         // The background and the foreground are assumed to be of the same size.
         Mat destination = new Mat( background.size(), background.type() );
 
@@ -319,10 +459,55 @@ public class OpenCVTestActivity extends AppCompatActivity {
         return destination;
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSynth.destory();
+
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0, this, mLoaderCallback);
+    }
+
+
+    private void CPentatonic(int x){
+        {
+
+            int divider = width/5;
+
+
+            if(x <= divider){
+                mSynth.setFrequencyWithPorta(Constants.NoteC4);
+            }
+            else if (x > divider && x < divider*2){
+
+                mSynth.setFrequencyWithPorta(Constants.NoteD4);
+
+            }
+            else if (x > divider*2 && x < divider*3){
+
+                mSynth.setFrequencyWithPorta(Constants.NoteE4);
+
+            }
+            else if (x > divider*3 && x < divider*4){
+
+                mSynth.setFrequencyWithPorta(Constants.NoteG4);
+
+            }
+            else if (x > divider*4 && x < divider*5){
+                mSynth.setFrequencyWithPorta(Constants.NoteA4);
+
+            }
+
+
+
+
+        }
     }
 
 
