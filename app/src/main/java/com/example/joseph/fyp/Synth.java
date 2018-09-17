@@ -54,6 +54,7 @@ public class Synth
 
     private double FREQUENCY_NOW = 440;
     private double freqDiff = 0;
+    private double freqDiffSliderFactor;
 
     private boolean ENABLE_PORTA = true;
     private boolean DELAY_ENABLED = true;
@@ -937,8 +938,7 @@ public class Synth
     }
 
 
-    public void setFrequencyWithPorta(double frequency){
-
+    public void setFrequencyWithPorta(final double frequency){
 
 
 
@@ -949,9 +949,14 @@ public class Synth
 
             final Timer tim = new Timer();
 
+
+
             if (frequency <= FREQUENCY_NOW) {
 
                 freqDiff = FREQUENCY_NOW - frequency;
+
+                freqDiffSliderFactor = 1;
+
                 TimerTask porta = new TimerTask() {
                     @Override
                     public void run() {
@@ -974,10 +979,11 @@ public class Synth
                         mOscTri2.frequency.set(FREQUENCY_NOW);
                         mOscTri3.frequency.set(FREQUENCY_NOW);
 
-                        FREQUENCY_NOW--;
-                        freqDiff--;
+                        FREQUENCY_NOW = FREQUENCY_NOW - freqDiffSliderFactor;
+                        freqDiff = freqDiff - freqDiffSliderFactor;
                         if(freqDiff <= 0.0){
 
+                            FREQUENCY_NOW = frequency;
                             tim.cancel();
 
 
@@ -997,7 +1003,12 @@ public class Synth
 
             if (frequency > FREQUENCY_NOW) {
 
+
+
+
                 freqDiff = frequency - FREQUENCY_NOW;
+                freqDiffSliderFactor = 1;
+
 
                 TimerTask porta = new TimerTask() {
                     @Override
@@ -1019,14 +1030,15 @@ public class Synth
                         mOscTri2.frequency.set(FREQUENCY_NOW);
                         mOscTri3.frequency.set(FREQUENCY_NOW);
 
-                        FREQUENCY_NOW++;
-                        freqDiff--;
+                        FREQUENCY_NOW = FREQUENCY_NOW + freqDiffSliderFactor;
+                        freqDiff = freqDiff + freqDiffSliderFactor;
 
                     //    Log.i("FYP" ,String.valueOf(freqDiff));
 
                         if(freqDiff <= 0.0){
 
                      //       Log.i("FYP" ,"Cancelling slide up");
+                            FREQUENCY_NOW = frequency;
 
                             tim.cancel();
 

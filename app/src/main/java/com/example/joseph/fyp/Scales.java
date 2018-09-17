@@ -56,53 +56,49 @@ public class Scales {
             int height_divider = height/2;
 
 
-            if(x <= divider){
-                mSynth.setFrequencyWithPorta(Constants.NoteC4);
-            }
-            else if (x > divider && x < divider*2){
+            if(y >= height_divider) {
 
-                mSynth.setFrequencyWithPorta(Constants.NoteD4);
+                if (x <= divider) {
+                    mSynth.setFrequencyWithPorta(Constants.NoteC4);
+                } else if (x > divider && x < divider * 2) {
 
-            }
-            else if (x > divider*2 && x < divider*3){
+                    mSynth.setFrequencyWithPorta(Constants.NoteD4);
 
-                mSynth.setFrequencyWithPorta(Constants.NoteE4);
+                } else if (x > divider * 2 && x < divider * 3) {
 
-            }
-            else if (x > divider*3 && x < divider*4){
+                    mSynth.setFrequencyWithPorta(Constants.NoteE4);
 
-                mSynth.setFrequencyWithPorta(Constants.NoteG4);
+                } else if (x > divider * 3 && x < divider * 4) {
 
-            }
-            else if (x > divider*4 && x < divider*5){
-                mSynth.setFrequencyWithPorta(Constants.NoteA4);
+                    mSynth.setFrequencyWithPorta(Constants.NoteG4);
 
-            }
+                } else if (x > divider * 4 && x < divider * 5) {
+                    mSynth.setFrequencyWithPorta(Constants.NoteA4);
 
-
-            if(x <= divider && y < height_divider){
-                mSynth.setFrequencyWithPorta(Constants.NoteC5);
-            }
-            else if (x > divider && x < divider*2 && y < height_divider){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteD5);
-
-            }
-            else if (x > divider*2 && x < divider*3 && y < height_divider){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteE5);
-
-            }
-            else if (x > divider*3 && x < divider*4 && y < height_divider){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteG5);
-
-            }
-            else if (x > divider*4 && x < divider*5 && y < height_divider){
-                mSynth.setFrequencyWithPorta(Constants.NoteA5);
-
+                }
             }
 
+
+            else {
+                if (x <= divider && y < height_divider) {
+                    mSynth.setFrequencyWithPorta(Constants.NoteC5);
+                } else if (x > divider && x < divider * 2 && y < height_divider) {
+
+                    mSynth.setFrequencyWithPorta(Constants.NoteD5);
+
+                } else if (x > divider * 2 && x < divider * 3 && y < height_divider) {
+
+                    mSynth.setFrequencyWithPorta(Constants.NoteE5);
+
+                } else if (x > divider * 3 && x < divider * 4 && y < height_divider) {
+
+                    mSynth.setFrequencyWithPorta(Constants.NoteG5);
+
+                } else if (x > divider * 4 && x < divider * 5 && y < height_divider) {
+                    mSynth.setFrequencyWithPorta(Constants.NoteA5);
+
+                }
+            }+
 
 
 
