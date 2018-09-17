@@ -8,6 +8,7 @@ public class SynthData {
 
     public String title = "Untitled Synth";
 
+    public double detuneValue;
 
     public double env_attack_duration;
     public double env_decay_duration;

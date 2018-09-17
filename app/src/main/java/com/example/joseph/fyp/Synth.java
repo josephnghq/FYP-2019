@@ -628,7 +628,7 @@ public class Synth
 
 
 
-        Log.i("fyp" , "attack is " + attack);
+      /*  Log.i("fyp" , "attack is " + attack);
         Log.i("fyp" , "decay is " + decay);
         Log.i("fyp" , "sustain is " + sustain);
         Log.i("fyp" , "release is " + release);
@@ -638,13 +638,16 @@ public class Synth
         Log.i("fyp" , "attack value is " + env_attack_value_filter);
         Log.i("fyp" , "decay is " + env_decay_value_filter);
         Log.i("fyp" , "sustain is " + env_sustain_value_filter);
-        Log.i("fyp" , "release is " + env_release_value_filter);
+        Log.i("fyp" , "release is " + env_release_value_filter);*/
 
 
         env_attack_duration_filter = attack;
         env_decay_duration_filter = decay;
         env_sustain_duration_filter = sustain;
         env_release_duration_filter = release;
+
+
+
 
 
         double[] envFilter =
@@ -754,7 +757,7 @@ public class Synth
     public void releaseOsc(){
 
 
-
+        envPlayer.dataQueue.clear();
         envPlayer.dataQueue.queue(envForVol , 3 , 1);
 
 
@@ -1163,6 +1166,8 @@ public class Synth
     public void loadData(SynthData sd){
 
 
+        detuneValue = sd.detuneValue;
+
         env_attack_duration = sd.env_attack_duration;
         env_decay_duration = sd.env_decay_duration;
         env_sustain_duration = sd.env_sustain_duration;
@@ -1176,7 +1181,12 @@ public class Synth
 
         ENABLE_FILTER_ADSR = sd.enable_filter_adsr;
 
+        if(ENABLE_FILTER_ADSR)
+        Log.i("FYP " , "ENABLE_FILTER_ADSR true" );
+
+
         ENABLE_PORTA = sd.enable_porta;
+
 
 
 
@@ -1189,6 +1199,16 @@ public class Synth
         env_decay_value_filter = sd.env_decay_value_filter;
         env_sustain_value_filter = sd.env_sustain_value_filter;
         env_release_value_filter = sd.env_release_value_filter;
+
+
+        Log.i("FYP" , " Value of filter attack, decay, sustain and release are "
+
+                +env_attack_value_filter + " "
+                +env_decay_value_filter + " "
+                +env_sustain_value_filter + " "
+                +env_release_value_filter + " "
+
+        );
 
         DELAY_TIME = sd.DELAY_TIME;
         num_of_delay_voices = sd.num_of_delay_voices;
@@ -1219,6 +1239,9 @@ public class Synth
 
 
     SynthData sd = new SynthData();
+
+
+    sd.detuneValue = detuneValue;
 
     sd.env_attack_duration = env_attack_duration;
     sd.env_decay_duration = env_decay_duration;

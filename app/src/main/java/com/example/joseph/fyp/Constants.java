@@ -19,6 +19,18 @@ public class Constants {
     static double NoteB4b =  466.16;
     static double NoteB4 = 493.88;
     static double NoteC5 = 523.25;
+    static double NoteD5b = 554.37;
+    static double NoteD5 = 587.33;
+    static double NoteE5b = 622.25;
+    static double NoteE5 = 659.25;
+    static double NoteF5 = 698.46;
+    static double NoteG5b = 739.99;
+    static double NoteG5 = 783.99;
+    static double NoteA5b = 830.61;
+    static double NoteA5 = 880;
+    static double NoteB5b = 932.33;
+    static double NoteB5 = 987.77;
+    static double NoteC6 = 1046.50;
 
 
 

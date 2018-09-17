@@ -82,6 +82,7 @@ public class XYPadActivity extends AppCompatActivity {
         mSynth.setfreqQ(6);
 
 
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
