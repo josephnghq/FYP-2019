@@ -15,6 +15,7 @@ import com.jsyn.unitgen.SquareOscillator;
 import com.jsyn.unitgen.TriangleOscillator;
 import com.jsyn.unitgen.VariableRateMonoReader;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,6 +62,17 @@ public class Synth
     private boolean ENABLE_LOW_PASS = true;
     private boolean ENABLE_HIGH_PASS = false;
     private boolean ENABLE_FILTER_ADSR = true;
+
+    private int unison = 3;
+    private int polyphony = 10;
+
+    private int noOfOscVoice = unison * polyphony;
+
+
+    private ArrayList<SawOscillator> mOscSawArray;
+    private ArrayList<SinOscillator> mOscSineArray;
+    private ArrayList<SqrOscillator> mOscSqrArray;
+    private ArrayList<TriOscillator> mOscTriArray;
 
 
     private SawtoothOscillatorBL mOscSaw = new SawtoothOscillatorBL();
@@ -162,6 +174,11 @@ public class Synth
 
 
 
+
+
+        setUpOscsArray();
+
+/*
         mSynth.add(mOscSine);
         mSynth.add(mOscSine2);
         mSynth.add(mOscSine3);
@@ -177,6 +194,15 @@ public class Synth
         mSynth.add(mOscSaw);
         mSynth.add(mOscSaw2);
         mSynth.add(mOscSaw3);
+
+        */
+
+
+
+
+
+
+
 
 
 
@@ -214,8 +240,10 @@ public class Synth
 
             loadData(sd);
 
+        setUpOscsArray();
 
-        mSynth.add(mOscSine);
+
+/*        mSynth.add(mOscSine);
         mSynth.add(mOscSine2);
         mSynth.add(mOscSine3);
 
@@ -229,7 +257,7 @@ public class Synth
 
         mSynth.add(mOscSaw);
         mSynth.add(mOscSaw2);
-        mSynth.add(mOscSaw3);
+        mSynth.add(mOscSaw3);*/
 
 
 
@@ -263,6 +291,54 @@ public class Synth
 
 
     }
+
+
+    private void setUpOscsArray(){
+
+       mOscSawArray = new ArrayList<SawOscillator>(polyphony);
+       mOscSineArray = new ArrayList<SinOscillator>(polyphony);
+       mOscTriArray = new ArrayList<TriOscillator>(polyphony);
+       mOscSqrArray = new ArrayList<SqrOscillator>(polyphony);
+
+
+       for(int i = 0 ; i < polyphony; i++){
+
+           mOscSawArray.add(i , new SawOscillator(unison));
+           mOscSineArray.add(i , new SinOscillator(unison));
+           mOscTriArray.add(i , new TriOscillator(unison));
+           mOscSqrArray.add(i , new SqrOscillator(unison));
+
+
+
+       }
+
+
+
+        for(int o = 0; o < polyphony; o++){
+
+           for(int i = 0 ; i < unison; i ++){
+
+               mSynth.add(mOscSawArray.get(o).getmOscArray().get(i));
+               mSynth.add(mOscSineArray.get(o).getmOscArray().get(i));
+               mSynth.add(mOscTriArray.get(o).getmOscArray().get(i));
+               mSynth.add(mOscSqrArray.get(o).getmOscArray().get(i));
+
+
+           }
+
+
+
+
+        }
+
+
+
+
+
+
+    }
+
+
 
     public void setOscToSine(){
 
@@ -359,16 +435,47 @@ public class Synth
         }
 
 
+        // connect filters and amp
+
+        for(int i = 0 ; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p++){
+
+                mOscSawArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSawArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscSqrArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSqrArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                envPlayer.output.connect(mOscSawArray.get(i).getmOscArray().get(p).amplitude);
+                envPlayer.output.connect(mOscTriArray.get(i).getmOscArray().get(p).amplitude);
+                envPlayer.output.connect(mOscSqrArray.get(i).getmOscArray().get(p).amplitude);
+                envPlayer.output.connect(mOscTriArray.get(i).getmOscArray().get(p).amplitude);
 
 
+
+
+            }
+
+
+
+
+        }
+
+
+
+        /*
 
 
         mOscSaw.output.connect(mHighPassFilter.input);
         mOscSaw2.output.connect(mHighPassFilter.input);
         mOscSaw3.output.connect(mHighPassFilter.input);
-
-
-
 
         mOscSaw.output.connect(mLowPassFilter.input);
         mOscSaw2.output.connect(mLowPassFilter.input);
@@ -403,6 +510,28 @@ public class Synth
         mOscSqr3.output.connect(mLowPassFilter.input);
 
 
+
+
+        envPlayer.output.connect(mOscSaw.amplitude);
+        envPlayer.output.connect(mOscSaw2.amplitude);
+        envPlayer.output.connect(mOscSaw3.amplitude);
+
+
+        envPlayer.output.connect(mOscSine.amplitude);
+        envPlayer.output.connect(mOscSine2.amplitude);
+        envPlayer.output.connect(mOscSine3.amplitude);
+
+
+        envPlayer.output.connect(mOscSqr.amplitude);
+        envPlayer.output.connect(mOscSqr2.amplitude);
+        envPlayer.output.connect(mOscSqr3.amplitude);
+
+        envPlayer.output.connect(mOscTri.amplitude);
+        envPlayer.output.connect(mOscTri2.amplitude);
+        envPlayer.output.connect(mOscTri3.amplitude);
+
+*/
+
         if(DisableSaw){
             disableSaw();
 
@@ -424,25 +553,6 @@ public class Synth
         disableTri();
         }
 
-
-
-        envPlayer.output.connect(mOscSaw.amplitude);
-        envPlayer.output.connect(mOscSaw2.amplitude);
-        envPlayer.output.connect(mOscSaw3.amplitude);
-
-
-        envPlayer.output.connect(mOscSine.amplitude);
-        envPlayer.output.connect(mOscSine2.amplitude);
-        envPlayer.output.connect(mOscSine3.amplitude);
-
-
-        envPlayer.output.connect(mOscSqr.amplitude);
-        envPlayer.output.connect(mOscSqr2.amplitude);
-        envPlayer.output.connect(mOscSqr3.amplitude);
-
-        envPlayer.output.connect(mOscTri.amplitude);
-        envPlayer.output.connect(mOscTri2.amplitude);
-        envPlayer.output.connect(mOscTri3.amplitude);
 
 
 
@@ -489,11 +599,15 @@ public class Synth
         }
 
 
+
     }
 
 
     public void selectLowPass(){
 
+        Log.i("FYP" , "selecting Low Pass");
+        ENABLE_LOW_PASS = true;
+        ENABLE_HIGH_PASS = false;
         mLowPassFilter.setEnabled(true);
         mHighPassFilter.setEnabled(false);
 
@@ -501,6 +615,9 @@ public class Synth
 
     public void selectHighPass(){
 
+        Log.i("FYP" , "selecting High Pass");
+        ENABLE_LOW_PASS = false;
+        ENABLE_HIGH_PASS = true;
         mLowPassFilter.setEnabled(false);
         mHighPassFilter.setEnabled(true);
 
@@ -518,9 +635,18 @@ public class Synth
     public void disableSaw(){
 
         DisableSaw = true;
-    mOscSaw.setEnabled(false);
+/*    mOscSaw.setEnabled(false);
     mOscSaw2.setEnabled(false);
-    mOscSaw3.setEnabled(false);
+    mOscSaw3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+            mOscSawArray.get(i).getmOscArray().get(p).setEnabled(false);
+
+        }
+
+
 
 
 
@@ -529,19 +655,32 @@ public class Synth
     public void disableSqr(){
 
         DisableSqr = true;
-        mOscSqr.setEnabled(false);
+/*        mOscSqr.setEnabled(false);
         mOscSqr2.setEnabled(false);
-        mOscSqr3.setEnabled(false);
+        mOscSqr3.setEnabled(false);*/
 
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscSqrArray.get(i).getmOscArray().get(p).setEnabled(false);
+        }
 
     }
 
     public void disableSine(){
 
         DisableSine = true;
-        mOscSine.setEnabled(false);
+/*        mOscSine.setEnabled(false);
         mOscSine2.setEnabled(false);
-        mOscSine3.setEnabled(false);
+        mOscSine3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscSineArray.get(i).getmOscArray().get(p).setEnabled(false);
+
+
+        }
 
 
 
@@ -550,9 +689,15 @@ public class Synth
     public void disableTri(){
 
         DisableTri = true;
-        mOscTri.setEnabled(false);
+/*        mOscTri.setEnabled(false);
         mOscTri2.setEnabled(false);
-        mOscTri3.setEnabled(false);
+        mOscTri3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+            mOscTriArray.get(i).getmOscArray().get(p).setEnabled(false);
+        }
 
 
     }
@@ -560,18 +705,34 @@ public class Synth
     public void enableSaw(){
 
         DisableSaw = false;
-        mOscSaw.setEnabled(true);
+/*        mOscSaw.setEnabled(true);
         mOscSaw2.setEnabled(true);
-        mOscSaw3.setEnabled(true);
+        mOscSaw3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscSawArray.get(i).getmOscArray().get(p).setEnabled(true);
+
+
+        }
 
     }
 
     public void enableSine(){
 
         DisableSine = false;
-        mOscSine.setEnabled(true);
+/*        mOscSine.setEnabled(true);
         mOscSine2.setEnabled(true);
-        mOscSine3.setEnabled(true);
+        mOscSine3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscSineArray.get(i).getmOscArray().get(p).setEnabled(true);
+        }
 
 
     }
@@ -580,18 +741,34 @@ public class Synth
     public void enableSqr(){
 
         DisableSqr = false;
-        mOscSqr.setEnabled(true);
+/*        mOscSqr.setEnabled(true);
         mOscSqr2.setEnabled(true);
-        mOscSqr3.setEnabled(true);
+        mOscSqr3.setEnabled(true);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscSqrArray.get(i).getmOscArray().get(p).setEnabled(true);
+
+        }
+
 
     }
 
     public void enableTri(){
 
         DisableTri = false;
-        mOscTri.setEnabled(true);
+/*        mOscTri.setEnabled(true);
         mOscTri2.setEnabled(true);
-        mOscTri3.setEnabled(true);
+        mOscTri3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+            for(int p = 0 ; p < unison; p ++)
+                mOscTriArray.get(i).getmOscArray().get(p).setEnabled(true);
+
+        }
 
     }
 
@@ -730,6 +907,9 @@ public class Synth
 
 
 
+
+
+
         if(envPlayerFilter.isEnabled()) {
             mLowPassFilter.frequency.set(0);
             mHighPassFilter.frequency.set(0);
@@ -738,6 +918,8 @@ public class Synth
         envPlayerFilter.dataQueue.clear();
 
         envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
+
+
 
      //   mLowPassFilter.frequency.set(20000);
       //  mHighPassFilter.frequency.set(20000);
@@ -797,6 +979,32 @@ public class Synth
 
 
 
+
+    public void traid(double first, double second, double third){
+
+
+
+        mOscSaw.frequency.set(first);
+        mOscSaw2.frequency.set(second);
+        mOscSaw3.frequency.set(third);
+
+        mOscSine.frequency.set(first);
+        mOscSine2.frequency.set(second);
+        mOscSine3.frequency.set(third);
+
+        mOscSqr.frequency.set(first);
+        mOscSqr2.frequency.set(second);
+        mOscSqr3.frequency.set(third);
+
+        mOscTri.frequency.set(first);
+        mOscTri2.frequency.set(second);
+        mOscTri3.frequency.set(third);
+
+
+
+    }
+
+
     public void D(){
         {
 
@@ -835,6 +1043,7 @@ public class Synth
 
             envPlayer.dataQueue.clear();
             envPlayer.dataQueue.queue(envForVol, 0, 4 );
+
             //  envPlayer.start();
 
 
@@ -847,6 +1056,8 @@ public class Synth
 
     public void Dmin(){
         {
+
+
 
 
 
@@ -938,6 +1149,10 @@ public class Synth
     }
 
 
+
+
+
+
     public void setFrequencyWithPorta(final double frequency){
 
 
@@ -968,23 +1183,22 @@ public class Synth
                         mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
-                        mOscSine2.frequency.set(FREQUENCY_NOW);
-                        mOscSine3.frequency.set(FREQUENCY_NOW);
+                        mOscSine2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSine3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSqr.frequency.set(FREQUENCY_NOW);
-                        mOscSqr2.frequency.set(FREQUENCY_NOW);
-                        mOscSqr3.frequency.set(FREQUENCY_NOW);
+                        mOscSqr2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSqr3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscTri.frequency.set(FREQUENCY_NOW);
-                        mOscTri2.frequency.set(FREQUENCY_NOW);
-                        mOscTri3.frequency.set(FREQUENCY_NOW);
+                        mOscTri2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscTri3.frequency.set(FREQUENCY_NOW - detuneValue);
 
-                        FREQUENCY_NOW = FREQUENCY_NOW - freqDiffSliderFactor;
-                        freqDiff = freqDiff - freqDiffSliderFactor;
+                        FREQUENCY_NOW--;
+                        freqDiff--;
                         if(freqDiff <= 0.0){
 
-                            FREQUENCY_NOW = frequency;
-                            tim.cancel();
+                             tim.cancel();
 
 
                         }
@@ -1019,26 +1233,25 @@ public class Synth
                         mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSine.frequency.set(FREQUENCY_NOW);
-                        mOscSine2.frequency.set(FREQUENCY_NOW);
-                        mOscSine3.frequency.set(FREQUENCY_NOW);
+                        mOscSine2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSine3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscSqr.frequency.set(FREQUENCY_NOW);
-                        mOscSqr2.frequency.set(FREQUENCY_NOW);
-                        mOscSqr3.frequency.set(FREQUENCY_NOW);
+                        mOscSqr2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscSqr3.frequency.set(FREQUENCY_NOW - detuneValue);
 
                         mOscTri.frequency.set(FREQUENCY_NOW);
-                        mOscTri2.frequency.set(FREQUENCY_NOW);
-                        mOscTri3.frequency.set(FREQUENCY_NOW);
+                        mOscTri2.frequency.set(FREQUENCY_NOW + detuneValue);
+                        mOscTri3.frequency.set(FREQUENCY_NOW - detuneValue);
 
-                        FREQUENCY_NOW = FREQUENCY_NOW + freqDiffSliderFactor;
-                        freqDiff = freqDiff + freqDiffSliderFactor;
+                        FREQUENCY_NOW++;
+                        freqDiff--;
 
                     //    Log.i("FYP" ,String.valueOf(freqDiff));
 
                         if(freqDiff <= 0.0){
 
                      //       Log.i("FYP" ,"Cancelling slide up");
-                            FREQUENCY_NOW = frequency;
 
                             tim.cancel();
 

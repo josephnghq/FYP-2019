@@ -231,7 +231,7 @@ public class OpenCVTestActivity extends AppCompatActivity {
                     Log.i("FYP" , "For contour number " + i + " x is at " + x);
                     Log.i("FYP" , "For contour number " + i + " y is at " + y);
 
-                    Scales.CPentatonic2Oct(x , y , height,  width , mSynth);
+                    Scales.C251(x ,   width , mSynth);
 
                     if(!mSynth.isFilterEnvEnabled())
                         mSynth.setFilterValue(y*5);

@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent XYPadActivity = new Intent(this, XYPadActivity.class);
 
         final Intent OpenCVTestActivity = new Intent(this, OpenCVTestActivity.class);
+        final Intent CreateChordFragmentActivity = new Intent(this, CreateChordFragmentActivity.class);
 
 
         final Button btn = (Button)findViewById(R.id.button);
@@ -57,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final Button btn4 = (Button)findViewById(R.id.button4);
+
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(CreateChordFragmentActivity);
+
+            }
+        });
 
 
 

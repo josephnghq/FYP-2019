@@ -101,6 +101,7 @@ public class XYPadActivity extends AppCompatActivity {
 
             }
         });
+
         alertDialog.show();
 
 
@@ -242,7 +243,7 @@ public class XYPadActivity extends AppCompatActivity {
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         v.setLayoutParams(layoutParams);
-                        CMajorScale(x);
+                        Scales.C251(x, width,mSynth);
 
                         if(!mSynth.isFilterEnvEnabled())
                         mSynth.setFilterValue(y*5);
