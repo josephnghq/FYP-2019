@@ -63,7 +63,7 @@ public class Synth
     private boolean ENABLE_HIGH_PASS = false;
     private boolean ENABLE_FILTER_ADSR = true;
 
-    private int unison = 3;
+    private int unison = 2;
     private int polyphony = 10;
 
     private int noOfOscVoice = unison * polyphony;
@@ -470,6 +470,9 @@ public class Synth
 
 
 
+
+
+
         /*
 
 
@@ -641,8 +644,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-            mOscSawArray.get(i).getmOscArray().get(p).setEnabled(false);
+            mOscSawArray.get(i).setDisable();
 
         }
 
@@ -661,8 +663,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscSqrArray.get(i).getmOscArray().get(p).setEnabled(false);
+                mOscSqrArray.get(i).setDisable();
         }
 
     }
@@ -676,8 +677,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscSineArray.get(i).getmOscArray().get(p).setEnabled(false);
+                mOscSineArray.get(i).setDisable();
 
 
         }
@@ -695,8 +695,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-            mOscTriArray.get(i).getmOscArray().get(p).setEnabled(false);
+            mOscTriArray.get(i).setDisable();
         }
 
 
@@ -712,8 +711,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscSawArray.get(i).getmOscArray().get(p).setEnabled(true);
+                mOscSawArray.get(i).setEnable();
 
 
         }
@@ -730,8 +728,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscSineArray.get(i).getmOscArray().get(p).setEnabled(true);
+                mOscSineArray.get(i).setEnable();
         }
 
 
@@ -747,8 +744,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscSqrArray.get(i).getmOscArray().get(p).setEnabled(true);
+                mOscSqrArray.get(i).setEnable();
 
         }
 
@@ -765,8 +761,7 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
-            for(int p = 0 ; p < unison; p ++)
-                mOscTriArray.get(i).getmOscArray().get(p).setEnabled(true);
+                mOscTriArray.get(i).setEnable();
 
         }
 
@@ -1054,14 +1049,52 @@ public class Synth
     }
 
 
+
+
+    public void setSawNotes(Notes notes){
+
+        for (int i = 0 ; i < notes.noteFreqs.size(); i++){
+
+
+            mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i));
+
+        }
+
+
+        //disable uneeded osc
+        for(int i = notes.noteFreqs.size() ; i < polyphony ; i ++){
+
+            mOscSawArray.get(i).setDisable();
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+
     public void Dmin(){
         {
 
 
+            Notes Dmin = new Notes(5);
+            Dmin.addNotes(Constants.NoteD4);
+            Dmin.addNotes(Constants.NoteF4);
+            Dmin.addNotes(Constants.NoteA4);
+            Dmin.addNotes(Constants.NoteC5);
+            Dmin.addNotes(Constants.NoteE5);
 
 
 
+            setSawNotes(Dmin);
 
+/*
 
             mOscSaw.frequency.set(Constants.NoteD4);
             mOscSaw2.frequency.set(Constants.NoteF4);
@@ -1077,7 +1110,7 @@ public class Synth
 
             mOscTri.frequency.set(Constants.NoteD4);
             mOscTri2.frequency.set(Constants.NoteF4);
-            mOscTri3.frequency.set(Constants.NoteA4);
+            mOscTri3.frequency.set(Constants.NoteA4);*/
 
 
             if(envPlayerFilter.isEnabled()) {

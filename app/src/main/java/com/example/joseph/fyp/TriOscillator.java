@@ -31,4 +31,31 @@ public class TriOscillator {
     public ArrayList<TriangleOscillator> getmOscArray() {
         return mOscArray;
     }
+
+
+    public void setFrequency(double frequency){
+
+
+        for(int i = 0 ; i < noOfVoices; i ++){
+            mOscArray.get(i).frequency.set(frequency);
+        }
+
+
+    }
+
+    public void setEnable(){
+
+        for(int i = 0 ; i < noOfVoices; i ++){
+            mOscArray.get(i).setEnabled(true);
+        }
+
+    }
+
+    public void setDisable(){
+
+        for(int i = 0 ; i < noOfVoices; i ++){
+            mOscArray.get(i).setEnabled(false);
+        }
+
+    }
 }

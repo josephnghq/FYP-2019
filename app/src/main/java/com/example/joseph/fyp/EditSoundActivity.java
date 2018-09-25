@@ -120,7 +120,7 @@ public class EditSoundActivity extends AppCompatActivity {
         btnPlayTestPitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSynth.D();
+                mSynth.Dmin();
             }
         });
         btnPlay = (Button)findViewById(R.id.play_osc_button);
