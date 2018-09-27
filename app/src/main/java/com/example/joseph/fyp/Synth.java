@@ -6,7 +6,6 @@ import com.jsyn.JSyn;
 import com.jsyn.data.SegmentedEnvelope;
 import com.jsyn.unitgen.FilterHighPass;
 import com.jsyn.unitgen.FilterLowPass;
-import com.jsyn.unitgen.FixedRateMonoWriter;
 import com.jsyn.unitgen.InterpolatingDelay;
 import com.jsyn.unitgen.LineOut;
 import com.jsyn.unitgen.SawtoothOscillatorBL;
@@ -57,22 +56,24 @@ public class Synth
     private double freqDiff = 0;
     private double freqDiffSliderFactor;
 
+    private double globalAmp = 0.1;
+
     private boolean ENABLE_PORTA = true;
     private boolean DELAY_ENABLED = true;
     private boolean ENABLE_LOW_PASS = true;
     private boolean ENABLE_HIGH_PASS = false;
     private boolean ENABLE_FILTER_ADSR = true;
 
-    private int unison = 2;
+    private int unison = 4;
     private int polyphony = 10;
 
     private int noOfOscVoice = unison * polyphony;
 
 
-    private ArrayList<SawOscillator> mOscSawArray;
-    private ArrayList<SinOscillator> mOscSineArray;
-    private ArrayList<SqrOscillator> mOscSqrArray;
-    private ArrayList<TriOscillator> mOscTriArray;
+    private ArrayList<Oscs> mOscSawArray;
+    private ArrayList<Oscs> mOscSineArray;
+    private ArrayList<Oscs> mOscSqrArray;
+    private ArrayList<Oscs> mOscTriArray;
 
 
     private SawtoothOscillatorBL mOscSaw = new SawtoothOscillatorBL();
@@ -295,18 +296,18 @@ public class Synth
 
     private void setUpOscsArray(){
 
-       mOscSawArray = new ArrayList<SawOscillator>(polyphony);
-       mOscSineArray = new ArrayList<SinOscillator>(polyphony);
-       mOscTriArray = new ArrayList<TriOscillator>(polyphony);
-       mOscSqrArray = new ArrayList<SqrOscillator>(polyphony);
+       mOscSawArray = new ArrayList<Oscs>(polyphony);
+       mOscSineArray = new ArrayList<Oscs>(polyphony);
+       mOscTriArray = new ArrayList<Oscs>(polyphony);
+       mOscSqrArray = new ArrayList<Oscs>(polyphony);
 
 
        for(int i = 0 ; i < polyphony; i++){
 
-           mOscSawArray.add(i , new SawOscillator(unison));
-           mOscSineArray.add(i , new SinOscillator(unison));
-           mOscTriArray.add(i , new TriOscillator(unison));
-           mOscSqrArray.add(i , new SqrOscillator(unison));
+           mOscSawArray.add(i , new Oscs(unison, Oscs.SAW));
+           mOscSineArray.add(i , new Oscs(unison , Oscs.SINE));
+           mOscTriArray.add(i , new Oscs(unison , Oscs.TRI));
+           mOscSqrArray.add(i , new Oscs(unison , Oscs.SQR));
 
 
 
@@ -373,6 +374,7 @@ public class Synth
 
 
 
+
         mLowPassFilter.frequency.set(20000);
         mLowPassFilter.Q.set(2.5);
         mLowPassFilter.output.connect( 0, mOut.input, 0 ); /* Left side */
@@ -382,6 +384,9 @@ public class Synth
         mHighPassFilter.Q.set(2.5);
         mHighPassFilter.output.connect(0,mOut.input , 0);
         mHighPassFilter.output.connect(0,mOut.input , 1);
+
+        mLowPassFilter.amplitude.set(0.1);
+        mHighPassFilter.amplitude.set(0.1);
 
         if(!ENABLE_LOW_PASS){
 
@@ -441,11 +446,18 @@ public class Synth
 
             for(int p = 0 ; p < unison; p++){
 
+
+                mOscSawArray.get(i).setAmp(globalAmp);
+                mOscSineArray.get(i).setAmp(globalAmp);
+                mOscSqrArray.get(i).setAmp(globalAmp);
+                mOscTriArray.get(i).setAmp(globalAmp);
+
+
                 mOscSawArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
                 mOscSawArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
 
-                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
-                mOscTriArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+                mOscSineArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSineArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
 
                 mOscSqrArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
                 mOscSqrArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
@@ -453,10 +465,12 @@ public class Synth
                 mOscTriArray.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
                 mOscTriArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
 
-                envPlayer.output.connect(mOscSawArray.get(i).getmOscArray().get(p).amplitude);
-                envPlayer.output.connect(mOscTriArray.get(i).getmOscArray().get(p).amplitude);
+
+
+               /* envPlayer.output.connect(mOscSawArray.get(i).getmOscArray().get(p).amplitude);
+                envPlayer.output.connect(mOscSineArray.get(i).getmOscArray().get(p).amplitude);
                 envPlayer.output.connect(mOscSqrArray.get(i).getmOscArray().get(p).amplitude);
-                envPlayer.output.connect(mOscTriArray.get(i).getmOscArray().get(p).amplitude);
+                envPlayer.output.connect(mOscTriArray.get(i).getmOscArray().get(p).amplitude);*/
 
 
 
@@ -468,6 +482,21 @@ public class Synth
 
         }
 
+
+
+
+        //disable all osc first, enable later when we need to use them
+        for(int i = 0 ; i < polyphony; i ++){
+
+            mOscSawArray.get(i).setDisable();
+            mOscSineArray.get(i).setDisable();
+            mOscSqrArray.get(i).setDisable();
+            mOscTriArray.get(i).setDisable();
+
+
+
+
+        }
 
 
 
@@ -557,6 +586,8 @@ public class Synth
         }
 
 
+      envPlayer.output.connect(mLowPassFilter.amplitude);
+      envPlayer.output.connect(mHighPassFilter.amplitude);
 
 
       envPlayerFilter.output.connect(mLowPassFilter.frequency);
@@ -728,7 +759,9 @@ public class Synth
 
         for(int i =0; i < polyphony; i++){
 
+
                 mOscSineArray.get(i).setEnable();
+
         }
 
 
@@ -928,6 +961,8 @@ public class Synth
 
 
 
+        //  envPlayer.start();
+
 
 
     }
@@ -978,22 +1013,11 @@ public class Synth
     public void traid(double first, double second, double third){
 
 
-
-        mOscSaw.frequency.set(first);
-        mOscSaw2.frequency.set(second);
-        mOscSaw3.frequency.set(third);
-
-        mOscSine.frequency.set(first);
-        mOscSine2.frequency.set(second);
-        mOscSine3.frequency.set(third);
-
-        mOscSqr.frequency.set(first);
-        mOscSqr2.frequency.set(second);
-        mOscSqr3.frequency.set(third);
-
-        mOscTri.frequency.set(first);
-        mOscTri2.frequency.set(second);
-        mOscTri3.frequency.set(third);
+        Notes note = new Notes(3);
+        note.addNotes(first);
+        note.addNotes(second);
+        note.addNotes(third);
+        setNotes(note , detuneValue);
 
 
 
@@ -1050,13 +1074,38 @@ public class Synth
 
 
 
+    //this method receives a collection of notes, and set all the osc's frequency to match those of the notes
 
-    public void setSawNotes(Notes notes){
+    public void setNotes(Notes notes , double detune){
+
+        //if detune is -1, just set detuneValue
+
+        if(detune == -1){
+            detune = detuneValue;
+        }
 
         for (int i = 0 ; i < notes.noteFreqs.size(); i++){
 
 
-            mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i));
+            if(!DisableSaw)
+            mOscSawArray.get(i).setEnable();
+
+            if(!DisableSine)
+            mOscSineArray.get(i).setEnable();
+
+            if(!DisableSqr)
+            mOscSqrArray.get(i).setEnable();
+
+            if(!DisableTri)
+            mOscTriArray.get(i).setEnable();
+
+
+
+            mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i) , detune);
+             mOscSineArray.get(i).setFrequency(notes.noteFreqs.get(i) , detune);
+             mOscSqrArray.get(i).setFrequency(notes.noteFreqs.get(i), detune);
+             mOscTriArray.get(i).setFrequency(notes.noteFreqs.get(i), detune);
+
 
         }
 
@@ -1065,6 +1114,9 @@ public class Synth
         for(int i = notes.noteFreqs.size() ; i < polyphony ; i ++){
 
             mOscSawArray.get(i).setDisable();
+            mOscSineArray.get(i).setDisable();
+            mOscSqrArray.get(i).setDisable();
+            mOscTriArray.get(i).setDisable();
 
 
         }
@@ -1084,15 +1136,14 @@ public class Synth
 
 
             Notes Dmin = new Notes(5);
-            Dmin.addNotes(Constants.NoteD4);
-            Dmin.addNotes(Constants.NoteF4);
-            Dmin.addNotes(Constants.NoteA4);
-            Dmin.addNotes(Constants.NoteC5);
-            Dmin.addNotes(Constants.NoteE5);
+            Dmin.addNotes(Constants.NoteE4);
+            Dmin.addNotes(Constants.NoteG4);
+            Dmin.addNotes(Constants.NoteB4);
+            Dmin.addNotes(Constants.NoteD5);
+            Dmin.addNotes(Constants.NoteA5);
 
 
-
-            setSawNotes(Dmin);
+            setNotes(Dmin , detuneValue);
 
 /*
 
@@ -1210,8 +1261,19 @@ public class Synth
                     public void run() {
 
 
+                        Notes note = new Notes(1);
+                        note.addNotes(FREQUENCY_NOW);
+                        setNotes(note , detuneValue);
 
-                        mOscSaw.frequency.set(FREQUENCY_NOW);
+
+
+
+
+
+
+
+
+/*                        mOscSaw.frequency.set(FREQUENCY_NOW);
                         mOscSaw2.frequency.set(FREQUENCY_NOW + detuneValue);
                         mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
 
@@ -1225,7 +1287,7 @@ public class Synth
 
                         mOscTri.frequency.set(FREQUENCY_NOW);
                         mOscTri2.frequency.set(FREQUENCY_NOW + detuneValue);
-                        mOscTri3.frequency.set(FREQUENCY_NOW - detuneValue);
+                        mOscTri3.frequency.set(FREQUENCY_NOW - detuneValue);*/
 
                         FREQUENCY_NOW--;
                         freqDiff--;
@@ -1261,6 +1323,11 @@ public class Synth
                     @Override
                     public void run() {
 
+                        Notes note = new Notes(1);
+                        note.addNotes(FREQUENCY_NOW);
+                        setNotes(note , detuneValue);
+/*
+
                         mOscSaw.frequency.set(FREQUENCY_NOW);
                         mOscSaw2.frequency.set(FREQUENCY_NOW + detuneValue);
                         mOscSaw3.frequency.set(FREQUENCY_NOW - detuneValue);
@@ -1276,6 +1343,7 @@ public class Synth
                         mOscTri.frequency.set(FREQUENCY_NOW);
                         mOscTri2.frequency.set(FREQUENCY_NOW + detuneValue);
                         mOscTri3.frequency.set(FREQUENCY_NOW - detuneValue);
+*/
 
                         FREQUENCY_NOW++;
                         freqDiff--;

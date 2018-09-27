@@ -1,5 +1,7 @@
 package com.example.joseph.fyp;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 /**
@@ -16,6 +18,26 @@ public class Notes {
     public Notes(int size){
         noteFreqs = new ArrayList<>(size);
     }
+
+    public Notes(){
+        noteFreqs = new ArrayList<>();
+    }
+
+    public void printNotesIntoLog(){
+
+        for(int i = 0 ; i < noteFreqs.size(); i ++){
+
+            Log.i("FYP" ,"Freq is " + noteFreqs.get(i));
+
+
+
+
+
+        }
+
+
+    }
+
 
     public void copyNotesFrom(Notes source){
 

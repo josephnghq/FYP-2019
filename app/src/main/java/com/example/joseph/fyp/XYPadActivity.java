@@ -33,11 +33,14 @@ public class XYPadActivity extends AppCompatActivity {
     private int width = 0;
     private int height = 0;
     SharedPreferences sharedPref;
+    SharedPreferences sharedPref2;
+
     private GsonBuilder builder = new GsonBuilder();
     private Gson gson;
 
     private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
-
+    private ArrayList<NotesArrayList> listOfNoteData = new ArrayList<NotesArrayList>();
+    private ArrayList<Notes> notesArrayList = new ArrayList<>();
 
 
     @Override
@@ -49,9 +52,18 @@ public class XYPadActivity extends AppCompatActivity {
         sharedPref=  this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
+
+        sharedPref2=  this.getSharedPreferences(
+                getString(R.string.notes_array_list), Context.MODE_PRIVATE);
+
+
         gson = builder.create();
 
         String gsonString = sharedPref.getString(getString(R.string.preference_file_key) , "");
+        String gsonString2 = sharedPref2.getString(getString(R.string.notes_array_list) , "");
+
+
+        Log.i("FYP" , gsonString2);
 
 
         if(gsonString.length()>0){
@@ -59,13 +71,29 @@ public class XYPadActivity extends AppCompatActivity {
         }
 
 
+        if(gsonString2.length()>0){
+            listOfNoteData = gson.fromJson(gsonString2,new TypeToken<ArrayList<NotesArrayList>>(){}.getType());
+        }
+
+
         ArrayList<String> synthDataTitles = new ArrayList<String>();
+        ArrayList<String> noteDataTitles = new ArrayList<String>();
+
         for(int i = 0 ; i < listOfSynthData.size(); i++){
 
             synthDataTitles.add(listOfSynthData.get(i).title);
 
 
         }
+
+        for(int i = 0 ; i < listOfNoteData.size(); i++){
+
+            noteDataTitles.add(listOfNoteData.get(i).name);
+
+
+        }
+
+        Log.i("FYP" , "size of listofnotedata is " + listOfNoteData.size());
 
 
 
@@ -87,7 +115,7 @@ public class XYPadActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
         alertDialog.setView(convertView);
-        alertDialog.setTitle("List");
+        alertDialog.setTitle("Select Sound");
         ListView lv = (ListView) convertView.findViewById(R.id.listView1);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,synthDataTitles);
         lv.setAdapter(adapter);
@@ -103,6 +131,32 @@ public class XYPadActivity extends AppCompatActivity {
         });
 
         alertDialog.show();
+
+
+
+        AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
+        LayoutInflater inflater2 = getLayoutInflater();
+        View convertView2 = (View) inflater2.inflate(R.layout.list_for_xy, null);
+        alertDialog2.setView(convertView2);
+        alertDialog2.setTitle("Select Scale");
+        ListView lv2 = (ListView) convertView2.findViewById(R.id.listView1);
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteDataTitles);
+        lv2.setAdapter(adapter2);
+        lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                notesArrayList = listOfNoteData.get(position).notesArrayList;
+
+            }
+        });
+
+        alertDialog2.show();
+
+
+
+
 
 
         XYLayout = (RelativeLayout) findViewById(R.id.XY_relative_layout);
@@ -243,10 +297,10 @@ public class XYPadActivity extends AppCompatActivity {
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         v.setLayoutParams(layoutParams);
-                        Scales.C251(x, width,mSynth);
+                        Scales.chord(x, width,notesArrayList,mSynth);
 
                         if(!mSynth.isFilterEnvEnabled())
-                        mSynth.setFilterValue(y*5);
+                        mSynth.setFilterValue(y*10);
 
 
 

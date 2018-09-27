@@ -63,6 +63,79 @@ public class Constants {
     static double[] NoteC6Pos = {48 , 1046.50};
 
 
+    //position is in relative to piano key, 0 is for lowest note on piano
+    public static double getNote(int position){
+
+        switch(position){
+
+            case 24:
+                return NoteC4;
+            case 25:
+                return NoteD4b;
+            case 26:
+                return NoteD4;
+            case 27:
+                return NoteE4b;
+            case 28:
+                return NoteE4;
+            case 29:
+                return NoteF4;
+            case 30:
+                return NoteG4b;
+            case 31:
+                return NoteG4;
+            case 32:
+                return NoteA4b;
+            case 33:
+                return NoteA4;
+            case 34:
+                return NoteB4b;
+            case 35:
+                return NoteB4;
+            case 36:
+                return NoteC5;
+            case 37:
+                return NoteD5b;
+            case 38:
+                return NoteD5;
+            case 39:
+                return NoteE5b;
+            case 40:
+                return NoteE5;
+            case 41:
+                return NoteF5;
+            case 42:
+                return NoteG5b;
+            case 43:
+                return NoteG5;
+            case 44:
+                return NoteA5b;
+            case 45:
+                return NoteA5;
+            case 46:
+                return NoteB5b;
+            case 47:
+                return NoteB5;
+            case 48:
+                return NoteC6;
+             default:
+                 return NoteC4;
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+    }
 
 
 

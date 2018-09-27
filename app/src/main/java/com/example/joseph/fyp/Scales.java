@@ -1,5 +1,7 @@
 package com.example.joseph.fyp;
 
+import java.util.ArrayList;
+
 /**
  * Created by Joseph on 9/18/2018.
  */
@@ -13,6 +15,38 @@ public class Scales {
 
 
 
+    public static void chord (int x , int width, ArrayList<Notes> notesArrayList , Synth mSynth){
+
+        int divider = width / notesArrayList.size();
+        int i = 1;
+
+        if(x <= divider){
+            mSynth.setNotes(notesArrayList.get(0) , -1);
+
+        }
+
+        while( i < notesArrayList.size()){
+
+            if( x > divider * (i) && x < divider * (i + 1)){
+
+                mSynth.setNotes(notesArrayList.get(i) , -1);
+
+
+            }
+
+            i++;
+
+        }
+
+
+
+
+
+
+
+    }
+
+
 
     public static void C251 (int x , int width, Synth mSynth){
 
@@ -24,6 +58,7 @@ public class Scales {
         if(x <= divider){
             mSynth.traid(Constants.NoteC4 , Constants.NoteE5 , Constants.NoteG4) ;
         }
+
         else if (x > divider && x < divider*2){
 
             mSynth.traid(Constants.NoteD4 , Constants.NoteF4 , Constants.NoteA4);
