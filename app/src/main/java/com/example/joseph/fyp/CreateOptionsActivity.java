@@ -5,25 +5,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
 
-public class MainActivity extends AppCompatActivity {
-
-
-    boolean onOff = false;
+public class CreateOptionsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_create_options);
+
         final Intent editSoundIntent = new Intent(this, EditSoundActivity.class);
         final Intent XYPadActivity = new Intent(this, XYPadActivity.class);
 
         final Intent OpenCVTestActivity = new Intent(this, OpenCVTestActivity.class);
         final Intent CreateChordFragmentActivity = new Intent(this, CreateChordFragmentActivity.class);
         final Intent PlayOptionsActivity = new Intent(this , PlayOptionsActivity.class);
-        final Intent CreateOptionsActivity = new Intent(this , CreateOptionsActivity.class);
 
 
 
@@ -33,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startActivity(PlayOptionsActivity);
+                startActivity(CreateChordFragmentActivity);
 
             }
         });
@@ -47,17 +42,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startActivity(CreateOptionsActivity);
+                startActivity(editSoundIntent);
 
             }
         });
-
-
-
-
-
-
-
 
     }
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.joseph.fyp.MainActivity">
+    tools:context="com.example.joseph.fyp.PlayOptionsActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,9 +29,7 @@
                 android:id="@+id/button2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Play" />
-
-
+                android:text="X Y Pad" />
 
             <Button
                 android:background="@drawable/custombutton1"
@@ -41,10 +39,12 @@
                 android:shadowRadius="9"
                 android:layout_marginBottom="13dp"
 
-                android:id="@+id/button4"
+                android:id="@+id/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Create" />
+                android:text="OpenCV" />
+
+
 
 
         </LinearLayout>
