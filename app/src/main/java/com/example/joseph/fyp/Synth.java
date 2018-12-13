@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.jsyn.JSyn;
 import com.jsyn.data.SegmentedEnvelope;
+import com.jsyn.unitgen.FilterAllPass;
 import com.jsyn.unitgen.FilterHighPass;
 import com.jsyn.unitgen.FilterLowPass;
 import com.jsyn.unitgen.InterpolatingDelay;
@@ -56,7 +57,9 @@ public class Synth
     private double freqDiff = 0;
     private double freqDiffSliderFactor;
 
-    private double globalAmp = 0.1;
+    private double globalAmp = 0.1; // amp for oscs
+    private double masterAmp = 0.5; // amp for master filter
+    private double oldArea = -1; //used for zoom object in/out for manipulating filter volume
 
     private boolean ENABLE_PORTA = true;
     private boolean DELAY_ENABLED = true;
@@ -103,6 +106,7 @@ public class Synth
     private LineOut mOut = new LineOut();
     private FilterLowPass mLowPassFilter = new FilterLowPass();
     private FilterHighPass mHighPassFilter = new FilterHighPass();
+    private FilterLowPass mMasterFilter = new FilterLowPass();
 
     private double env_attack_duration = 0.6;
     private double env_decay_duration = 0.3;
@@ -212,7 +216,9 @@ public class Synth
         mSynth.add(mHighPassFilter);
         mSynth.add(envPlayer);
         mSynth.add(envPlayerFilter);
-       // mSynth.add(mDelayUnit);
+        mSynth.add(mMasterFilter);
+
+        // mSynth.add(mDelayUnit);
 
 
 
@@ -267,6 +273,7 @@ public class Synth
         mSynth.add(mHighPassFilter);
         mSynth.add(envPlayer);
         mSynth.add(envPlayerFilter);
+        mSynth.add(mMasterFilter);
         // mSynth.add(mDelayUnit);
 
 
@@ -358,11 +365,42 @@ public class Synth
         mHighPassFilter.frequency.set(value);
 
 
-        Log.i("FYP" , "low pass is " + mLowPassFilter.frequency.get());
-        Log.i("FYP" , "high pass is " + mHighPassFilter.frequency.get());
+
+    }
+
+    public void setFilterAmp(double area){
+
+        //max is 0.1
+
+        if(oldArea == -1){
+            oldArea = area;
+            return;
+        }
+
+
+        double prevAmp = mMasterFilter.amplitude.get();
+        double areaDiff = area - oldArea;
+        double modArea = Math.abs(areaDiff);
+
+        prevAmp = prevAmp * area/oldArea;
+
+        Log.i("FYP" , "prevAmp is " + prevAmp);
+
+
+        oldArea = area;
+
+
+
+
+
+
+        mMasterFilter.amplitude.set(prevAmp);
+
 
 
     }
+
+
 
 
 
@@ -377,16 +415,23 @@ public class Synth
 
         mLowPassFilter.frequency.set(20000);
         mLowPassFilter.Q.set(2.5);
-        mLowPassFilter.output.connect( 0, mOut.input, 0 ); /* Left side */
-        mLowPassFilter.output.connect( 0, mOut.input, 1 );
+        mLowPassFilter.output.connect( mMasterFilter.input);
 
         mHighPassFilter.frequency.set(0);
         mHighPassFilter.Q.set(2.5);
-        mHighPassFilter.output.connect(0,mOut.input , 0);
-        mHighPassFilter.output.connect(0,mOut.input , 1);
+        mHighPassFilter.output.connect( mMasterFilter.input);
 
-        mLowPassFilter.amplitude.set(0.1);
-        mHighPassFilter.amplitude.set(0.1);
+
+        mMasterFilter.frequency.set(20000);
+        mMasterFilter.Q.set(1);
+        mMasterFilter.output.connect(0,mOut.input ,0);
+        mMasterFilter.output.connect(0,mOut.input ,1);
+        mMasterFilter.amplitude.set(globalAmp);
+
+
+
+        mLowPassFilter.amplitude.set(0.2);
+        mHighPassFilter.amplitude.set(0.2);
 
         if(!ENABLE_LOW_PASS){
 
@@ -429,10 +474,10 @@ public class Synth
 
             mDelays[i].output.connect(mDelaysFilter[i].input);
 
-            mDelaysFilter[i].output.connect(0,mOut.input,0);
-            mDelaysFilter[i].output.connect(0,mOut.input,1);
-
+            mDelaysFilter[i].output.connect(mMasterFilter);
             mDelays[i].delay.set(DELAY_TIME * (i+1));
+
+
 
 
 
@@ -614,7 +659,6 @@ public class Synth
         envPlayer.output.connect(mOscTri2.amplitude);
         envPlayer.output.connect(mOscTri3.amplitude);
 */
-
 
 
         mSynth.start();

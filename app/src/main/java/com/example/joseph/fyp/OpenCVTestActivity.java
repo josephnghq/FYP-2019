@@ -3,9 +3,11 @@ package com.example.joseph.fyp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -51,9 +53,15 @@ public class OpenCVTestActivity extends AppCompatActivity {
     private Scalar               mBlobColorRgba;
     private Scalar               mBlobColorHsv;
     private ColorBlobDetector    mDetector;
+    private ColorBlobDetector    mDetector2;
+
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
+    private Scalar               CONTOUR_COLOR2;
+    private GestureDetector      mGestureDetector;
+
+    private int                  mTouchChoice = 0;
 
     private double hue_start = 119;
     private double hue_stop = 149;
@@ -95,9 +103,11 @@ public class OpenCVTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_cvtest);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.HelloOpenCvView);
 
+        mGestureDetector = new GestureDetector(this , new MyGestureListener());
 
 
         sharedPref=  this.getSharedPreferences(
@@ -192,7 +202,6 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
 
-        setupBars();
 
         Button btn = (Button)findViewById(R.id.button_mute_audio_open_CV);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -216,11 +225,15 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
                 mDetector = new ColorBlobDetector();
+                mDetector2 = new ColorBlobDetector();
+
                 mSpectrum = new Mat();
                 mBlobColorRgba = new Scalar(255);
                 mBlobColorHsv = new Scalar(255);
                 SPECTRUM_SIZE = new Size(200, 64);
                 CONTOUR_COLOR = new Scalar(255,0,0,255);
+                CONTOUR_COLOR2 = new Scalar(200,200,200,200);
+
 
             }
 
@@ -238,9 +251,12 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                 mRgba = inputFrame;
 
+
                 Core.flip(mRgba,mRgba,1);
 
-                List<MatOfPoint> contours = mDetector.getContours();
+                List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
+                List<MatOfPoint> contours2 = mDetector2.getContours(); // anaylse contours
+
                 Size sizeRgba = mRgba.size();
 
 
@@ -249,7 +265,10 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                 if (mIsColorSelected) {
                     mDetector.process(mRgba);
-                    Log.e("FYP", "Contours count: " + contours.size());
+                    mDetector2.process(mRgba);
+
+                    // Log.e("FYP", "Contours count: " + contours.size());
+
 
                     if(contours.size() == 0 && SYNTH_PLAYING){
                         Log.i("FYP" , "RELEASEING OSC ");
@@ -264,31 +283,65 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
                     Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+                    Imgproc.drawContours(mRgba, contours2, -1, CONTOUR_COLOR2);
 
-                    Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+
+                    Mat colorLabel = mRgba.submat(4, 68, 4, 68); // this is just the color label at top left
                     colorLabel.setTo(mBlobColorRgba);
 
-                    Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+                    Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols()); // this is just color label at top left too
                     mSpectrum.copyTo(spectrumLabel);
                 }
 
                 List<Moments> mu = new ArrayList<Moments>(contours.size());
+
                 for (int i = 0; i < contours.size(); i++) {
                     mu.add(i, Imgproc.moments(contours.get(i), false));
                     Moments p = mu.get(i);
                     int x = (int) (p.get_m10() / p.get_m00());
                     int y = (int) (p.get_m01() / p.get_m00());
 
-                    Log.i("FYP" , "For contour number " + i + " x is at " + x);
-                    Log.i("FYP" , "For contour number " + i + " y is at " + y);
+                    double area = p.get_m00();
+                    Log.i("FYP" , "For contour number " + i + " area is  " + area);
+
+
+                   // Log.i("FYP" , "For contour number " + i + " x is at " + x);
+                   // Log.i("FYP" , "For contour number " + i + " y is at " + y);
 
                     Scales.chord(x ,   width , notesArrayList, mSynth);
+                    mSynth.setFilterAmp(area);
 
                     if(!mSynth.isFilterEnvEnabled())
                         mSynth.setFilterValue(y*10);
 
                     Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(255,49,0,255));
                 }
+
+                mu = new ArrayList<Moments>(contours.size());
+
+
+                for (int i = 0; i < contours2.size(); i++) {
+                    mu.add(i, Imgproc.moments(contours2.get(i), false));
+                    Moments p = mu.get(i);
+                    int x = (int) (p.get_m10() / p.get_m00());
+                    int y = (int) (p.get_m01() / p.get_m00());
+
+                    double area = p.get_m00();
+                    Log.i("FYP" , "For contour2 number " + i + " area is  " + area);
+
+
+                    // Log.i("FYP" , "For contour number " + i + " x is at " + x);
+                    // Log.i("FYP" , "For contour number " + i + " y is at " + y);
+
+                   // Scales.chord(x ,   width , notesArrayList, mSynth);
+                   // mSynth.setFilterAmp(area);
+
+                  //  if(!mSynth.isFilterEnvEnabled())
+                  //      mSynth.setFilterValue(y*10);
+
+                    Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(122,122,122,255));
+                }
+
 
 
                 return mRgba;
@@ -464,7 +517,19 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
                 return mRgba;*/
             }
-        });
+
+
+
+
+
+
+
+        }
+
+
+
+
+        );
 
 
          mLoaderCallback = new BaseLoaderCallback(this) {
@@ -487,70 +552,95 @@ public class OpenCVTestActivity extends AppCompatActivity {
 
 
 
+
+
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        int cols = mRgba.cols();
-        int rows = mRgba.rows();
+        return mGestureDetector.onTouchEvent(event);
 
-        int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
-        int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
-
-        int x = (int) event.getX() - xOffset;
-        int y = (int) event.getY() - yOffset;
-
-        Log.i("FYP", "Touch image coordinates: (" + x + ", " + y + ")");
-
-        if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
-
-
-        Rect touchedRect = new Rect();
-
-        touchedRect.x = (x>4) ? x-4 : 0;
-        touchedRect.y = (y>4) ? y-4 : 0;
-
-        touchedRect.width = (x+4 < cols) ? x + 4 - touchedRect.x : cols - touchedRect.x;
-        touchedRect.height = (y+4 < rows) ? y + 4 - touchedRect.y : rows - touchedRect.y;
-
-        Mat touchedRegionRgba = mRgba.submat(touchedRect);
-
-        Mat touchedRegionHsv = new Mat();
-        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
-
-        // Calculate average color of touched region
-        mBlobColorHsv = Core.sumElems(touchedRegionHsv);
-        int pointCount = touchedRect.width*touchedRect.height;
-        for (int i = 0; i < mBlobColorHsv.val.length; i++)
-            mBlobColorHsv.val[i] /= pointCount;
-
-        mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
-
-        Log.i("FYP", "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
-                ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
-
-        mDetector.setHsvColor(mBlobColorHsv);
-
-        Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
-
-        mIsColorSelected = true;
-
-        touchedRegionRgba.release();
-        touchedRegionHsv.release();
-
-
-
-
-
-
-
-
-
-
-
-
-        return false;
+//        Log.e("FYP" , "TOUCH");
+//
+//
+//
+//        int cols = mRgba.cols();
+//        int rows = mRgba.rows();
+//
+//        int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
+//        int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
+//
+//        int x = (int) event.getX() - xOffset;
+//        int y = (int) event.getY() - yOffset;
+//
+//        Log.i("FYP", "Touch image coordinates: (" + x + ", " + y + ")");
+//
+//        if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
+//
+//
+//        Rect touchedRect = new Rect();
+//
+//        touchedRect.x = (x>4) ? x-4 : 0;
+//        touchedRect.y = (y>4) ? y-4 : 0;
+//
+//        touchedRect.width = (x+4 < cols) ? x + 4 - touchedRect.x : cols - touchedRect.x;
+//        touchedRect.height = (y+4 < rows) ? y + 4 - touchedRect.y : rows - touchedRect.y;
+//
+//        Mat touchedRegionRgba = mRgba.submat(touchedRect);
+//
+//        Mat touchedRegionHsv = new Mat();
+//        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+//
+//        // Calculate average color of touched region
+//        mBlobColorHsv = Core.sumElems(touchedRegionHsv);
+//        int pointCount = touchedRect.width*touchedRect.height;
+//        for (int i = 0; i < mBlobColorHsv.val.length; i++)
+//            mBlobColorHsv.val[i] /= pointCount;
+//
+//        mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
+//
+//        Log.i("FYP", "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
+//                ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
+//
+//
+//        if(mTouchChoice == 0) {
+//
+//            mDetector.setHsvColor(mBlobColorHsv);
+//            mTouchChoice = 1;
+//        }
+//
+//        else if (mTouchChoice == 1){
+//
+//            mDetector2.setHsvColor(mBlobColorHsv);
+//            mTouchChoice = 0;
+//
+//        }
+//
+//        Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+//        Imgproc.resize(mDetector2.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+//
+//
+//        mIsColorSelected = true;
+//
+//        touchedRegionRgba.release();
+//        touchedRegionHsv.release();
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//        return false;
 
 
 
@@ -606,271 +696,104 @@ public class OpenCVTestActivity extends AppCompatActivity {
     }
 
 
-    private void CPentatonic(int x){
-        {
 
-            int divider = width/5;
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            {
+
+                Log.e("FYP" , "TOUCH");
 
 
-            if(x <= divider){
-                mSynth.setFrequencyWithPorta(Constants.NoteC4);
+
+                int cols = mRgba.cols();
+                int rows = mRgba.rows();
+
+                int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
+                int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
+
+                int x = (int) e.getX() - xOffset;
+                int y = (int) e.getY() - yOffset;
+
+                Log.i("FYP", "Touch image coordinates: (" + x + ", " + y + ")");
+
+                if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
+
+
+                Rect touchedRect = new Rect();
+
+                touchedRect.x = (x>4) ? x-4 : 0;
+                touchedRect.y = (y>4) ? y-4 : 0;
+
+                touchedRect.width = (x+4 < cols) ? x + 4 - touchedRect.x : cols - touchedRect.x;
+                touchedRect.height = (y+4 < rows) ? y + 4 - touchedRect.y : rows - touchedRect.y;
+
+                Mat touchedRegionRgba = mRgba.submat(touchedRect);
+
+                Mat touchedRegionHsv = new Mat();
+                Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+
+                // Calculate average color of touched region
+                mBlobColorHsv = Core.sumElems(touchedRegionHsv);
+                int pointCount = touchedRect.width*touchedRect.height;
+                for (int i = 0; i < mBlobColorHsv.val.length; i++)
+                    mBlobColorHsv.val[i] /= pointCount;
+
+                mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
+
+                Log.i("FYP", "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
+                        ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
+
+
+                if(mTouchChoice == 0) {
+
+                    mDetector.setHsvColor(mBlobColorHsv);
+                    mTouchChoice = 1;
+                    Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+                }
+
+                else if (mTouchChoice == 1){
+
+                    mDetector2.setHsvColor(mBlobColorHsv);
+                    mTouchChoice = 0;
+                    Imgproc.resize(mDetector2.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+
+                }
+
+//                Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+//                Imgproc.resize(mDetector2.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+
+                mIsColorSelected = true;
+
+                touchedRegionRgba.release();
+                touchedRegionHsv.release();
+
+
+
+
+
+
+
+
+
+
+
+
+                return false;
+
+
+
+
+
+
             }
-            else if (x > divider && x < divider*2){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteD4);
-
-            }
-            else if (x > divider*2 && x < divider*3){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteE4);
-
-            }
-            else if (x > divider*3 && x < divider*4){
-
-                mSynth.setFrequencyWithPorta(Constants.NoteG4);
-
-            }
-            else if (x > divider*4 && x < divider*5){
-                mSynth.setFrequencyWithPorta(Constants.NoteA4);
-
-            }
-
-
-
-
         }
     }
 
-
-    private void CMajorScale(int x){
-
-        int divider = width/13;
-
-
-        if(x <= divider){
-            mSynth.setFrequencyWithPorta(Constants.NoteC4);
-        }
-        else if (x > divider && x < divider*2){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteD4b);
-
-        }
-        else if (x > divider*2 && x < divider*3){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteD4);
-
-        }
-        else if (x > divider*3 && x < divider*4){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteE4b);
-
-        }
-        else if (x > divider*4 && x < divider*5){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteE4);
-
-        }
-        else if (x > divider*5 && x < divider*6){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteF4);
-
-        }
-
-        else if (x > divider*6 && x < divider*7){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteG4b);
-
-        }
-        else if (x > divider*7 && x < divider*8){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteG4);
-
-        }
-        else if (x > divider*8 && x < divider*9){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteA4b);
-
-        }
-        else if (x > divider*9 && x < divider*10){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteA4);
-
-        }
-        else if (x > divider*10 && x < divider*11){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteB4b);
-
-        }
-        else if (x > divider*11 && x < divider*12){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteB4);
-
-        }
-        else if (x > divider*12 && x < divider*13){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteC5);
-
-        }
-
-
-
-
-
-    }
-
-
-
-    private void setupBars(){
-
-
-        SeekBar hueStartSb = (SeekBar) findViewById(R.id.seekBar_hue_start);
-        hueStartSb.setMax(180);
-        hueStartSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                hue_start = value;
-                Log.i("FYP" , "value of hue_start is " + hue_start);
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        SeekBar hueStopSB = (SeekBar) findViewById(R.id.seekBar_hue_stop);
-        hueStopSB.setMax(180);
-        hueStopSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                hue_stop = value;
-                Log.i("FYP" , "value of hue_stop is " + hue_stop);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-        SeekBar satStart = (SeekBar) findViewById(R.id.seekBar_sat_start);
-        satStart.setMax(255);
-        satStart.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                sat_start = value;
-                Log.i("FYP" , "value of sat_start is " + sat_start);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-        SeekBar satStop = (SeekBar) findViewById(R.id.seekBar_sat_stop);
-        satStop.setMax(255);
-        satStop.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                sat_stop = value;
-                Log.i("FYP" , "value of sat_stop is " + sat_stop);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-        SeekBar valStart = (SeekBar) findViewById(R.id.seekBar_val_start);
-        valStart.setMax(255);
-        valStart.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                val_start = value;
-                Log.i("FYP" , "value of val_start is " + val_start);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        SeekBar valStop = (SeekBar) findViewById(R.id.seekBar_val_stop);
-        valStop.setMax(255);
-        valStop.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                double value = (double)progress;
-                val_stop = value;
-                Log.i("FYP" , "value of val_stop is " + val_stop);
-
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-    }
 
 
 

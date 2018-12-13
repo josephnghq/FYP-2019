@@ -46,45 +46,6 @@
             android:layout_height="wrap_content">
 
 
-            <SeekBar
-                android:id="@+id/seekBar_hue_start"
-                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <SeekBar
-                android:id="@+id/seekBar_hue_stop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <SeekBar
-                android:id="@+id/seekBar_sat_start"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-
-            <SeekBar
-                android:id="@+id/seekBar_sat_stop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-
-            <SeekBar
-                android:id="@+id/seekBar_val_start"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-
-            <SeekBar
-                android:id="@+id/seekBar_val_stop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
             <Button
                 android:id="@+id/button_mute_audio_open_CV"
                 android:text="Mute"
