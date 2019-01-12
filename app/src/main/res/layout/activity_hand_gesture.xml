@@ -40,7 +40,7 @@
 
 
         <LinearLayout
-            android:id="@+id/opencv_linear_layout_notes"
+            android:id="@+id/hand_gesture__linear_layout_notes"
             android:divider="@drawable/ss"
             android:showDividers="middle"
             android:layout_height="match_parent"
@@ -62,33 +62,33 @@
             >
 
             <Button
-                android:id="@+id/second_obj_func_btn"
+                android:id="@+id/hand_gesture_second_obj_func_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2nd Obj Func"/>
             <Button
-                android:id="@+id/select_sound_btn"
+                android:id="@+id/hand_gesture_select_sound_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Select Sound"/>
             <Button
-                android:id="@+id/calibrate_first_obj"
+                android:id="@+id/hand_gesture_calibrate_first_obj"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Calibrate 1st Obj"/>
             <ToggleButton
-                android:id="@+id/select_1st_obj"
+                android:id="@+id/hand_gesture_select_thumbs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Select 1st obj"
-                android:textOff="Select 1st obj"/>
+                android:textOn="Select thumbs"
+                android:textOff="Select thumbs"/>
             />
             <ToggleButton
-                android:id="@+id/select_2nd_obj"
+                android:id="@+id/hand_gesture_select_fingers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Select 2nd obj"
-                android:textOff="Select 2nd obj"/>
+                android:textOn="Select fingers"
+                android:textOff="Select fingers"/>
 
             />
 

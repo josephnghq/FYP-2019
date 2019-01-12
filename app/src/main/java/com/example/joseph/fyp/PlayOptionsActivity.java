@@ -17,7 +17,7 @@ public class PlayOptionsActivity extends AppCompatActivity {
         final Intent editSoundIntent = new Intent(this, EditSoundActivity.class);
         final Intent XYPadActivity = new Intent(this, XYPadActivity.class);
 
-        final Intent OpenCVTestActivity = new Intent(this, OpenCVTestActivity.class);
+        final Intent OpenCVTestActivity = new Intent(this, HandGestureActivity.class);
         final Intent CreateChordFragmentActivity = new Intent(this, CreateChordFragmentActivity.class);
 
 

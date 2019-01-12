@@ -9,28 +9,50 @@ import java.util.ArrayList;
 
 //Call the function and they will return the scale based on where x OR x and y is
 
+
+
+    //call this function to play notes
+    //this class handles note playings, and vibrato
+
 public class Scales {
 
 
+   static int currentPos = -1;
 
 
 
-    public static void chord (int x , int width, ArrayList<Notes> notesArrayList , Synth mSynth){
+
+    //use amount to indicate how much to deviate from original frequency, useful in vibrato
+
+    public static boolean chord (int amount , int x , int width, ArrayList<Notes> notesArrayList , Synth mSynth){
 
         int divider = width / notesArrayList.size();
         int i = 1;
 
-        if(x <= divider){
-            mSynth.setNotes(notesArrayList.get(0) , -1);
 
+
+        boolean changedNote = false; //false means the notes didn't change, true means the notes changed
+
+        // set first note
+        if(x <= divider){
+            mSynth.setNotes(notesArrayList.get(0) , -1 , amount);
+             if(currentPos != 0){
+                changedNote = true;
+            }
+            currentPos = 0;
         }
 
+
+        //rest of the notes
         while( i < notesArrayList.size()){
 
             if( x > divider * (i) && x < divider * (i + 1)){
 
-                mSynth.setNotes(notesArrayList.get(i) , -1);
-
+                mSynth.setNotes(notesArrayList.get(i) , -1 , amount);
+                 if(currentPos != i){
+                    changedNote = true;
+                }
+                currentPos = i;
 
             }
 
@@ -38,11 +60,7 @@ public class Scales {
 
         }
 
-
-
-
-
-
+        return changedNote;
 
     }
 

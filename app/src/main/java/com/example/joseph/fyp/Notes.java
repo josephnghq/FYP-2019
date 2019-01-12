@@ -30,10 +30,60 @@ public class Notes {
             Log.i("FYP" ,"Freq is " + noteFreqs.get(i));
 
 
+        }
 
+
+    }
+
+
+
+    //for this noteArray,shift every note in that chord/note
+    public void shiftSemitone(int semitones , int mode) {
+
+        // for every single note
+        // for mode, 1 for up semitone, 0 for down
+
+
+        if (mode == 1){
+
+            for (int i = 0; i < noteFreqs.size(); i++) {
+
+                for (int p = 0; p < semitones; p++) {
+
+                    double tempNoteFreq = noteFreqs.get(i);
+
+                    tempNoteFreq = tempNoteFreq * 1.0595;
+
+                    noteFreqs.set(i, tempNoteFreq);
+
+
+                }
+
+
+            }
+    }
+
+   if (mode == 0){
+
+        for (int i = 0; i < noteFreqs.size(); i++) {
+
+            for (int p = 0; p < semitones; p++) {
+
+                double tempNoteFreq = noteFreqs.get(i);
+
+                tempNoteFreq = tempNoteFreq / 1.0595;
+
+                noteFreqs.set(i, tempNoteFreq);
+
+
+            }
 
 
         }
+    }
+
+
+
 
 
     }

@@ -59,7 +59,8 @@ public class Synth
 
     private double globalAmp = 0.1; // amp for oscs
     private double masterAmp = 0.5; // amp for master filter
-    private double oldArea = -1; //used for zoom object in/out for manipulating filter volume
+    private double oldArea = -1; //used for zoom object in/out for manipulating filter volume setFilterAmp2
+    private double masterArea = -1; // used for setFilterAmp
 
     private boolean ENABLE_PORTA = true;
     private boolean DELAY_ENABLED = true;
@@ -283,7 +284,7 @@ public class Synth
 
             mDelaysFilter[i] = new FilterLowPass();
             mDelaysFilter[i].frequency.set(20000);
-            mDelaysFilter[i].amplitude.set(   (0.6 / (i + 1) ) - 0      );
+            mDelaysFilter[i].amplitude.set(   (masterAmp / (i + 1) )       );
 
             // Log.i("FYP" , "delay amp is " + String.valueOf((0.6 / (i + 1) ) - 0 ) + " " + i);
 
@@ -368,7 +369,42 @@ public class Synth
 
     }
 
+    public void setMasterArea(double masterArea) {
+        this.masterArea = masterArea;
+        mMasterFilter.amplitude.set(globalAmp);
+    }
+
+    //use this to reset the area volume back to normal
+    public void resetFilterAmp(){
+
+        mMasterFilter.amplitude.set(masterAmp);
+
+
+    }
+
+
     public void setFilterAmp(double area){
+
+        //max is 0.1
+
+        double prevAmp = mMasterFilter.amplitude.get();
+
+        prevAmp = prevAmp * area/masterArea;
+
+        Log.i("FYP" , "masterArea is " + masterArea);
+
+
+        Log.i("FYP" , "prevAmp is " + prevAmp);
+
+        mMasterFilter.amplitude.set(prevAmp);
+
+
+
+    }
+
+
+    //This one works by comparing current area with previous area
+    public void setFilterAmp2(double area){
 
         //max is 0.1
 
@@ -379,16 +415,19 @@ public class Synth
 
 
         double prevAmp = mMasterFilter.amplitude.get();
-        double areaDiff = area - oldArea;
-        double modArea = Math.abs(areaDiff);
 
         prevAmp = prevAmp * area/oldArea;
 
-        Log.i("FYP" , "prevAmp is " + prevAmp);
 
+        Log.i("FYP" , "difference between two area  is " + area/oldArea);
+
+        Log.i("FYP" , "prevAmp is " + prevAmp);
 
         oldArea = area;
 
+//        for(int i = 0 ; i < mDelays.length ; i++) {
+//            mDelaysFilter[i].amplitude.set((prevAmp / (i + 1)));
+//        }
 
 
 
@@ -426,7 +465,7 @@ public class Synth
         mMasterFilter.Q.set(1);
         mMasterFilter.output.connect(0,mOut.input ,0);
         mMasterFilter.output.connect(0,mOut.input ,1);
-        mMasterFilter.amplitude.set(globalAmp);
+        mMasterFilter.amplitude.set(masterAmp);
 
 
 
@@ -467,14 +506,20 @@ public class Synth
         for(int i = 0 ; i<mDelays.length ; i++){
 
 
+//
+//            mLowPassFilter.output.connect(mDelays[i]);
+//            mHighPassFilter.output.connect(mDelays[i]);
+//
+//
+//
 
-            mLowPassFilter.output.connect(mDelays[i]);
-            mHighPassFilter.output.connect(mDelays[i]);
 
+            mMasterFilter.output.connect(mDelays[i]);
 
             mDelays[i].output.connect(mDelaysFilter[i].input);
 
-            mDelaysFilter[i].output.connect(mMasterFilter);
+            mDelaysFilter[i].output.connect(0,mOut.input ,0);
+            mDelaysFilter[i].output.connect(0,mOut.input ,1);
             mDelays[i].delay.set(DELAY_TIME * (i+1));
 
 
@@ -1061,7 +1106,7 @@ public class Synth
         note.addNotes(first);
         note.addNotes(second);
         note.addNotes(third);
-        setNotes(note , detuneValue);
+        setNotes(note , detuneValue , 0);
 
 
 
@@ -1120,13 +1165,22 @@ public class Synth
 
     //this method receives a collection of notes, and set all the osc's frequency to match those of the notes
 
-    public void setNotes(Notes notes , double detune){
+
+
+
+
+
+
+
+    public void setNotes(Notes notes , double detune , double offset){
 
         //if detune is -1, just set detuneValue
 
         if(detune == -1){
             detune = detuneValue;
         }
+
+        //play notes
 
         for (int i = 0 ; i < notes.noteFreqs.size(); i++){
 
@@ -1144,11 +1198,10 @@ public class Synth
             mOscTriArray.get(i).setEnable();
 
 
-
-            mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i) , detune);
-             mOscSineArray.get(i).setFrequency(notes.noteFreqs.get(i) , detune);
-             mOscSqrArray.get(i).setFrequency(notes.noteFreqs.get(i), detune);
-             mOscTriArray.get(i).setFrequency(notes.noteFreqs.get(i), detune);
+            mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i) + offset , detune);
+             mOscSineArray.get(i).setFrequency(notes.noteFreqs.get(i) + offset, detune);
+             mOscSqrArray.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
+             mOscTriArray.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
 
 
         }
@@ -1187,7 +1240,7 @@ public class Synth
             Dmin.addNotes(Constants.NoteA5);
 
 
-            setNotes(Dmin , detuneValue);
+            setNotes(Dmin , detuneValue , 0);
 
 /*
 
@@ -1307,7 +1360,7 @@ public class Synth
 
                         Notes note = new Notes(1);
                         note.addNotes(FREQUENCY_NOW);
-                        setNotes(note , detuneValue);
+                        setNotes(note , detuneValue , 0);
 
 
 
@@ -1369,7 +1422,7 @@ public class Synth
 
                         Notes note = new Notes(1);
                         note.addNotes(FREQUENCY_NOW);
-                        setNotes(note , detuneValue);
+                        setNotes(note , detuneValue , 0);
 /*
 
                         mOscSaw.frequency.set(FREQUENCY_NOW);

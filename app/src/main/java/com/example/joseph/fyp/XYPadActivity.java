@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +14,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,6 +37,9 @@ public class XYPadActivity extends AppCompatActivity {
     private int height = 0;
     SharedPreferences sharedPref;
     SharedPreferences sharedPref2;
+
+
+
 
     private GsonBuilder builder = new GsonBuilder();
     private Gson gson;
@@ -76,6 +82,9 @@ public class XYPadActivity extends AppCompatActivity {
         }
 
 
+
+
+
         ArrayList<String> synthDataTitles = new ArrayList<String>();
         ArrayList<String> noteDataTitles = new ArrayList<String>();
 
@@ -108,6 +117,7 @@ public class XYPadActivity extends AppCompatActivity {
         mSynth.disableFilterEnv();
         mSynth.selectHighPass();
         mSynth.setfreqQ(6);
+
 
 
 
@@ -148,6 +158,7 @@ public class XYPadActivity extends AppCompatActivity {
 
                 Log.i("FYP" , "CLICKED CLICKED CLICKED");
                 notesArrayList = listOfNoteData.get(position).notesArrayList;
+                setupNoteLayout();
 
             }
         });
@@ -171,12 +182,39 @@ public class XYPadActivity extends AppCompatActivity {
     }
 
 
-    private void startPlayOsc(){
+
+
+
+    private void setupNoteLayout(){
+
+
+        int size = notesArrayList.size();
+
+        LinearLayout ll = (LinearLayout) findViewById(R.id.XYPad_linear_layout_for_notes);
+
+        LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(0 , LinearLayout.LayoutParams.WRAP_CONTENT);
+        linearParams.weight = 1;
+
+
+        for(int i = 0 ; i < size ; i++){
+
+        TextView tv = new TextView(this);
+
+        tv.setText(String.valueOf(i));
+        tv.setLayoutParams(linearParams);
+
+
+        ll.addView(tv);
+
+        }
+
 
 
 
 
     }
+
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -187,82 +225,6 @@ public class XYPadActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
     }
 
-
-    private void CMajorScale(int x){
-
-        int divider = width/13;
-
-
-        if(x <= divider){
-            mSynth.setFrequencyWithPorta(Constants.NoteC4);
-        }
-        else if (x > divider && x < divider*2){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteD4b);
-
-        }
-        else if (x > divider*2 && x < divider*3){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteD4);
-
-        }
-        else if (x > divider*3 && x < divider*4){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteE4b);
-
-        }
-        else if (x > divider*4 && x < divider*5){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteE4);
-
-        }
-        else if (x > divider*5 && x < divider*6){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteF4);
-
-        }
-
-        else if (x > divider*6 && x < divider*7){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteG4b);
-
-        }
-        else if (x > divider*7 && x < divider*8){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteG4);
-
-        }
-        else if (x > divider*8 && x < divider*9){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteA4b);
-
-        }
-        else if (x > divider*9 && x < divider*10){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteA4);
-
-        }
-        else if (x > divider*10 && x < divider*11){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteB4b);
-
-        }
-        else if (x > divider*11 && x < divider*12){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteB4);
-
-        }
-        else if (x > divider*12 && x < divider*13){
-
-            mSynth.setFrequencyWithPorta(Constants.NoteC5);
-
-        }
-
-
-
-
-
-    }
 
     private View.OnTouchListener onTouchListener(){
 
@@ -297,7 +259,7 @@ public class XYPadActivity extends AppCompatActivity {
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         v.setLayoutParams(layoutParams);
-                        Scales.chord(x, width,notesArrayList,mSynth);
+                        Scales.chord( 0 , x, width,notesArrayList,mSynth);
 
                         if(!mSynth.isFilterEnvEnabled())
                         mSynth.setFilterValue(y*10);

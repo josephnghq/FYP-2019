@@ -34,6 +34,7 @@
         <activity android:name=".EditSoundActivity" />
         <activity android:name=".XYPadActivity" />
         <activity android:name=".OpenCVTestActivity" />
+        <activity android:name=".HandGestureActivity" />
         <activity android:name=".CreateChordFragmentActivity" />
         <activity android:name=".PlayOptionsActivity" />
         <activity android:name=".CreateOptionsActivity"></activity>

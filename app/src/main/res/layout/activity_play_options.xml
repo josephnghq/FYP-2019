@@ -29,7 +29,7 @@
                 android:id="@+id/button2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="X Y Pad" />
+                android:text="OpenCV" />
 
             <Button
                 android:background="@drawable/custombutton1"
@@ -42,7 +42,7 @@
                 android:id="@+id/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="OpenCV" />
+                android:text="X Y Pad" />
 
 
 

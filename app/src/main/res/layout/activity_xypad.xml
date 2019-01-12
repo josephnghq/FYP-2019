@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_xypad_constrant"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,11 +14,14 @@
     </GridLayout>
 
     <LinearLayout
+        android:id="@+id/XYPad_linear_layout_for_notes"
         android:layout_width="match_parent"
+        android:divider="@drawable/ss"
         android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:showDividers="middle"
         tools:layout_editor_absoluteY="4dp">
-
+<!--
         <TextView
             android:id="@+id/C1"
             android:layout_width="0px"
@@ -107,7 +111,7 @@
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="C" />
+            android:text="C" />-->
     </LinearLayout>
 
     <RelativeLayout

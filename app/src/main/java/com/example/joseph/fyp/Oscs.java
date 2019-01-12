@@ -22,6 +22,7 @@ public class Oscs {
     public final static int SINE = 1;
     public final static int SQR = 2;
     public final static int TRI = 3;
+    private double currentFreq = 0;
 
 
     public Oscs(int noOfVoices, int choice){
@@ -75,6 +76,12 @@ public class Oscs {
 
     }
 
+    public double getCurrentFreq() {
+
+        return currentFreq;
+
+    }
+
     public void setAmp(double amp){
 
 
@@ -86,7 +93,11 @@ public class Oscs {
     }
 
 
+    //detuned handled by this function
+
     public void setFrequency(double frequency, double detune){
+
+        currentFreq = frequency;
 
 
         for(int i = 0 ; i < noOfVoices; i ++){

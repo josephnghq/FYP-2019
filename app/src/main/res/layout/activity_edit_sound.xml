@@ -21,35 +21,217 @@
 
 
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <GridLayout
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Osc 1"/>
+
+
+                <GridLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/osc_sawtooth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sawtooth" />
+
+                    <CheckBox
+                        android:id="@+id/osc_sine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sine" />
+
+                    <CheckBox
+                        android:id="@+id/osc_square"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Square" />
+
+                    <CheckBox
+                        android:id="@+id/osc_triangle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Triangle" />
+                </GridLayout>
+
+
+
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rowCount="2"
+                    android:columnCount="8"
+                    android:useDefaultMargins="true"
+                    >
+
+                    <TextView
+                        android:id="@+id/textview_attack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+                         android:text="Attack" />
+
+                    <TextView
+                        android:id="@+id/textview_decay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+                        android:text="Decay" />
+
+                    <TextView
+                        android:id="@+id/textview_sustain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+                        android:text="Sustain" />
+
+                    <TextView
+                        android:id="@+id/textview_release"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+                        android:text="Release" />
+
+                    <TextView
+                        android:id="@+id/textview_attack_lvl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+
+                        android:text="Attack Level" />
+
+
+                    <TextView
+                        android:id="@+id/textview_decay_lvl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+
+                        android:text="Decay Level" />
+
+
+                    <TextView
+                        android:id="@+id/textview_sustain_lvl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+
+                        android:text="Sustain Level" />
+
+                    <TextView
+                        android:id="@+id/textview_release_lvl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+
+                        android:text="Release Level" />
+
+                    <SeekBar
+                        android:id="@+id/env_attack"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0" />
+
+
+                    <SeekBar
+                        android:id="@+id/env_decay"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+
+
+                    <SeekBar
+                        android:id="@+id/env_sustain"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+
+                        />
+
+
+                    <SeekBar
+                        android:id="@+id/env_release"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+
+
+
+                    <SeekBar
+                        android:id="@+id/env_attack_lvl"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+
+
+
+                    <SeekBar
+                        android:id="@+id/env_decay_lvl"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+
+
+                    <SeekBar
+                        android:id="@+id/env_sustain_lvl"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+
+
+                    <SeekBar
+                        android:id="@+id/env_release_lvl"
+                        android:layout_width="77dp"
+                        android:layout_height="wrap_content"
+                        android:layout_row="1"
+                        />
+                </GridLayout>
+
+
+
+
+            </LinearLayout>
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:paddingLeft="100dp"
+            android:paddingRight="100dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+
+
+
+
+
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:text="Filter"/>
 
-                <CheckBox
-                    android:id="@+id/osc_sawtooth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sawtooth" />
-
-                <CheckBox
-                    android:id="@+id/osc_sine"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sine" />
-
-                <CheckBox
-                    android:id="@+id/osc_square"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Square" />
-
-                <CheckBox
-                    android:id="@+id/osc_triangle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Triangle" />
-            </GridLayout>
 
             <GridLayout
                 android:layout_width="wrap_content"
@@ -58,21 +240,172 @@
 
                 <RadioGroup>
 
-                <RadioButton
-                    android:id="@+id/radio_hipass"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="HiPass" />
+                    <RadioButton
+                        android:id="@+id/radio_hipass"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HiPass" />
 
-                <RadioButton
-                    android:id="@+id/radio_lowpass"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LowPass" />
+                    <RadioButton
+                        android:id="@+id/radio_lowpass"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LowPass" />
 
                 </RadioGroup>
 
             </GridLayout>
+
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:rowCount="2"
+                android:columnCount="4"
+                android:useDefaultMargins="true"
+                >
+
+                <TextView
+                    android:id="@+id/textview_attack_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Attack"
+                    android:layout_row="0"/>
+
+
+                <TextView
+                    android:id="@+id/textview_decay_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Decay"
+                    android:layout_row="0"/>
+
+
+
+                <TextView
+                    android:id="@+id/textview_sustain_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Sustain"
+                    android:layout_row="0"/>
+
+
+                <TextView
+                    android:id="@+id/textview_release_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Release"
+                    android:layout_row="0"/>
+
+                <SeekBar
+                    android:id="@+id/env_attack_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="0"/>
+
+
+
+                <SeekBar
+                    android:id="@+id/env_decay_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+
+                <SeekBar
+                    android:id="@+id/env_sustain_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+
+                <SeekBar
+                    android:id="@+id/env_release_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+
+            </GridLayout>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:rowCount="2"
+                android:columnCount="4"
+                android:useDefaultMargins="true"
+                >
+
+
+                <TextView
+                    android:id="@+id/textview_attack_lvl_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Attack Level"
+                    android:layout_row="0"
+
+                />
+
+                <TextView
+                    android:id="@+id/textview_decay_lvl_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Decay Level"
+                    android:layout_row="0"/>
+
+
+                <TextView
+                    android:id="@+id/textview_sustain_lvl_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Sustain Level"
+                    android:layout_row="0"/>
+
+
+                <TextView
+                    android:id="@+id/textview_release_lvl_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter Release Level"
+                    android:layout_row="0"/>
+
+
+                <SeekBar
+                    android:id="@+id/env_attack_lvl_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="0"/>
+
+
+
+                <SeekBar
+                    android:id="@+id/env_decay_lvl_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+
+                <SeekBar
+                    android:id="@+id/env_sustain_lvl_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+
+                <SeekBar
+                    android:id="@+id/env_release_lvl_filter"
+                    android:layout_width="77dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"/>
+
+            </GridLayout>
+
+
+
+
+
+
+        </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
@@ -88,7 +421,8 @@
                 <SeekBar
                     android:id="@+id/detune"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    />
 
                 <TextView
                     android:id="@+id/filter_q_value_text"
@@ -114,197 +448,10 @@
             </LinearLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/textview_attack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Attack" />
 
-            <SeekBar
-                android:id="@+id/env_attack"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/textview_decay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Decay" />
 
-            <SeekBar
-                android:id="@+id/env_decay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_sustain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sustain" />
-
-            <SeekBar
-                android:id="@+id/env_sustain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_release"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Release" />
-
-            <SeekBar
-                android:id="@+id/env_release"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/textview_attack_lvl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Attack Level" />
-
-            <SeekBar
-                android:id="@+id/env_attack_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textview_decay_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Decay Level" />
-
-            <SeekBar
-                android:id="@+id/env_decay_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_sustain_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sustain Level" />
-
-            <SeekBar
-                android:id="@+id/env_sustain_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_release_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Release Level" />
-
-            <SeekBar
-                android:id="@+id/env_release_lvl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/textview_attack_filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Filter Attack" />
-
-            <SeekBar
-                android:id="@+id/env_attack_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textview_decay_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Decay" />
-
-            <SeekBar
-                android:id="@+id/env_decay_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_sustain_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Sustain" />
-
-            <SeekBar
-                android:id="@+id/env_sustain_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_release_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Release" />
-
-            <SeekBar
-                android:id="@+id/env_release_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/textview_attack_lvl_filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Filter Attack Level" />
-
-            <SeekBar
-                android:id="@+id/env_attack_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textview_decay_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Decay Level" />
-
-            <SeekBar
-                android:id="@+id/env_decay_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_sustain_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Sustain Level" />
-
-            <SeekBar
-                android:id="@+id/env_sustain_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_release_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filter Release Level" />
-
-            <SeekBar
-                android:id="@+id/env_release_lvl_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
 
 
         <CheckBox
