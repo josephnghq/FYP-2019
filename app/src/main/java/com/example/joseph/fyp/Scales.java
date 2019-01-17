@@ -22,7 +22,43 @@ public class Scales {
 
 
 
+   public static boolean chordPoint ( int amount , int x , ArrayList<Notes> notesArrayList , Synth mSynth , int noOfFingers){
+
+
+       if(noOfFingers == 2){
+
+           x = x + 4;
+
+
+       }
+
+       if(noOfFingers == 3){
+
+           x = x + 8;
+
+
+       }
+
+
+
+       if(x >= notesArrayList.size()){
+           mSynth.setNotes(notesArrayList.get(notesArrayList.size()-1) , -1 , amount);
+
+       }
+
+       else {
+           mSynth.setNotes(notesArrayList.get(x), -1, amount);
+       }
+
+
+        return false;
+
+
+   }
+
+
     //use amount to indicate how much to deviate from original frequency, useful in vibrato
+    //this function is used in the sliding feature
 
     public static boolean chord (int amount , int x , int width, ArrayList<Notes> notesArrayList , Synth mSynth){
 

@@ -67,12 +67,6 @@ public class HandGestureActivity extends AppCompatActivity {
     private Scalar CONTOUR_COLOR2;
     private GestureDetector mGestureDetector;
     private int mTouchChoice = 0;
-    private double hue_start = 119;
-    private double hue_stop = 149;
-    private double sat_start = 174;
-    private double sat_stop = 196;
-    private double val_start = 146;
-    private double val_stop = 181;
     private Synth mSynth;
     private Synth mSynth2;
     private boolean SYNTH_PLAYING = true;
@@ -106,6 +100,11 @@ public class HandGestureActivity extends AppCompatActivity {
     private Mat mRgba;
     private Handler secondObjHandler;
     private Handler vibratoEnablerHandler;
+
+    private boolean ENABLE_DELETE_CLOSE_OBJECTS = true;
+
+
+
 
     private int fingerCount = 0;
     private Timer fingerCounter;
@@ -329,17 +328,41 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           // used to keep track of object 1's x value
 
+
+
                                                           mRgba = inputFrame;
                                                           Core.flip(mRgba, mRgba, 1);
 
                                                           List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
                                                           List<MatOfPoint> contours2 = mDetector2.getContours(); // anaylse contours
 
+
+                                                          // for all the contours, delete away contours that are near to each other, to avoid situations whereby two points are detected
+                                                          // for the same object
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                           Size sizeRgba = mRgba.size();
 
 
                                                           height = (int) sizeRgba.height;
                                                           width = (int) sizeRgba.width;
+                                                          int firstHalf = width/2;
+
+
+                                                          Imgproc.line(mRgba , new Point(width/2 , height -1 ) , new Point ( width/2 , 0) , new Scalar(255,0,0,255)
+                                                          , 3);
+
 
 
                                                           Imgproc.rectangle(mRgba, new Point(0, 0), new Point(150, height * 0.3), new Scalar(0, 255, 0));
@@ -391,22 +414,72 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           List<Moments> mu = new ArrayList<Moments>(contours.size());
 
-                                                          Log.i("FYP","number of thumbs " + contours.size());
 
                                                           for (int i = 0; i < contours.size(); i++) {
-
                                                               mu.add(i, Imgproc.moments(contours.get(i), false));
+                                                              Moments p = mu.get(i);
+                                                              int x = (int) (p.get_m10() / p.get_m00());
+                                                              int y = (int) (p.get_m01() / p.get_m00());
+                                                          }
+
+
+                                                          //remove close points
+                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                          for(int i = 0 ; i < mu.size(); i ++){
+
+                                                              for(int p = i; p < mu.size(); p++){
+
+                                                                  Moments mom = mu.get(i);
+                                                                  Moments momToCompare = mu.get(p);
+
+
+                                                                  double dist = distanceOfXYPoints(mom.get_m10()/mom.get_m00() , momToCompare.get_m10()/momToCompare.get_m00() ,
+                                                                          mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
+
+
+                                                                  if ( dist < 30 && p != i ){
+
+                                                                      Log.e("FYP" , "Removing close points");
+                                                                      mu.remove(p);
+                                                                      break;
+
+                                                                  }
+
+
+                                                              }
+
+
+                                                          }
+
+
+                                                          Log.i("FYP","number of thumbs " + mu.size());
+
+                                                          for (int i = 0; i < mu.size()/*i < contours.size()*/; i++) {
+
+                                                             /* mu.add(i, Imgproc.moments(contours.get(i), false));*/
                                                               Moments p = mu.get(i);
                                                               int x = (int) (p.get_m10() / p.get_m00());
                                                               int y = (int) (p.get_m01() / p.get_m00());
                                                               currentXObj1 = x;
 
+
+                                                              if(x < firstHalf){
+                                                                  Log.i("FYP" , "Moments number " + i + " (thumb) is in first half");
+                                                              }
+                                                              else if(x > firstHalf){
+
+                                                                  Log.i("FYP" , "Moments number " + i + " (thumb) is in second half");
+
+                                                              }
+
+
+
                                                               first_obj_area = p.get_m00();
 
-                                                              if (!SYNTH_PLAYING) {
+                                                              /*if (!SYNTH_PLAYING) {
                                                                   mSynth.playOsc();
                                                                   SYNTH_PLAYING = true;
-                                                              }
+                                                              }*/
 
                                                               if (SETUP_MASTER_AREA) {
 
@@ -419,9 +492,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 //                    Log.i("FYP" , "For contour number " + i + " area is  " + area);
 
-
-
-                                                              boolean noteChanged = Scales.chord(0, x, width, notesArrayList, mSynth);
+                                                              /*boolean noteChanged = Scales.chord(0, x, width, notesArrayList, mSynth);
                                                               if (noteChanged) {
 
                                                                   VIBRATO_ENABLE = false;
@@ -435,7 +506,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                   Scales.chord((x - startPointXObj1) / 3, x, width, notesArrayList, mSynth);
                                                               }
-
+*/
 
                                                               mSynth.setFilterAmp2(first_obj_area);
 
@@ -449,6 +520,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           }
 
 
+
+
+
+
                                                           //SECOND OBJECT
                                                           //SECOND OBJECT
                                                           //SECOND OBJECT
@@ -457,9 +532,46 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                           List<Moments> mu2 = new ArrayList<Moments>(contours2.size());
-                                                          ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayList = new ArrayList<FingerMomentsXYData>();
+                                                          ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListLeftSide = new ArrayList<FingerMomentsXYData>();
+                                                          ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListRightSide = new ArrayList<FingerMomentsXYData>();
 
-                                                          final int a = contours2.size();
+
+                                                          for (int i = 0; i < contours2.size(); i++) {
+                                                              mu2.add(i, Imgproc.moments(contours2.get(i), false));
+
+                                                          }
+
+
+                                                          //remove close objects
+                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                          for(int i = 0 ; i < mu2.size(); i ++){
+
+                                                              for(int p = i; p < mu2.size(); p++){
+
+                                                                  Moments mom = mu2.get(i);
+                                                                  Moments momToCompare = mu2.get(p);
+
+
+                                                                  double dist = distanceOfXYPoints(mom.get_m10()/mom.get_m00() , momToCompare.get_m10()/momToCompare.get_m00() ,
+                                                                          mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
+
+
+                                                                  if ( dist < 30 && p != i ){
+
+                                                                      Log.e("FYP" , "Removing close points");
+                                                                      mu2.remove(p);
+                                                                      break;
+
+                                                                  }
+
+                                                              }
+
+
+                                                          }
+
+
+                                                          final int a = mu2.size();
+
 
                                                           if(!fingerCounterLock) {
                                                               Log.i("FYP", "sss");
@@ -474,7 +586,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       fingerCounterLock = false;
 
                                                                   }
-                                                              }, 500);
+                                                              }, 300);
 
                                                           }
 
@@ -487,36 +599,48 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           Log.i("FYP", "Number of fingers detected = " + fingerCount);
 
-                                                          for (int i = 0; i < contours2.size(); i++) {
+
+
+                                                          // processing all the moments
+                                                          for (int i = 0; i < mu2.size(); i++) {
                                                                resetObjectLatchResetHandler();
 
-                                                              mu2.add(i, Imgproc.moments(contours2.get(i), false));
+                                                              /*mu2.add(i, Imgproc.moments(contours2.get(i), false));*/
                                                               Moments p = mu2.get(i);
                                                               int x = (int) (p.get_m10() / p.get_m00());
                                                               int y = (int) (p.get_m01() / p.get_m00());
 
-                                                              fingerMomentsXYDataArrayList.add(new FingerMomentsXYData(i,x,y));
 
 
+                                                              if(x < firstHalf){
+                                                                  Log.i("FYP" , "Moments number " + i + " (finger) is in first half");
+                                                                  fingerMomentsXYDataArrayListLeftSide.add(new FingerMomentsXYData(i,x,y ,true));
 
 
+                                                              }
+                                                              else if(x > firstHalf){
 
+                                                                  Log.i("FYP" , "Moments number " + i + " (finger) is in second half");
+                                                                  fingerMomentsXYDataArrayListRightSide.add(new FingerMomentsXYData(i,x,y , false ));
 
-
-
-
+                                                              }
 
 
                                                               double area = p.get_m00();
-//                    Log.i("FYP" , "For contour2 number " + i + " area is  " + area);
 
 
+                                                              //draw circle of center point of the contours, and label them with numbers
                                                               Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(122, 122, 122, 255));
                                                               Log.i("FYP",String.valueOf(i));
                                                               Imgproc.putText(mRgba ,String.valueOf(i) , new Point(x,y) , Core.FONT_HERSHEY_SIMPLEX,1,new Scalar(122, 122, 122, 255),4);
 
 
-                                                              if (SECOND_OBJ_OCTAVE) {
+
+
+
+                                                              //note processing
+
+                                                              /*if (SECOND_OBJ_OCTAVE) {
 
 
                                                                   if(fingerCount == 2 && !OCTAVE_UP_LATCHER){
@@ -537,14 +661,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   }
                                                                   else{
 
-                                                resetObjectLatchResetHandler();
+                                                                      resetObjectLatchResetHandler();
 
                                                                   }
 
 
-                                                              }
-
-
+                                                              }*/
+                                                              /*
                                                               if (SECOND_OBJ_NOTE) {
 
                                                                   if (!SYNTH_PLAYING2) {
@@ -560,20 +683,64 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-
-
                                                               if (SECOND_OBJ_DETECT_ONE_CONTOUR) {
                                                                   break;
-                                                              }
+                                                              }*/
 
 
                                                           }
 
 
 
+                                                          //find the right finger that would be used for 'cursor'
+
+                                                          int largestY = 0;
+                                                          FingerMomentsXYData selectedCursor = null ;
+
+                                                          for(int i = 0; i < fingerMomentsXYDataArrayListRightSide.size(); i ++){
+
+
+                                                            if(fingerMomentsXYDataArrayListRightSide.get(i).FIRST_HALF == false && fingerMomentsXYDataArrayListRightSide.get(i).y > largestY){
+
+                                                                largestY = fingerMomentsXYDataArrayListRightSide.get(i).y;
+                                                                selectedCursor = fingerMomentsXYDataArrayListRightSide.get(i);
+
+                                                            }
+
+                                                          }
+
+                                                          if(selectedCursor!=null)
+                                                          for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size(); i ++){
+
+                                                              if(selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15
+                                                                      &&
+                                                                 selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15
+
+                                                                      )
+
+                                                              {
+
+
+                                                                  if (!SYNTH_PLAYING2) {
+                                                                      mSynth2.playOsc();
+                                                                      SYNTH_PLAYING2 = true;
+                                                                  }
+
+                                                                  Log.i("FYP" , "HIT on " +  fingerMomentsXYDataArrayListLeftSide.get(i).id);
+
+
+                                                                  Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
 
 
 
+
+                                                              }
+                                                              else{
+
+
+                                                              }
+
+                                                          }
 
 
 
@@ -613,6 +780,21 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
     }
+
+
+    private double distanceOfXYPoints(double x1, double x2, double y1, double y2){
+
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+
+
+        return Math.sqrt(Math.pow(dx,2) + Math.pow(dy ,2));
+
+
+
+    }
+
+
 
 
     private void resetObjectLatchResetHandler() {

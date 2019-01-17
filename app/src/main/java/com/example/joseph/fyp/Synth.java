@@ -52,6 +52,8 @@ public class Synth
     private InterpolatingDelay[] mDelays = new InterpolatingDelay[num_of_delay_voices];
     private FilterLowPass[] mDelaysFilter = new FilterLowPass[num_of_delay_voices];
 
+    private RoomDAO mRoomDAO;
+
 
     private double FREQUENCY_NOW = 440;
     private double freqDiff = 0;
@@ -1661,7 +1663,7 @@ public class Synth
     public SynthData saveData(){
 
 
-    SynthData sd = new SynthData();
+   SynthData sd = new SynthData();
 
 
     sd.detuneValue = detuneValue;
@@ -1699,6 +1701,59 @@ public class Synth
 
     sd.enableLowPass = mLowPassFilter.isEnabled();
     sd.enableHighPass = mHighPassFilter.isEnabled();
+
+
+        final RoomEntity RoomSynthData = new RoomEntity();
+
+
+        RoomSynthData.detuneValue = detuneValue;
+
+        RoomSynthData.env_attack_duration = env_attack_duration;
+        RoomSynthData.env_decay_duration = env_decay_duration;
+        RoomSynthData.env_sustain_duration = env_sustain_duration;
+        RoomSynthData.env_release_duration = env_release_duration;
+
+        RoomSynthData.env_attack_value = env_attack_value;
+        RoomSynthData.env_decay_value = env_decay_value;
+        RoomSynthData.env_sustain_value = env_sustain_value;
+        RoomSynthData.env_release_value = env_release_value;
+
+        RoomSynthData.enable_filter_adsr = envPlayerFilter.isEnabled();
+        RoomSynthData.enable_porta = ENABLE_PORTA;
+        RoomSynthData.enable_delay = DELAY_ENABLED;
+
+        RoomSynthData.env_attack_duration_filter = env_attack_duration_filter;
+        RoomSynthData.env_decay_duration_filter = env_decay_duration_filter;
+        RoomSynthData.env_sustain_duration_filter = env_sustain_duration_filter;
+        RoomSynthData.env_release_duration_filter = env_release_duration_filter;
+
+        RoomSynthData.env_attack_value_filter = env_attack_value_filter;
+        RoomSynthData.env_decay_value_filter = env_decay_value_filter;
+        RoomSynthData.env_sustain_value_filter = env_sustain_value_filter;
+        RoomSynthData.env_release_value_filter = env_release_value_filter;
+
+        RoomSynthData.DELAY_TIME = DELAY_TIME;
+        RoomSynthData.num_of_delay_voices = num_of_delay_voices;
+        RoomSynthData.DisableSaw = DisableSaw;
+        RoomSynthData.DisableSine = DisableSine;
+        RoomSynthData.DisableSqr = DisableSqr;
+        RoomSynthData.DisableTri = DisableTri;
+
+        RoomSynthData.enableLowPass = mLowPassFilter.isEnabled();
+        RoomSynthData.enableHighPass = mHighPassFilter.isEnabled();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                RoomSingleton.db.roomDAO().insertAll(RoomSynthData);
+
+            }
+        }).start();
+
+
+
 
     return sd;
 
