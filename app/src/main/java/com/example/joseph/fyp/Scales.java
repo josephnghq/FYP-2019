@@ -55,7 +55,7 @@ public class Scales {
 
        else {
            mSynth.setNotes(notesArrayList.get(x), -1, amount);
-           currentNote = notesArrayList.size()-1;
+           currentNote = x;
        }
 
        if(currentNote != oldNote){
