@@ -34,6 +34,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -41,6 +42,8 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.video.Video;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -96,12 +99,19 @@ public class HandGestureActivity extends AppCompatActivity {
     private double first_obj_area = 0;
     private int startPointXObj1 = -1;
     private int currentXObj1 = -1; //used to track current obj 1 's x coordinate
+
+    //Use this for finger pointing gesture
+    private int startPointYObj1 = -1;
+    private int currentYObj1 = -1; //used to track current obj 1 's y coordinate
+
+
     private Mat mIntermediateMat;
     private Mat mRgba;
     private Handler secondObjHandler;
     private Handler vibratoEnablerHandler;
 
     private boolean ENABLE_DELETE_CLOSE_OBJECTS = true;
+    private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
 
 
@@ -311,7 +321,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           SPECTRUM_SIZE = new Size(200, 64);
                                                           CONTOUR_COLOR = new Scalar(255, 0, 0, 255);
                                                           CONTOUR_COLOR2 = new Scalar(200, 200, 200, 200);
-
+                                                          backgroundSubtractorMOG2 = Video.createBackgroundSubtractorMOG2();
 
                                                       }
 
@@ -328,13 +338,17 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           // used to keep track of object 1's x value
 
-
-
                                                           mRgba = inputFrame;
+                                                         // backgroundSubtractorMOG2.apply(inputFrame , mRgba);
+
+
                                                           Core.flip(mRgba, mRgba, 1);
 
                                                           List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
                                                           List<MatOfPoint> contours2 = mDetector2.getContours(); // anaylse contours
+
+
+
 
 
                                                           // for all the contours, delete away contours that are near to each other, to avoid situations whereby two points are detected
@@ -437,10 +451,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
 
 
-                                                                  if ( dist < 30 && p != i ){
+                                                                  if ( dist < 20 && p != i ){
 
                                                                       Log.e("FYP" , "Removing close points");
-                                                                      mu.remove(p);
+                                                                     // mu.remove(p);
                                                                       break;
 
                                                                   }
@@ -556,10 +570,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
 
 
-                                                                  if ( dist < 30 && p != i ){
+                                                                  if ( dist < 20 && p != i ){
 
                                                                       Log.e("FYP" , "Removing close points");
-                                                                      mu2.remove(p);
+                                                                     // mu2.remove(p);
                                                                       break;
 
                                                                   }
@@ -709,28 +723,49 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           }
 
-                                                          if(selectedCursor!=null)
+
+                                                          // processing of cursor to finger
+
+                                                          if(selectedCursor!=null) // there is a cursor
                                                           for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size(); i ++){
 
-                                                              if(selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15
-                                                                      &&
-                                                                 selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15
-
-                                                                      )
+                                                              if(selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
 
                                                               {
-
+                                                                    currentYObj1 = selectedCursor.y;
 
                                                                   if (!SYNTH_PLAYING2) {
                                                                       mSynth2.playOsc();
                                                                       SYNTH_PLAYING2 = true;
                                                                   }
 
+
+
+
                                                                   Log.i("FYP" , "HIT on " +  fingerMomentsXYDataArrayListLeftSide.get(i).id);
 
 
-                                                                  Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
+                                                                Boolean noteChanged =   Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
 
+                                                                  if (noteChanged) {
+
+                                                                      VIBRATO_ENABLE = false;
+                                                                      startVibratoHandler();
+
+
+                                                                  }
+
+                                                                  if (VIBRATO_ENABLE) {
+
+
+                                                                      Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
+                                                                      Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
+                                                                  }
+
+                                                                  int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
+
+                                                                  if (!mSynth2.isFilterEnvEnabled())
+                                                                      mSynth2.setFilterValue(distanceDifference * 10);
 
 
 
@@ -741,6 +776,87 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
                                                           }
+
+                                                          else{
+
+
+                                                              mSynth2.releaseOsc();
+                                                              SYNTH_PLAYING2 = false;
+
+
+                                                          }
+
+
+
+                                                          //this is hull convex part, W.I.P
+
+/*
+
+                                                          List<MatOfInt> hull = new ArrayList<MatOfInt>();
+                                                          //List<MatOfInt> hull2 = new ArrayList<MatOfInt>();
+
+                                                          // Find the convex hull
+                                                          for(int i=0; i < contours.size(); i++){
+                                                              hull.add(new MatOfInt());
+                                                          }
+
+                                                          // Convert MatOfInt to MatOfPoint for drawing convex hull
+                                                          for(int i=0; i < contours.size(); i++){
+                                                              Imgproc.convexHull(contours.get(i), hull.get(i));
+                                                          }
+
+                                                          // Loop over all contours
+                                                           List<Point[]> hullpoints = new ArrayList<Point[]>();
+                                                          for(int i=0; i < hull.size(); i++){
+                                                              Point[] points = new Point[hull.get(i).rows()];
+
+                                                              // Loop over all points that need to be hulled in current contour
+                                                              for(int j=0; j < hull.get(i).rows(); j++){
+                                                                  int index = (int)hull.get(i).get(j, 0)[0];
+                                                                  points[j] = new Point(contours.get(i).get(index, 0)[0], contours.get(i).get(index, 0)[1]);
+                                                              }
+
+                                                              hullpoints.add(points);
+                                                          }
+
+
+                                                          // Convert Point arrays into MatOfPoint
+                                                          List<MatOfPoint> hullmop = new ArrayList<MatOfPoint>();
+                                                          for(int i=0; i < hullpoints.size(); i++){
+
+                                                               MatOfPoint mop = new MatOfPoint();
+                                                              mop.fromArray(hullpoints.get(i));
+                                                              hullmop.add(mop);
+
+
+                                                          }
+
+
+                                                          for(int i = 0 ; i < hullmop.size(); i ++){
+
+
+
+                                                              MatOfPoint points = hullmop.get(i);
+                                                              Point[] point = points.toArray();
+
+                                                              Log.i("FYP" , "For iter " + i + " Size of point is " + point.length );
+
+
+                                                              for(int p = 0 ; p < point.length; p ++)
+                                                              Imgproc.putText(mRgba ,String.valueOf(p) , new Point(point[p].x,point[p].y) , Core.FONT_HERSHEY_SIMPLEX,1,new Scalar(192, 222, 162, 255),4);
+
+
+                                                          }
+
+
+                                                          // Draw contours + hull results
+                                                          //Mat overlay = new Mat(mRgba.size(), CvType.CV_8UC3);
+                                                          Scalar color = new Scalar(0, 255, 0);   // Green
+
+                                                              Imgproc.drawContours(mRgba, contours, -1, color);
+                                                              Imgproc.drawContours(mRgba, hullmop, -1, color);
+*/
+
 
 
 
@@ -827,6 +943,7 @@ public class HandGestureActivity extends AppCompatActivity {
             public void run() {
                 VIBRATO_ENABLE = true;
                 startPointXObj1 = currentXObj1;
+                startPointYObj1 = currentYObj1;
             }
         }, 700);
 

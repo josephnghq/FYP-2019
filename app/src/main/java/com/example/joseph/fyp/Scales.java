@@ -18,11 +18,16 @@ public class Scales {
 
 
    static int currentPos = -1;
+   static int oldNote = -1;
+   static int currentNote = -1;
 
 
+    //use amount to indicate how much to deviate from original frequency, useful in vibrato
+    //this function is used in the sliding feature
 
 
-   public static boolean chordPoint ( int amount , int x , ArrayList<Notes> notesArrayList , Synth mSynth , int noOfFingers){
+    public static boolean chordPoint ( int amount , int x , ArrayList<Notes> notesArrayList , Synth mSynth , int noOfFingers){
+
 
 
        if(noOfFingers == 2){
@@ -42,16 +47,34 @@ public class Scales {
 
 
        if(x >= notesArrayList.size()){
+
            mSynth.setNotes(notesArrayList.get(notesArrayList.size()-1) , -1 , amount);
+           currentNote = notesArrayList.size()-1;
 
        }
 
        else {
            mSynth.setNotes(notesArrayList.get(x), -1, amount);
+           currentNote = notesArrayList.size()-1;
        }
 
+       if(currentNote != oldNote){
 
-        return false;
+           oldNote = currentNote;
+           return true;
+
+
+       }
+
+       if(currentNote == oldNote){
+
+           oldNote = currentNote;
+           return false;
+
+
+       }
+
+    return true;
 
 
    }

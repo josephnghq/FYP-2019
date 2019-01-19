@@ -1,5 +1,7 @@
 package com.example.joseph.fyp;
 
+import android.util.Log;
+
 import com.jsyn.unitgen.SawtoothOscillatorBL;
 import com.jsyn.unitgen.SineOscillator;
 import com.jsyn.unitgen.SquareOscillator;
