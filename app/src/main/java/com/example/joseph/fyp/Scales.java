@@ -129,30 +129,30 @@ public class Scales {
 
 
 
-        int divider = width/3;
+    int divider = width/3;
 
 
         if(x <= divider){
-            mSynth.traid(Constants.NoteC4 , Constants.NoteE5 , Constants.NoteG4) ;
-        }
+        mSynth.traid(Constants.NoteC4 , Constants.NoteE5 , Constants.NoteG4) ;
+    }
 
         else if (x > divider && x < divider*2){
 
-            mSynth.traid(Constants.NoteD4 , Constants.NoteF4 , Constants.NoteA4);
-
-        }
-        else if (x > divider*2 && x < divider*3){
-
-            mSynth.traid(Constants.NoteG4 , Constants.NoteB4 , Constants.NoteD5);
-
-        }
-
-
-
-
-
+        mSynth.traid(Constants.NoteD4 , Constants.NoteF4 , Constants.NoteA4);
 
     }
+        else if (x > divider*2 && x < divider*3){
+
+        mSynth.traid(Constants.NoteG4 , Constants.NoteB4 , Constants.NoteD5);
+
+    }
+
+
+
+
+
+
+}
 
 
 

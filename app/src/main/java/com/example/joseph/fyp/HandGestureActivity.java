@@ -115,11 +115,16 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
+    private ArrayList<FingerMomentsXYData> thumbLeftSideVelocity = new ArrayList<FingerMomentsXYData>();
+    private ArrayList<FingerMomentsXYData> thumbRightSideVelocity = new ArrayList<FingerMomentsXYData>();
 
     private int fingerCount = 0;
     private Timer fingerCounter;
     private boolean VIBRATO_ENABLE = false;
     private boolean fingerCounterLock = false;
+
+    private double leftThumbSize = 0;
+    private double rightThumbSize = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -426,6 +431,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           //THIS IS THUMB
 
 
+                                                          ArrayList<FingerMomentsXYData> thumbLeftSide = new ArrayList<FingerMomentsXYData>();
+                                                          ArrayList<FingerMomentsXYData> thumbRightSide = new ArrayList<FingerMomentsXYData>();
+
+
+
+
+
                                                           List<Moments> mu = new ArrayList<Moments>(contours.size());
 
 
@@ -434,6 +446,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               Moments p = mu.get(i);
                                                               int x = (int) (p.get_m10() / p.get_m00());
                                                               int y = (int) (p.get_m01() / p.get_m00());
+
+                                                              double area = Imgproc.contourArea(contours.get(i));
+
+                                                          }
+
+                                                          if(contours.size() == 0){
+                                                              startObjectLatchResetHandler();
                                                           }
 
 
@@ -468,6 +487,14 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           Log.i("FYP","number of thumbs " + mu.size());
 
+                                                          if(mu.size() == 0){
+
+                                                              thumbLeftSideVelocity.clear();
+                                                              thumbRightSideVelocity.clear();
+
+
+                                                          }
+
                                                           for (int i = 0; i < mu.size()/*i < contours.size()*/; i++) {
 
                                                              /* mu.add(i, Imgproc.moments(contours.get(i), false));*/
@@ -477,14 +504,73 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               currentXObj1 = x;
 
 
+
                                                               if(x < firstHalf){
                                                                   Log.i("FYP" , "Moments number " + i + " (thumb) is in first half");
+
+                                                                  thumbLeftSide.add(new FingerMomentsXYData(i,x,y , true));
+
+                                                                  if(thumbLeftSideVelocity.size() == 30){
+
+                                                                      thumbLeftSideVelocity.remove(thumbLeftSideVelocity.size()-1);
+                                                                      thumbLeftSideVelocity.add(0,new FingerMomentsXYData(i,x,y,true,System.currentTimeMillis()));
+
+                                                                  }
+
+                                                                  else {
+                                                                      thumbLeftSideVelocity.add(new FingerMomentsXYData(i, x, y, true, System.currentTimeMillis()));
+                                                                  }
+
+
                                                               }
                                                               else if(x > firstHalf){
 
                                                                   Log.i("FYP" , "Moments number " + i + " (thumb) is in second half");
 
+                                                                  thumbRightSide.add(new FingerMomentsXYData(i,x,y , false));
+
+                                                                  if(thumbRightSideVelocity.size() == 30){
+
+                                                                      thumbRightSideVelocity.remove(thumbRightSideVelocity.size()-1);
+                                                                      thumbRightSideVelocity.add(0,new FingerMomentsXYData(i,x,y,true,System.currentTimeMillis()));
+
+                                                                  }
+
+                                                                  else {
+                                                                      thumbRightSideVelocity.add(new FingerMomentsXYData(i, x, y, true, System.currentTimeMillis()));
+                                                                  }
+
                                                               }
+
+
+                                                              /*if(thumbLeftSideVelocity.size() == 30) {
+                                                                  double leftSideThumbInitialVelocityX = thumbLeftSideVelocity.get(thumbLeftSideVelocity.size() - 1).x;
+                                                                  double leftSideThumbInitialVelocityY = thumbLeftSideVelocity.get(thumbLeftSideVelocity.size() - 1).y;
+                                                                  double leftSideThumbLastVelocityX = thumbLeftSideVelocity.get(0).x;
+                                                                  double leftSideThumbLastVelocityY = thumbLeftSideVelocity.get(0).y;
+
+                                                                  double distLeft = distanceOfXYPoints(leftSideThumbInitialVelocityX, leftSideThumbLastVelocityX, leftSideThumbInitialVelocityY, leftSideThumbLastVelocityY);
+
+                                                                  double leftVelocity = distLeft / (thumbLeftSideVelocity.get(0).timeStamp - thumbLeftSideVelocity.get(thumbLeftSideVelocity.size() - 1).timeStamp);
+
+                                                                  Log.i("FYP", "Thumb left velocity is " + leftVelocity);
+                                                              }
+
+
+                                                              if(thumbRightSideVelocity.size() == 30) {
+                                                                  double rightSideThumbInitialVelocityX = thumbRightSideVelocity.get(thumbRightSideVelocity.size() - 1).x;
+                                                                  double rightSideThumbInitialVelocityY = thumbRightSideVelocity.get(thumbRightSideVelocity.size() - 1).y;
+                                                                  double rightSideThumbLastVelocityX = thumbRightSideVelocity.get(0).x;
+                                                                  double rightSideThumbLastVelocityY = thumbRightSideVelocity.get(0).y;
+
+                                                                  double distRight = distanceOfXYPoints(rightSideThumbInitialVelocityX, rightSideThumbLastVelocityX, rightSideThumbInitialVelocityY, rightSideThumbLastVelocityY);
+
+                                                                  double rightVelocity = distRight / (thumbRightSideVelocity.get(0).timeStamp - thumbRightSideVelocity.get(thumbRightSideVelocity.size() - 1).timeStamp);
+
+                                                                  Log.i("FYP", "Thumb right velocity is " + rightVelocity);
+                                                              }*/
+
+
 
 
 
@@ -522,10 +608,21 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 */
 
-                                                              mSynth.setFilterAmp2(first_obj_area);
+                                                             /* mSynth.setFilterAmp2(first_obj_area);
 
                                                               if (!mSynth.isFilterEnvEnabled())
                                                                   mSynth.setFilterValue(y * 10);
+
+*/
+
+
+                                                             Log.i("FYP" , "Value of OCTAVE UP LATCHER " + OCTAVE_UP_LATCHER + " Value of OCTAVE DOWN LATCHER " + OCTAVE_DWN_LATCHER);
+
+
+
+
+
+
 
                                                               Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(255, 49, 0, 255));
                                                               Imgproc.putText(mRgba ,String.valueOf(i) , new Point(x,y) , Core.FONT_HERSHEY_SIMPLEX,1,new Scalar(255, 49, 0, 255 ),4);
@@ -626,6 +723,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
+
+                                                              //split the data into both sides
                                                               if(x < firstHalf){
                                                                   Log.i("FYP" , "Moments number " + i + " (finger) is in first half");
                                                                   fingerMomentsXYDataArrayListLeftSide.add(new FingerMomentsXYData(i,x,y ,true));
@@ -725,6 +824,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                           // processing of cursor to finger
+                                                          //observerations so far is, 0 is pinky on left hand, 3 is second finger on left hand
 
                                                           if(selectedCursor!=null) // there is a cursor
                                                           for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size(); i ++){
@@ -742,7 +842,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-                                                                  Log.i("FYP" , "HIT on " +  fingerMomentsXYDataArrayListLeftSide.get(i).id);
+                                                                  Log.i("FYP" , "HIT on " +  i);
 
 
                                                                 Boolean noteChanged =   Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
@@ -783,6 +883,45 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               mSynth2.releaseOsc();
                                                               SYNTH_PLAYING2 = false;
 
+
+                                                          }
+
+
+
+
+
+
+
+
+                                                          if(thumbLeftSide.size() == 1 && !OCTAVE_UP_LATCHER &&  fingerMomentsXYDataArrayListLeftSide.size()> 3 /*&& thumbLeftSide.get(0).x < fingerMomentsXYDataArrayListLeftSide.get(3).x && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(2).y*/ && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(3).y){
+
+
+                                                              shiftNotes(12, 1);
+                                                              OCTAVE_UP_LATCHER = true;
+                                                              OCTAVE_DWN_LATCHER = false;
+                                                              Log.i("FYP" , "GOING UP LATCHER");
+
+
+
+                                                          }
+
+
+
+                                                          else if(thumbRightSide.size() == 1 && !OCTAVE_DWN_LATCHER && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y < fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size()-1).y) {
+
+
+
+                                                              shiftNotes(12, 0);
+                                                              OCTAVE_DWN_LATCHER = true;
+                                                              OCTAVE_UP_LATCHER = false;
+                                                              Log.i("FYP" , "GOING Down LATCHER ");
+
+
+
+                                                          }
+                                                          else{
+
+                                                              startObjectLatchResetHandler();
 
                                                           }
 
