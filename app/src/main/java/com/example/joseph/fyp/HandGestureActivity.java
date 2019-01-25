@@ -104,6 +104,8 @@ public class HandGestureActivity extends AppCompatActivity {
     private int startPointYObj1 = -1;
     private int currentYObj1 = -1; //used to track current obj 1 's y coordinate
 
+    private boolean SHIFTED_UP  = false;
+
 
     private Mat mIntermediateMat;
     private Mat mRgba;
@@ -396,12 +398,12 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-                                                              if (contours.size() == 0 && SYNTH_PLAYING) {
+                                                              /*if (contours.size() == 0 && SYNTH_PLAYING) {
 
 
                                                                   mSynth.releaseOsc();
                                                                   SYNTH_PLAYING = false;
-                                                              }
+                                                              }*/
 
 
                                                               if (contours2.size() == 0 && SYNTH_PLAYING2) {
@@ -457,7 +459,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                           //remove close points
-                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                        /*  if(ENABLE_DELETE_CLOSE_OBJECTS)
                                                           for(int i = 0 ; i < mu.size(); i ++){
 
                                                               for(int p = i; p < mu.size(); p++){
@@ -482,10 +484,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                          }
+                                                          }*/
 
 
-                                                          Log.i("FYP","number of thumbs " + mu.size());
+                                                        //  Log.i("FYP","number of thumbs " + mu.size());
 
                                                           if(mu.size() == 0){
 
@@ -506,7 +508,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                               if(x < firstHalf){
-                                                                  Log.i("FYP" , "Moments number " + i + " (thumb) is in first half");
+                                                                //  Log.i("FYP" , "Moments number " + i + " (thumb) is in first half");
 
                                                                   thumbLeftSide.add(new FingerMomentsXYData(i,x,y , true));
 
@@ -525,7 +527,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
                                                               else if(x > firstHalf){
 
-                                                                  Log.i("FYP" , "Moments number " + i + " (thumb) is in second half");
+                                                                //  Log.i("FYP" , "Moments number " + i + " (thumb) is in second half");
 
                                                                   thumbRightSide.add(new FingerMomentsXYData(i,x,y , false));
 
@@ -616,7 +618,7 @@ public class HandGestureActivity extends AppCompatActivity {
 */
 
 
-                                                             Log.i("FYP" , "Value of OCTAVE UP LATCHER " + OCTAVE_UP_LATCHER + " Value of OCTAVE DOWN LATCHER " + OCTAVE_DWN_LATCHER);
+                                                      //       Log.i("FYP" , "Value of OCTAVE UP LATCHER " + OCTAVE_UP_LATCHER + " Value of OCTAVE DOWN LATCHER " + OCTAVE_DWN_LATCHER);
 
 
 
@@ -654,7 +656,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                           //remove close objects
-                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                       /*   if(ENABLE_DELETE_CLOSE_OBJECTS)
                                                           for(int i = 0 ; i < mu2.size(); i ++){
 
                                                               for(int p = i; p < mu2.size(); p++){
@@ -678,13 +680,15 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                          }
+                                                          }*/
 
 
                                                           final int a = mu2.size();
 
 
-                                                          if(!fingerCounterLock) {
+                                                          // this counts finger
+
+                                                         /* if(!fingerCounterLock) {
                                                               Log.i("FYP", "sss");
 
                                                               fingerCounterLock = true;
@@ -699,7 +703,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   }
                                                               }, 300);
 
-                                                          }
+                                                          }*/
 
                                                           //detected nothing from 2nd object
                                                           if (contours2.size() == 0) {
@@ -708,7 +712,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           }
 
-                                                          Log.i("FYP", "Number of fingers detected = " + fingerCount);
+                                                          //Log.i("FYP", "Number of fingers detected = " + fingerCount);
 
 
 
@@ -726,14 +730,14 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               //split the data into both sides
                                                               if(x < firstHalf){
-                                                                  Log.i("FYP" , "Moments number " + i + " (finger) is in first half");
+                                                                  //Log.i("FYP" , "Moments number " + i + " (finger) is in first half");
                                                                   fingerMomentsXYDataArrayListLeftSide.add(new FingerMomentsXYData(i,x,y ,true));
 
 
                                                               }
                                                               else if(x > firstHalf){
 
-                                                                  Log.i("FYP" , "Moments number " + i + " (finger) is in second half");
+                                                                //  Log.i("FYP" , "Moments number " + i + " (finger) is in second half");
                                                                   fingerMomentsXYDataArrayListRightSide.add(new FingerMomentsXYData(i,x,y , false ));
 
                                                               }
@@ -744,7 +748,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               //draw circle of center point of the contours, and label them with numbers
                                                               Imgproc.circle(mRgba, new Point(x, y), 4, new Scalar(122, 122, 122, 255));
-                                                              Log.i("FYP",String.valueOf(i));
+                                                             // Log.i("FYP",String.valueOf(i));
                                                               Imgproc.putText(mRgba ,String.valueOf(i) , new Point(x,y) , Core.FONT_HERSHEY_SIMPLEX,1,new Scalar(122, 122, 122, 255),4);
 
 
@@ -842,7 +846,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-                                                                  Log.i("FYP" , "HIT on " +  i);
+                                                                //  Log.i("FYP" , "HIT on " +  i);
 
 
                                                                 Boolean noteChanged =   Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
@@ -858,7 +862,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   if (VIBRATO_ENABLE) {
 
 
-                                                                      Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
+                                                                   //   Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
                                                                       Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
                                                                   }
 
@@ -895,11 +899,13 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           if(thumbLeftSide.size() == 1 && !OCTAVE_UP_LATCHER &&  fingerMomentsXYDataArrayListLeftSide.size()> 3 /*&& thumbLeftSide.get(0).x < fingerMomentsXYDataArrayListLeftSide.get(3).x && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(2).y*/ && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(3).y){
 
+/*
 
                                                               shiftNotes(12, 1);
                                                               OCTAVE_UP_LATCHER = true;
                                                               OCTAVE_DWN_LATCHER = false;
                                                               Log.i("FYP" , "GOING UP LATCHER");
+*/
 
 
 
@@ -907,19 +913,29 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-                                                          else if(thumbRightSide.size() == 1 && !OCTAVE_DWN_LATCHER && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y < fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size()-1).y) {
+                                                          else if(thumbRightSide.size() == 1 /*&& !OCTAVE_DWN_LATCHER*/ && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y < fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size()-1).y) {
 
 
 
-                                                              shiftNotes(12, 0);
+
+
+                                                              if(!SHIFTED_UP) {
+                                                                  shiftNotes(12, 1);
+                                                              }
                                                               OCTAVE_DWN_LATCHER = true;
                                                               OCTAVE_UP_LATCHER = false;
-                                                              Log.i("FYP" , "GOING Down LATCHER ");
+                                                          //    Log.i("FYP" , "GOING Down LATCHER ");
+                                                              SHIFTED_UP = true;
 
 
 
                                                           }
                                                           else{
+
+                                                              if(SHIFTED_UP){
+                                                                  shiftNotes(12,0);
+                                                                  SHIFTED_UP = false;
+                                                              }
 
                                                               startObjectLatchResetHandler();
 

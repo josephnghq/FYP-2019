@@ -11,6 +11,7 @@ import com.jsyn.unitgen.InterpolatingDelay;
 import com.jsyn.unitgen.LineOut;
 import com.jsyn.unitgen.SawtoothOscillatorBL;
 import com.jsyn.unitgen.SineOscillator;
+import com.jsyn.unitgen.SineOscillatorPhaseModulated;
 import com.jsyn.unitgen.SquareOscillator;
 import com.jsyn.unitgen.TriangleOscillator;
 import com.jsyn.unitgen.VariableRateMonoReader;
@@ -82,7 +83,16 @@ public class Synth
     private ArrayList<Oscs> mOscTriArray;
 
 
-    private SawtoothOscillatorBL mOscSaw = new SawtoothOscillatorBL();
+    private SineOscillator SinePMFeeder;
+
+    private ArrayList<Oscs> mOscSawArray2;
+    private ArrayList<Oscs> mOscSineArray2;
+    private ArrayList<Oscs> mOscSqrArray2;
+    private ArrayList<Oscs> mOscTriArray2;
+
+
+
+/*    private SawtoothOscillatorBL mOscSaw = new SawtoothOscillatorBL(); // useless
     private SawtoothOscillatorBL mOscSaw2 = new SawtoothOscillatorBL();
     private SawtoothOscillatorBL mOscSaw3 = new SawtoothOscillatorBL();
 
@@ -97,7 +107,7 @@ public class Synth
 
     private TriangleOscillator mOscTri = new TriangleOscillator();
     private TriangleOscillator mOscTri2 = new TriangleOscillator();
-    private TriangleOscillator mOscTri3 = new TriangleOscillator();
+    private TriangleOscillator mOscTri3 = new TriangleOscillator();*/
 
 
     private boolean DisableSaw = false;
@@ -105,6 +115,11 @@ public class Synth
     private boolean DisableSqr = true;
     private boolean DisableTri = true;
 
+
+    private boolean DisableSaw2 = true;
+    private boolean DisableSine2 = true;
+    private boolean DisableSqr2 = true;
+    private boolean DisableTri2 = true;
 
     private LineOut mOut = new LineOut();
     private FilterLowPass mLowPassFilter = new FilterLowPass();
@@ -120,6 +135,8 @@ public class Synth
     private double env_decay_value = 0.25;
     private double env_sustain_value = 0.2;
     private double env_release_value = 0;
+
+
 
 
 
@@ -186,62 +203,7 @@ public class Synth
 
         setUpOscsArray();
 
-/*
-        mSynth.add(mOscSine);
-        mSynth.add(mOscSine2);
-        mSynth.add(mOscSine3);
-
-        mSynth.add(mOscSqr);
-        mSynth.add(mOscSqr2);
-        mSynth.add(mOscSqr3);
-
-        mSynth.add(mOscTri);
-        mSynth.add(mOscTri2);
-        mSynth.add(mOscTri3);
-
-        mSynth.add(mOscSaw);
-        mSynth.add(mOscSaw2);
-        mSynth.add(mOscSaw3);
-
-        */
-
-
-
-
-
-
-
-
-
-
-        mSynth.add(mOut);
-        mSynth.add(mLowPassFilter);
-        mSynth.add(mHighPassFilter);
-        mSynth.add(envPlayer);
-        mSynth.add(envPlayerFilter);
-        mSynth.add(mMasterFilter);
-
-        // mSynth.add(mDelayUnit);
-
-
-
-         for(int i = 0 ; i < mDelays.length ; i++){
-
-
-            mDelaysFilter[i] = new FilterLowPass();
-            mDelaysFilter[i].frequency.set(20000);
-            mDelaysFilter[i].amplitude.set(   (0.6 / (i + 1) ) - 0      );
-
-           // Log.i("FYP" , "delay amp is " + String.valueOf((0.6 / (i + 1) ) - 0 ) + " " + i);
-
-            mDelays[i] = new InterpolatingDelay();
-            mDelays[i].allocate(132300);
-            mSynth.add(mDelays[i]);
-            mSynth.add(mDelaysFilter[i]);
-
-        }
-
-        setupCircuit();
+        setupCircuitStuff();
 
     }
 
@@ -251,6 +213,17 @@ public class Synth
             loadData(sd);
 
         setUpOscsArray();
+        setupCircuitStuff();
+
+
+
+
+    }
+
+
+    private void setupCircuitStuff(){
+
+
 
 
 /*        mSynth.add(mOscSine);
@@ -277,7 +250,7 @@ public class Synth
         mSynth.add(envPlayer);
         mSynth.add(envPlayerFilter);
         mSynth.add(mMasterFilter);
-        // mSynth.add(mDelayUnit);
+         // mSynth.add(mDelayUnit);
 
 
 
@@ -298,11 +271,10 @@ public class Synth
         }
 
         setupCircuit();
-     //   disableFilterEnv();
+        //   disableFilterEnv();
 
 
     }
-
 
     private void setUpOscsArray(){
 
@@ -311,13 +283,23 @@ public class Synth
        mOscTriArray = new ArrayList<Oscs>(polyphony);
        mOscSqrArray = new ArrayList<Oscs>(polyphony);
 
+        mOscSawArray2 = new ArrayList<Oscs>(polyphony);
+        mOscSineArray2 = new ArrayList<Oscs>(polyphony);
+        mOscTriArray2 = new ArrayList<Oscs>(polyphony);
+        mOscSqrArray2 = new ArrayList<Oscs>(polyphony);
+
 
        for(int i = 0 ; i < polyphony; i++){
 
            mOscSawArray.add(i , new Oscs(unison, Oscs.SAW));
-           mOscSineArray.add(i , new Oscs(unison , Oscs.SINE));
+           mOscSineArray.add(i , new Oscs(unison , Oscs.SINEPM));
            mOscTriArray.add(i , new Oscs(unison , Oscs.TRI));
            mOscSqrArray.add(i , new Oscs(unison , Oscs.SQR));
+
+           mOscSawArray2.add(i , new Oscs(unison, Oscs.SAW));
+           mOscSineArray2.add(i , new Oscs(unison , Oscs.SINE));
+           mOscTriArray2.add(i , new Oscs(unison , Oscs.TRI));
+           mOscSqrArray2.add(i , new Oscs(unison , Oscs.SQR));
 
 
 
@@ -335,6 +317,12 @@ public class Synth
                mSynth.add(mOscSqrArray.get(o).getmOscArray().get(i));
 
 
+               mSynth.add(mOscSawArray2.get(o).getmOscArray().get(i));
+               mSynth.add(mOscSineArray2.get(o).getmOscArray().get(i));
+               mSynth.add(mOscTriArray2.get(o).getmOscArray().get(i));
+               mSynth.add(mOscSqrArray2.get(o).getmOscArray().get(i));
+
+
            }
 
 
@@ -350,7 +338,7 @@ public class Synth
     }
 
 
-
+/*
     public void setOscToSine(){
 
     disableSaw();
@@ -360,7 +348,7 @@ public class Synth
 
 
 
-    }
+    }*/
 
     public void setFilterValue(int value){
 
@@ -450,6 +438,9 @@ public class Synth
 
         // osc -> filter -> output
         // env volume controls amp of oscs
+
+        SinePMFeeder = new SineOscillator();
+        mSynth.add(SinePMFeeder);
 
 
 
@@ -558,6 +549,24 @@ public class Synth
                 mOscTriArray.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
 
 
+                mOscSawArray2.get(i).setAmp(globalAmp);
+                mOscSineArray2.get(i).setAmp(globalAmp);
+                mOscSqrArray2.get(i).setAmp(globalAmp);
+                mOscTriArray2.get(i).setAmp(globalAmp);
+
+
+                mOscSawArray2.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSawArray2.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscSineArray2.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSineArray2.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscSqrArray2.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscSqrArray2.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
+                mOscTriArray2.get(i).getmOscArray().get(p).output.connect(mHighPassFilter.input);
+                mOscTriArray2.get(i).getmOscArray().get(p).output.connect(mLowPassFilter.input);
+
 
                /* envPlayer.output.connect(mOscSawArray.get(i).getmOscArray().get(p).amplitude);
                 envPlayer.output.connect(mOscSineArray.get(i).getmOscArray().get(p).amplitude);
@@ -584,6 +593,11 @@ public class Synth
             mOscSineArray.get(i).setDisable();
             mOscSqrArray.get(i).setDisable();
             mOscTriArray.get(i).setDisable();
+
+            mOscSawArray2.get(i).setDisable();
+            mOscSineArray2.get(i).setDisable();
+            mOscSqrArray2.get(i).setDisable();
+            mOscTriArray2.get(i).setDisable();
 
 
 
@@ -658,27 +672,39 @@ public class Synth
 
         if(DisableSaw){
             disableSaw();
-
         }
 
         if(DisableSqr){
-
             disableSqr();
-
         }
 
         if(DisableSine){
-
         disableSine();
         }
 
         if(DisableTri){
-
         disableTri();
         }
 
+        if(DisableSaw2){
+            disableSaw2();
+        }
 
-      envPlayer.output.connect(mLowPassFilter.amplitude);
+        if(DisableSqr2){
+            disableSqr2();
+        }
+
+        if(DisableSine2){
+            disableSine2();
+        }
+
+        if(DisableTri2){
+            disableTri2();
+        }
+
+
+
+        envPlayer.output.connect(mLowPassFilter.amplitude);
       envPlayer.output.connect(mHighPassFilter.amplitude);
 
 
@@ -756,6 +782,63 @@ public class Synth
 
     }
 
+    public void enablePM() {
+
+
+        for (int i = 0; i < polyphony; i++) {
+
+            for (int p = 0; p < unison; p++) {
+
+
+
+
+                    SinePMFeeder.output.connect(((SineOscillatorPhaseModulated) mOscSineArray.get(i).getmOscArray().get(p)).modulation);
+
+
+
+            }
+        }
+
+        SinePMFeeder.setEnabled(true);
+        SinePMFeeder.start();
+    }
+
+    public void disablePM() {
+
+
+        for (int i = 0; i < polyphony; i++) {
+
+            for (int p = 0; p < unison; p++) {
+
+
+
+
+                SinePMFeeder.output.disconnect(((SineOscillatorPhaseModulated) mOscSineArray.get(i).getmOscArray().get(p)).modulation);
+
+
+
+            }
+        }
+
+        SinePMFeeder.setEnabled(false);
+        SinePMFeeder.stop();
+    }
+
+    public void setPMfreq(double freq){
+
+
+        SinePMFeeder.frequency.set(freq);
+
+
+    }
+
+    public void setPMamp(double amp){
+
+
+        SinePMFeeder.amplitude.set(amp);
+    }
+
+
 
     public void disableSaw(){
 
@@ -771,7 +854,21 @@ public class Synth
         }
 
 
+    }
 
+
+    public void disableSaw2(){
+
+        DisableSaw2 = true;
+/*    mOscSaw.setEnabled(false);
+    mOscSaw2.setEnabled(false);
+    mOscSaw3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscSawArray2.get(i).setDisable();
+
+        }
 
 
     }
@@ -790,6 +887,21 @@ public class Synth
 
     }
 
+
+    public void disableSqr2(){
+
+        DisableSqr2 = true;
+/*        mOscSqr.setEnabled(false);
+        mOscSqr2.setEnabled(false);
+        mOscSqr3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscSqrArray2.get(i).setDisable();
+        }
+
+    }
+
     public void disableSine(){
 
         DisableSine = true;
@@ -800,6 +912,24 @@ public class Synth
         for(int i =0; i < polyphony; i++){
 
                 mOscSineArray.get(i).setDisable();
+
+
+        }
+
+
+
+    }
+
+    public void disableSine2(){
+
+        DisableSine2 = true;
+/*        mOscSine.setEnabled(false);
+        mOscSine2.setEnabled(false);
+        mOscSine3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscSineArray2.get(i).setDisable();
 
 
         }
@@ -823,6 +953,21 @@ public class Synth
 
     }
 
+    public void disableTri2(){
+
+        DisableTri2 = true;
+/*        mOscTri.setEnabled(false);
+        mOscTri2.setEnabled(false);
+        mOscTri3.setEnabled(false);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscTriArray2.get(i).setDisable();
+        }
+
+
+    }
+
     public void enableSaw(){
 
         DisableSaw = false;
@@ -840,6 +985,25 @@ public class Synth
 
     }
 
+
+    public void enableSaw2(){
+
+        DisableSaw2 = false;
+/*        mOscSaw.setEnabled(true);
+        mOscSaw2.setEnabled(true);
+        mOscSaw3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscSawArray2.get(i).setEnable();
+
+
+        }
+
+    }
+
+
     public void enableSine(){
 
         DisableSine = false;
@@ -852,6 +1016,24 @@ public class Synth
 
 
                 mOscSineArray.get(i).setEnable();
+
+        }
+
+
+    }
+
+    public void enableSine2(){
+
+        DisableSine2 = false;
+/*        mOscSine.setEnabled(true);
+        mOscSine2.setEnabled(true);
+        mOscSine3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+
+            mOscSineArray2.get(i).setEnable();
 
         }
 
@@ -875,6 +1057,22 @@ public class Synth
 
     }
 
+    public void enableSqr2(){
+
+        DisableSqr2 = false;
+/*        mOscSqr.setEnabled(true);
+        mOscSqr2.setEnabled(true);
+        mOscSqr3.setEnabled(true);*/
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscSqrArray2.get(i).setEnable();
+
+        }
+
+
+    }
+
     public void enableTri(){
 
         DisableTri = false;
@@ -886,6 +1084,23 @@ public class Synth
         for(int i =0; i < polyphony; i++){
 
                 mOscTriArray.get(i).setEnable();
+
+        }
+
+    }
+
+
+    public void enableTri2(){
+
+        DisableTri2 = false;
+/*        mOscTri.setEnabled(true);
+        mOscTri2.setEnabled(true);
+        mOscTri3.setEnabled(true);*/
+
+
+        for(int i =0; i < polyphony; i++){
+
+            mOscTriArray2.get(i).setEnable();
 
         }
 
@@ -1000,14 +1215,14 @@ public class Synth
     public void playTestPitch(){
 
 
-
+/*
         mOscSaw.frequency.set(Constants.NoteC4);
         mOscSaw2.frequency.set(Constants.NoteE4);
         mOscSaw3.frequency.set(Constants.NoteG4);
 
         mOscSaw.amplitude.set(0.8);
         mOscSaw2.amplitude.set(0.8);
-        mOscSaw3.amplitude.set(0.8);
+        mOscSaw3.amplitude.set(0.8);*/
 
 
 
@@ -1120,6 +1335,7 @@ public class Synth
 
 
 
+/*
 
 
             mOscSaw.frequency.set(Constants.NoteD4);
@@ -1137,6 +1353,7 @@ public class Synth
             mOscTri.frequency.set(Constants.NoteD4);
             mOscTri2.frequency.set(Constants.NoteD4 + detuneValue);
             mOscTri3.frequency.set(Constants.NoteD4 - detuneValue);
+*/
 
 
             if(envPlayerFilter.isEnabled()) {
@@ -1200,10 +1417,30 @@ public class Synth
             mOscTriArray.get(i).setEnable();
 
 
+            if(!DisableSaw2)
+                mOscSawArray2.get(i).setEnable();
+
+            if(!DisableSine2)
+                mOscSineArray2.get(i).setEnable();
+
+            if(!DisableSqr2)
+                mOscSqrArray2.get(i).setEnable();
+
+            if(!DisableTri2)
+                mOscTriArray2.get(i).setEnable();
+
+
             mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i) + offset , detune);
              mOscSineArray.get(i).setFrequency(notes.noteFreqs.get(i) + offset, detune);
              mOscSqrArray.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
              mOscTriArray.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
+
+
+            mOscSawArray2.get(i).setFrequency(notes.noteFreqs.get(i) + offset , detune);
+            mOscSineArray2.get(i).setFrequency(notes.noteFreqs.get(i) + offset, detune);
+            mOscSqrArray2.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
+            mOscTriArray2.get(i).setFrequency(notes.noteFreqs.get(i)+ offset, detune);
+
 
 
         }
@@ -1216,6 +1453,12 @@ public class Synth
             mOscSineArray.get(i).setDisable();
             mOscSqrArray.get(i).setDisable();
             mOscTriArray.get(i).setDisable();
+
+            mOscSawArray2.get(i).setDisable();
+            mOscSineArray2.get(i).setDisable();
+            mOscSqrArray2.get(i).setDisable();
+            mOscTriArray2.get(i).setDisable();
+
 
 
         }
@@ -1292,14 +1535,14 @@ public class Synth
             {
 
 
-
+/*
                 mOscSaw.frequency.set(Constants.NoteD4);
                 mOscSaw2.frequency.set(Constants.NoteF4);
                 mOscSaw3.frequency.set(Constants.NoteG4);
 
                 mOscSaw.amplitude.set(0.8);
                 mOscSaw2.amplitude.set(0.8);
-                mOscSaw3.amplitude.set(0.8);
+                mOscSaw3.amplitude.set(0.8);*/
 
 
                 envPlayer.dataQueue.clear();
@@ -1547,7 +1790,7 @@ public class Synth
 
 
 
-
+/*
 
 
             mOscSaw.frequency.set(frequency);
@@ -1564,7 +1807,7 @@ public class Synth
 
             mOscTri.frequency.set(frequency);
             mOscTri2.frequency.set(frequency);
-            mOscTri3.frequency.set(frequency);
+            mOscTri3.frequency.set(frequency);*/
 
 
 
@@ -1575,8 +1818,10 @@ public class Synth
     public void stopTestPitch(){
 
 
+/*
 
         mOscSaw.amplitude.set(0.0);
+*/
 
 
 

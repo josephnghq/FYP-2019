@@ -21,6 +21,8 @@
 
 
 
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -29,7 +31,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Osc 1"/>
+                    android:text="Osc 1 ( PM Sine )" />
 
 
                 <GridLayout
@@ -64,146 +66,253 @@
 
 
 
-                <GridLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:rowCount="2"
-                    android:columnCount="8"
-                    android:useDefaultMargins="true"
-                    >
-
-                    <TextView
-                        android:id="@+id/textview_attack"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                         android:text="Attack" />
-
-                    <TextView
-                        android:id="@+id/textview_decay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:text="Decay" />
-
-                    <TextView
-                        android:id="@+id/textview_sustain"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:text="Sustain" />
-
-                    <TextView
-                        android:id="@+id/textview_release"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:text="Release" />
-
-                    <TextView
-                        android:id="@+id/textview_attack_lvl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-
-                        android:text="Attack Level" />
-
-
-                    <TextView
-                        android:id="@+id/textview_decay_lvl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-
-                        android:text="Decay Level" />
-
-
-                    <TextView
-                        android:id="@+id/textview_sustain_lvl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-
-                        android:text="Sustain Level" />
-
-                    <TextView
-                        android:id="@+id/textview_release_lvl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-
-                        android:text="Release Level" />
-
-                    <SeekBar
-                        android:id="@+id/env_attack"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0" />
-
-
-                    <SeekBar
-                        android:id="@+id/env_decay"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-
-
-                    <SeekBar
-                        android:id="@+id/env_sustain"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-
-                        />
-
-
-                    <SeekBar
-                        android:id="@+id/env_release"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-
-
-
-                    <SeekBar
-                        android:id="@+id/env_attack_lvl"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-
-
-
-                    <SeekBar
-                        android:id="@+id/env_decay_lvl"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-
-
-                    <SeekBar
-                        android:id="@+id/env_sustain_lvl"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-
-
-                    <SeekBar
-                        android:id="@+id/env_release_lvl"
-                        android:layout_width="77dp"
-                        android:layout_height="wrap_content"
-                        android:layout_row="1"
-                        />
-                </GridLayout>
-
 
 
 
             </LinearLayout>
+
+
+
+
+
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:paddingLeft="100dp"
+            android:paddingRight="100dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Osc 2"/>
+
+
+            <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/osc_sawtooth2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sawtooth" />
+
+                <CheckBox
+                    android:id="@+id/osc_sine2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sine" />
+
+                <CheckBox
+                    android:id="@+id/osc_square2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Square" />
+
+                <CheckBox
+                    android:id="@+id/osc_triangle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Triangle" />
+            </GridLayout>
+
+            <CheckBox
+                android:id="@+id/osc2_enablePM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable PM" />
+
+
+            <TextView
+                android:id="@+id/PM_freq_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Freq" />
+
+            <SeekBar
+                android:id="@+id/PM_freq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:id="@+id/PM_amp_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amp" />
+
+            <SeekBar
+                android:id="@+id/PM_amp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
+        </LinearLayout>
+
+
+
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:paddingLeft="100dp"
+            android:paddingRight="100dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Volume Envelope"/>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="2"
+            android:columnCount="8"
+            android:useDefaultMargins="true"
+            >
+
+            <TextView
+                android:id="@+id/textview_attack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:text="Attack" />
+
+            <TextView
+                android:id="@+id/textview_decay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:text="Decay" />
+
+            <TextView
+                android:id="@+id/textview_sustain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:text="Sustain" />
+
+            <TextView
+                android:id="@+id/textview_release"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:text="Release" />
+
+            <TextView
+                android:id="@+id/textview_attack_lvl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+
+                android:text="Attack Level" />
+
+
+            <TextView
+                android:id="@+id/textview_decay_lvl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+
+                android:text="Decay Level" />
+
+
+            <TextView
+                android:id="@+id/textview_sustain_lvl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+
+                android:text="Sustain Level" />
+
+            <TextView
+                android:id="@+id/textview_release_lvl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+
+                android:text="Release Level" />
+
+            <SeekBar
+                android:id="@+id/env_attack"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="0" />
+
+
+            <SeekBar
+                android:id="@+id/env_decay"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+
+
+            <SeekBar
+                android:id="@+id/env_sustain"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+
+                />
+
+
+            <SeekBar
+                android:id="@+id/env_release"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+
+
+
+            <SeekBar
+                android:id="@+id/env_attack_lvl"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+
+
+
+            <SeekBar
+                android:id="@+id/env_decay_lvl"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+
+
+            <SeekBar
+                android:id="@+id/env_sustain_lvl"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+
+
+            <SeekBar
+                android:id="@+id/env_release_lvl"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                />
+        </GridLayout>
 
         <LinearLayout
             android:orientation="vertical"
@@ -232,12 +341,6 @@
             android:paddingRight="100dp"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"/>
-
-
-
-
-
-
 
 
 
@@ -445,6 +548,8 @@
 
 
              </LinearLayout>
+
+
 
 
 

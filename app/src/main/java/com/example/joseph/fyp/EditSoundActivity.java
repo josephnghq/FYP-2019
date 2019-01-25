@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -34,6 +35,14 @@ public class EditSoundActivity extends AppCompatActivity {
     private CheckBox filterADSRCheckbox;
 
 
+    private CheckBox oscSawRadioButton2;
+    private CheckBox oscSineRadioButton2;
+    private CheckBox oscTriRadioButton2;
+    private CheckBox oscSqrRadioButton2;
+
+    private CheckBox enablePM;
+
+
     private Synth mSynth;
     private Button btnPlayTestPitch;
     private Button btnPlay;
@@ -50,6 +59,10 @@ public class EditSoundActivity extends AppCompatActivity {
     private SeekBar seekBarDecay;
     private SeekBar seekBarSustain;
     private SeekBar seekBarRelease;
+
+
+    private SeekBar PMfreq;
+    private SeekBar PMamp;
 
     private SeekBar seekBarAttackLevel;
     private SeekBar seekBarDecayLevel;
@@ -69,6 +82,10 @@ public class EditSoundActivity extends AppCompatActivity {
     private SeekBar seekBarDecayFilterLevel;
     private SeekBar seekBarSustainFilterLevel;
     private SeekBar seekBarReleaseFilterLevel;
+
+
+
+    private SeekBar detune2;
 
 
     private double durationAttack = 0.5;
@@ -104,6 +121,7 @@ public class EditSoundActivity extends AppCompatActivity {
         editor = sharedPref.edit();
         gson = builder.create();
         String gsonString = sharedPref.getString(getString(R.string.preference_file_key) , "");
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         if(gsonString.length()>0){
             listOfSynthData = gson.fromJson(gsonString,new TypeToken<ArrayList<SynthData>>(){}.getType());
@@ -134,7 +152,7 @@ public class EditSoundActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSynth.setFrequencyWithPorta(110);
+                mSynth.releaseOsc();
             }
         });
 
@@ -179,6 +197,29 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+        oscSawRadioButton2 = (CheckBox)findViewById(R.id.osc_sawtooth2);
+        oscSawRadioButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean checked = oscSawRadioButton2.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableSaw2();
+
+                }
+                else{
+                    mSynth.disableSaw2();
+                }
+
+
+
+
+            }
+        });
+
 
         oscSineRadioButton = (CheckBox)findViewById(R.id.osc_sine);
         oscSineRadioButton.setOnClickListener(new View.OnClickListener() {
@@ -195,6 +236,27 @@ public class EditSoundActivity extends AppCompatActivity {
                 }
                 else{
                     mSynth.disableSine();
+                }
+
+
+            }
+        });
+
+        oscSineRadioButton2 = (CheckBox)findViewById(R.id.osc_sine2);
+        oscSineRadioButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean checked = oscSineRadioButton2.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableSine2();
+
+                }
+                else{
+                    mSynth.disableSine2();
                 }
 
 
@@ -223,6 +285,28 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+        oscSqrRadioButton2 = (CheckBox)findViewById(R.id.osc_square2);
+        oscSqrRadioButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                boolean checked = oscSqrRadioButton2.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableSqr2();
+
+                }
+                else{
+                    mSynth.disableSqr2();
+                }
+
+
+            }
+        });
+
         oscTriRadioButton = (CheckBox)findViewById(R.id.osc_triangle);
         oscTriRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,6 +322,27 @@ public class EditSoundActivity extends AppCompatActivity {
                 }
                 else{
                     mSynth.disableTri();
+                }
+
+
+            }
+        });
+
+        oscTriRadioButton2 = (CheckBox)findViewById(R.id.osc_triangle);
+        oscTriRadioButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean checked = oscTriRadioButton2.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableTri2();
+
+                }
+                else{
+                    mSynth.disableTri2();
                 }
 
 
@@ -265,6 +370,29 @@ public class EditSoundActivity extends AppCompatActivity {
 
             }
         });
+
+        enablePM = (CheckBox)findViewById(R.id.osc2_enablePM);
+        enablePM.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                boolean checked = enablePM.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enablePM();
+
+                }
+                else{
+                    mSynth.disablePM();
+                }
+
+
+            }
+        });
+
 
 
         filterADSRCheckbox = (CheckBox)findViewById(R.id.enable_filter_adsr);
@@ -403,6 +531,8 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
+
+
         filterValue = (SeekBar)findViewById(R.id.filter_value);
         filterValue.setMax(20000);
 
@@ -419,6 +549,55 @@ public class EditSoundActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        PMfreq = (SeekBar)findViewById(R.id.PM_freq);
+        PMfreq.setMax(8000);
+
+        PMfreq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+                mSynth.setPMfreq(progress);
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+        PMamp = (SeekBar) findViewById(R.id.PM_amp);
+        PMamp.setMax(100);
+        PMamp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setPMamp(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
 

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.jsyn.unitgen.SawtoothOscillatorBL;
 import com.jsyn.unitgen.SineOscillator;
+import com.jsyn.unitgen.SineOscillatorPhaseModulated;
 import com.jsyn.unitgen.SquareOscillator;
 import com.jsyn.unitgen.TriangleOscillator;
 import com.jsyn.unitgen.UnitOscillator;
@@ -24,6 +25,8 @@ public class Oscs {
     public final static int SINE = 1;
     public final static int SQR = 2;
     public final static int TRI = 3;
+    public final static int SINEPM = 4;
+
     private double currentFreq = 0;
 
 
@@ -51,6 +54,10 @@ public class Oscs {
 
                 case TRI:
                     mOscArray.add(new TriangleOscillator());
+                    break;
+
+                case SINEPM:
+                    mOscArray.add(new SineOscillatorPhaseModulated());
                     break;
 
 
