@@ -586,18 +586,18 @@ public class Synth
 
 
 
-        //disable all osc first, enable later when we need to use them
-        for(int i = 0 ; i < polyphony; i ++){
+            //disable all osc first, enable later when we need to use them
+            for(int i = 0 ; i < polyphony; i ++){
 
-            mOscSawArray.get(i).setDisable();
-            mOscSineArray.get(i).setDisable();
-            mOscSqrArray.get(i).setDisable();
-            mOscTriArray.get(i).setDisable();
+                mOscSawArray.get(i).setDisable();
+                mOscSineArray.get(i).setDisable();
+                mOscSqrArray.get(i).setDisable();
+                mOscTriArray.get(i).setDisable();
 
-            mOscSawArray2.get(i).setDisable();
-            mOscSineArray2.get(i).setDisable();
-            mOscSqrArray2.get(i).setDisable();
-            mOscTriArray2.get(i).setDisable();
+                mOscSawArray2.get(i).setDisable();
+                mOscSineArray2.get(i).setDisable();
+                mOscSqrArray2.get(i).setDisable();
+                mOscTriArray2.get(i).setDisable();
 
 
 
@@ -703,13 +703,12 @@ public class Synth
         }
 
 
-
         envPlayer.output.connect(mLowPassFilter.amplitude);
-      envPlayer.output.connect(mHighPassFilter.amplitude);
+        envPlayer.output.connect(mHighPassFilter.amplitude);
 
 
-      envPlayerFilter.output.connect(mLowPassFilter.frequency);
-      envPlayerFilter.output.connect(mHighPassFilter.frequency);
+        envPlayerFilter.output.connect(mLowPassFilter.frequency);
+        envPlayerFilter.output.connect(mHighPassFilter.frequency);
 
 
 
