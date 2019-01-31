@@ -41,6 +41,8 @@ public class EditSoundActivity extends AppCompatActivity {
     private CheckBox oscSqrRadioButton2;
 
     private CheckBox enablePM;
+    private CheckBox enableLFO;
+
 
 
     private Synth mSynth;
@@ -63,6 +65,9 @@ public class EditSoundActivity extends AppCompatActivity {
 
     private SeekBar PMfreq;
     private SeekBar PMamp;
+
+    private SeekBar LFOfreq;
+    private SeekBar LFOamp;
 
     private SeekBar seekBarAttackLevel;
     private SeekBar seekBarDecayLevel;
@@ -394,6 +399,28 @@ public class EditSoundActivity extends AppCompatActivity {
         });
 
 
+        enableLFO = (CheckBox)findViewById(R.id.LFO_1);
+        enableLFO.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                boolean checked = enableLFO.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enableLFO();
+
+                }
+                else{
+                    mSynth.disableLFO();
+                }
+
+
+            }
+        });
+
 
         filterADSRCheckbox = (CheckBox)findViewById(R.id.enable_filter_adsr);
         filterADSRCheckbox.setOnClickListener(new View.OnClickListener() {
@@ -558,6 +585,33 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+        LFOfreq = (SeekBar)findViewById(R.id.LFO_1_freq);
+        LFOfreq.setMax(15);
+
+        LFOfreq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+                mSynth.setLFOfreq(progress);
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
         PMfreq = (SeekBar)findViewById(R.id.PM_freq);
         PMfreq.setMax(8000);
 
@@ -593,6 +647,29 @@ public class EditSoundActivity extends AppCompatActivity {
 
                 double value = (double)progress/100;
                 mSynth.setPMamp(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        LFOamp = (SeekBar) findViewById(R.id.LFO_1_amp);
+        LFOamp.setMax(100);
+        LFOamp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setLFOamp(value);
 
             }
 
@@ -1020,11 +1097,13 @@ public class EditSoundActivity extends AppCompatActivity {
 
                 title = et.getText().toString();
                 SynthData sd;
-                sd = mSynth.saveData();
+                mSynth.title = title;
+                mSynth.saveData();
+/*                d = mSynth.saveData();
                 sd.title = title;
                 listOfSynthData.add(sd);
                 editor.putString(getString(R.string.preference_file_key), gson.toJson(listOfSynthData));
-                editor.commit();
+                editor.commit();*/
 
             }
         });

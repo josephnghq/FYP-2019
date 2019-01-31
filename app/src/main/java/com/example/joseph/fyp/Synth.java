@@ -4,16 +4,12 @@ import android.util.Log;
 
 import com.jsyn.JSyn;
 import com.jsyn.data.SegmentedEnvelope;
-import com.jsyn.unitgen.FilterAllPass;
 import com.jsyn.unitgen.FilterHighPass;
 import com.jsyn.unitgen.FilterLowPass;
 import com.jsyn.unitgen.InterpolatingDelay;
 import com.jsyn.unitgen.LineOut;
-import com.jsyn.unitgen.SawtoothOscillatorBL;
 import com.jsyn.unitgen.SineOscillator;
 import com.jsyn.unitgen.SineOscillatorPhaseModulated;
-import com.jsyn.unitgen.SquareOscillator;
-import com.jsyn.unitgen.TriangleOscillator;
 import com.jsyn.unitgen.VariableRateMonoReader;
 
 import java.util.ArrayList;
@@ -55,6 +51,7 @@ public class Synth
 
     private RoomDAO mRoomDAO;
 
+    public String title;
 
     private double FREQUENCY_NOW = 440;
     private double freqDiff = 0;
@@ -71,6 +68,9 @@ public class Synth
     private boolean ENABLE_HIGH_PASS = false;
     private boolean ENABLE_FILTER_ADSR = true;
 
+    private boolean ENABLE_PM;
+    private boolean ENABLE_LFO;
+
     private int unison = 4;
     private int polyphony = 10;
 
@@ -83,7 +83,8 @@ public class Synth
     private ArrayList<Oscs> mOscTriArray;
 
 
-    private SineOscillator SinePMFeeder;
+    private SineOscillator SinePMFeeder = new SineOscillator();
+    private SineOscillator SineLFO = new SineOscillator();
 
     private ArrayList<Oscs> mOscSawArray2;
     private ArrayList<Oscs> mOscSineArray2;
@@ -219,6 +220,19 @@ public class Synth
 
 
     }
+
+    public Synth(RoomSynthData rsd){
+
+        loadData(rsd);
+
+        setUpOscsArray();
+        setupCircuitStuff();
+
+
+
+
+    }
+
 
 
     private void setupCircuitStuff(){
@@ -439,9 +453,8 @@ public class Synth
         // osc -> filter -> output
         // env volume controls amp of oscs
 
-        SinePMFeeder = new SineOscillator();
         mSynth.add(SinePMFeeder);
-
+        mSynth.add(SineLFO);
 
 
 
@@ -748,6 +761,15 @@ public class Synth
             disableDelay();
         }
 
+        if(ENABLE_LFO){
+            enableLFO();
+        }
+
+        if(ENABLE_PM){
+            enablePM();
+        }
+
+
 
 
     }
@@ -781,6 +803,40 @@ public class Synth
 
     }
 
+
+
+    public void enableLFO(){
+
+        Log.i("FYP" , "LFO enabled");
+
+        SineLFO.output.connect(mMasterFilter.amplitude);
+
+
+        SineLFO.setEnabled(true);
+        SineLFO.start();
+
+        ENABLE_LFO = true;
+
+
+
+    }
+
+    public void disableLFO(){
+        Log.i("FYP" , "LFO disableLFO");
+
+
+        SineLFO.output.disconnect(mMasterFilter.amplitude);
+
+        SineLFO.setEnabled(false);
+        SineLFO.stop();
+
+        ENABLE_LFO = false;
+
+
+
+    }
+
+
     public void enablePM() {
 
 
@@ -800,6 +856,10 @@ public class Synth
 
         SinePMFeeder.setEnabled(true);
         SinePMFeeder.start();
+
+        ENABLE_PM = true;
+
+
     }
 
     public void disablePM() {
@@ -821,7 +881,26 @@ public class Synth
 
         SinePMFeeder.setEnabled(false);
         SinePMFeeder.stop();
+
+        ENABLE_PM = false;
+
     }
+
+    public void setLFOfreq(double freq){
+
+
+        SineLFO.frequency.set(freq);
+
+    }
+
+    public void setLFOamp(double amp){
+
+
+        SineLFO.amplitude.set(amp);
+
+
+    }
+
 
     public void setPMfreq(double freq){
 
@@ -1390,9 +1469,14 @@ public class Synth
 
 
 
-    public void setNotes(Notes notes , double detune , double offset){
+    public void setNotes(Notes notes , double detune , double offset ){
 
         //if detune is -1, just set detuneValue
+
+
+
+
+
 
         if(detune == -1){
             detune = detuneValue;
@@ -1401,6 +1485,7 @@ public class Synth
         //play notes
 
         for (int i = 0 ; i < notes.noteFreqs.size(); i++){
+
 
 
             if(!DisableSaw)
@@ -1427,6 +1512,9 @@ public class Synth
 
             if(!DisableTri2)
                 mOscTriArray2.get(i).setEnable();
+
+
+            Log.i("FYP" , "Setting note " + i + " freq " + notes.noteFreqs.get(i));
 
 
             mOscSawArray.get(i).setFrequency(notes.noteFreqs.get(i) + offset , detune);
@@ -1832,8 +1920,10 @@ public class Synth
         this.detuneValue = detuneValue;
     }
 
-    public void loadData(SynthData sd){
 
+    public void loadData(RoomSynthData rsd){
+        {
+/*
 
         detuneValue = sd.detuneValue;
 
@@ -1882,6 +1972,7 @@ public class Synth
         DELAY_TIME = sd.DELAY_TIME;
         num_of_delay_voices = sd.num_of_delay_voices;
         DELAY_ENABLED = sd.enable_delay;
+
         DisableSaw = sd.DisableSaw;
         DisableSine = sd.DisableSine;
         DisableSqr = sd.DisableSqr;
@@ -1890,13 +1981,196 @@ public class Synth
         ENABLE_HIGH_PASS = sd.enableHighPass;
 
         setADSR(env_attack_duration,env_decay_duration,env_sustain_duration,env_release_duration);
+        setADSRFilter(env_attack_duration_filter,env_decay_duration_filter,env_sustain_value_filter,env_release_duration_filter);*/
+
+            final RoomSynthData RoomSynthData = rsd;
+
+            detuneValue = RoomSynthData.detuneValue ;
+
+            env_attack_duration = RoomSynthData.env_attack_duration;
+            env_decay_duration = RoomSynthData.env_decay_duration;
+            env_sustain_duration = RoomSynthData.env_sustain_duration;
+            env_release_duration = RoomSynthData.env_release_duration;
+
+            env_attack_value = RoomSynthData.env_attack_value;
+            env_decay_value = RoomSynthData.env_decay_value;
+            env_sustain_value = RoomSynthData.env_sustain_value;
+            env_release_value = RoomSynthData.env_release_value;
+
+            ENABLE_FILTER_ADSR = RoomSynthData.enable_filter_adsr;
+
+
+            ENABLE_PORTA = RoomSynthData.enable_porta;
+            DELAY_ENABLED = RoomSynthData.enable_delay;
+            DELAY_TIME = RoomSynthData.DELAY_TIME;
+            num_of_delay_voices = RoomSynthData.num_of_delay_voices;
+
+
+            env_attack_duration_filter = RoomSynthData.env_attack_duration_filter;
+            env_decay_duration_filter = RoomSynthData.env_decay_duration_filter;
+            env_sustain_duration_filter = RoomSynthData.env_sustain_duration_filter;
+            env_release_duration_filter = RoomSynthData.env_release_duration_filter;
+
+            env_attack_value_filter = RoomSynthData.env_attack_value_filter ;
+            env_decay_value_filter = RoomSynthData.env_decay_value_filter ;
+            env_sustain_value_filter = RoomSynthData.env_sustain_value_filter;
+            env_release_value_filter = RoomSynthData.env_release_value_filter;
+
+
+
+            DisableSaw = RoomSynthData.DisableSaw;
+            DisableSine = RoomSynthData.DisableSine;
+            DisableSqr = RoomSynthData.DisableSqr;
+            DisableTri = RoomSynthData.DisableTri;
+
+
+            ENABLE_LOW_PASS = RoomSynthData.enableLowPass;
+            ENABLE_HIGH_PASS = RoomSynthData.enableHighPass;
+
+
+
+            ENABLE_LFO = RoomSynthData.ENABLE_LFO;
+            SineLFO.frequency.set(RoomSynthData.LFO_freq);
+            SineLFO.amplitude.set(RoomSynthData.LFO_amp);
+
+            ENABLE_PM = RoomSynthData.ENABLE_PM;
+            SinePMFeeder.frequency.set(RoomSynthData.PM_freq);
+            SinePMFeeder.amplitude.set(RoomSynthData.PM_amp);
+
+
+
+
+            setADSR(env_attack_duration,env_decay_duration,env_sustain_duration,env_release_duration);
+            setADSRFilter(env_attack_duration_filter,env_decay_duration_filter,env_sustain_value_filter,env_release_duration_filter);
+
+
+
+        }
+    }
+
+
+
+    public void loadData(SynthData sd){
+/*
+
+        detuneValue = sd.detuneValue;
+
+        env_attack_duration = sd.env_attack_duration;
+        env_decay_duration = sd.env_decay_duration;
+        env_sustain_duration = sd.env_sustain_duration;
+        env_release_duration = sd.env_release_duration;
+
+        env_attack_value = sd.env_attack_value;
+        env_decay_value = sd.env_decay_value;
+        env_sustain_value = sd.env_sustain_value;
+        env_release_value = sd.env_release_value;
+
+
+        ENABLE_FILTER_ADSR = sd.enable_filter_adsr;
+
+        if(ENABLE_FILTER_ADSR)
+        Log.i("FYP " , "ENABLE_FILTER_ADSR true" );
+
+
+        ENABLE_PORTA = sd.enable_porta;
+
+
+
+
+        env_attack_duration_filter = sd.env_attack_duration_filter;
+        env_decay_duration_filter = sd.env_decay_duration_filter;
+        env_sustain_duration_filter = sd.env_sustain_duration_filter;
+        env_release_duration_filter = sd.env_release_duration_filter;
+
+        env_attack_value_filter = sd.env_attack_value_filter;
+        env_decay_value_filter = sd.env_decay_value_filter;
+        env_sustain_value_filter = sd.env_sustain_value_filter;
+        env_release_value_filter = sd.env_release_value_filter;
+
+
+        Log.i("FYP" , " Value of filter attack, decay, sustain and release are "
+
+                +env_attack_value_filter + " "
+                +env_decay_value_filter + " "
+                +env_sustain_value_filter + " "
+                +env_release_value_filter + " "
+
+        );
+
+        DELAY_TIME = sd.DELAY_TIME;
+        num_of_delay_voices = sd.num_of_delay_voices;
+        DELAY_ENABLED = sd.enable_delay;
+
+        DisableSaw = sd.DisableSaw;
+        DisableSine = sd.DisableSine;
+        DisableSqr = sd.DisableSqr;
+        DisableTri = sd.DisableTri;
+        ENABLE_LOW_PASS = sd.enableLowPass;
+        ENABLE_HIGH_PASS = sd.enableHighPass;
+
+        setADSR(env_attack_duration,env_decay_duration,env_sustain_duration,env_release_duration);
+        setADSRFilter(env_attack_duration_filter,env_decay_duration_filter,env_sustain_value_filter,env_release_duration_filter);*/
+
+        final RoomSynthData RoomSynthData = new RoomSynthData();
+
+
+        detuneValue = RoomSynthData.detuneValue ;
+
+        env_attack_duration = RoomSynthData.env_attack_duration;
+        env_decay_duration = RoomSynthData.env_decay_duration;
+        env_sustain_duration = RoomSynthData.env_sustain_duration;
+        env_release_duration = RoomSynthData.env_release_duration;
+
+        env_attack_value = RoomSynthData.env_attack_value;
+        env_decay_value = RoomSynthData.env_decay_value;
+        env_sustain_value = RoomSynthData.env_sustain_value;
+        env_release_value = RoomSynthData.env_release_value;
+
+        ENABLE_FILTER_ADSR = RoomSynthData.enable_filter_adsr;
+
+
+        ENABLE_PORTA = RoomSynthData.enable_porta;
+        DELAY_ENABLED = RoomSynthData.enable_delay;
+        DELAY_TIME = RoomSynthData.DELAY_TIME;
+        num_of_delay_voices = RoomSynthData.num_of_delay_voices;
+
+
+        env_attack_duration_filter = RoomSynthData.env_attack_duration_filter;
+        env_decay_duration_filter = RoomSynthData.env_decay_duration_filter;
+        env_sustain_duration_filter = RoomSynthData.env_sustain_duration_filter;
+        env_release_duration_filter = RoomSynthData.env_release_duration_filter;
+
+        env_attack_value_filter = RoomSynthData.env_attack_value_filter ;
+        env_decay_value_filter = RoomSynthData.env_decay_value_filter ;
+        env_sustain_value_filter = RoomSynthData.env_sustain_value_filter;
+        env_release_value_filter = RoomSynthData.env_release_value_filter;
+
+
+
+        DisableSaw = RoomSynthData.DisableSaw;
+        DisableSine = RoomSynthData.DisableSine;
+        DisableSqr = RoomSynthData.DisableSqr;
+        DisableTri = RoomSynthData.DisableTri;
+
+
+        ENABLE_LOW_PASS = RoomSynthData.enableLowPass;
+        ENABLE_HIGH_PASS = RoomSynthData.enableHighPass;
+
+
+
+        ENABLE_LFO = RoomSynthData.ENABLE_LFO;
+        SineLFO.frequency.set(RoomSynthData.LFO_freq);
+        SineLFO.amplitude.set(RoomSynthData.LFO_amp);
+
+        ENABLE_PM = RoomSynthData.ENABLE_PM;
+        SinePMFeeder.frequency.set(RoomSynthData.PM_freq);
+        SinePMFeeder.amplitude.set(RoomSynthData.PM_amp);
+
+
+
+
+        setADSR(env_attack_duration,env_decay_duration,env_sustain_duration,env_release_duration);
         setADSRFilter(env_attack_duration_filter,env_decay_duration_filter,env_sustain_value_filter,env_release_duration_filter);
-
-
-
-
-
-
 
 
 
@@ -1904,9 +2178,10 @@ public class Synth
 
 
 
-    public SynthData saveData(){
+    public void saveData(){
 
 
+/*
    SynthData sd = new SynthData();
 
 
@@ -1945,10 +2220,13 @@ public class Synth
 
     sd.enableLowPass = mLowPassFilter.isEnabled();
     sd.enableHighPass = mHighPassFilter.isEnabled();
+*/
 
 
-        final RoomEntity RoomSynthData = new RoomEntity();
+        final RoomSynthData RoomSynthData = new RoomSynthData();
 
+
+        RoomSynthData.title = title;
 
         RoomSynthData.detuneValue = detuneValue;
 
@@ -1986,6 +2264,14 @@ public class Synth
         RoomSynthData.enableLowPass = mLowPassFilter.isEnabled();
         RoomSynthData.enableHighPass = mHighPassFilter.isEnabled();
 
+        RoomSynthData.ENABLE_LFO = ENABLE_LFO;
+        RoomSynthData.LFO_freq = SineLFO.frequency.get();
+        RoomSynthData.LFO_amp = SineLFO.amplitude.get();
+
+        RoomSynthData.ENABLE_PM = ENABLE_PM;
+        RoomSynthData.PM_freq = SinePMFeeder.frequency.get();
+        RoomSynthData.PM_amp = SinePMFeeder.amplitude.get();
+
 
         new Thread(new Runnable() {
             @Override
@@ -1997,9 +2283,6 @@ public class Synth
         }).start();
 
 
-
-
-    return sd;
 
 
 

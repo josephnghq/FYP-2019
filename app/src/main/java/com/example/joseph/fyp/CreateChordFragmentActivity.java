@@ -156,8 +156,21 @@ public class CreateChordFragmentActivity extends AppCompatActivity  {
 
                     String name = et.getText().toString();
                     nal.setName(name);
+
+
+                    final RoomNotesArrayList RoomNotes = new RoomNotesArrayList();
+
+
                     listOfNotesArrayList.add(nal);
                     editor.putString(getString(R.string.notes_array_list), gson.toJson(listOfNotesArrayList));
+
+                    RoomNotes.nal = gson.toJson(listOfNotesArrayList);
+
+
+
+                    //RoomSingleton.db.roomDAO().insertAllNotes(RoomNotes);
+
+
                     editor.commit();
 
                 }

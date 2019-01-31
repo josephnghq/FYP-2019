@@ -4,7 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.support.constraint.ConstraintLayout;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class XYPadActivity extends AppCompatActivity {
@@ -38,13 +40,22 @@ public class XYPadActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     SharedPreferences sharedPref2;
 
+    ArrayList<String> synthDataTitles;
+    ArrayList<String> noteDataTitles;
 
 
+    private Handler handler;
 
     private GsonBuilder builder = new GsonBuilder();
     private Gson gson;
 
-    private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
+    //private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
+
+    private List<RoomSynthData> ListOfRoomSynthData;
+    private List<RoomNotesArrayList> ListOfRoomNotesArrayLists;
+
+
+
     private ArrayList<NotesArrayList> listOfNoteData = new ArrayList<NotesArrayList>();
     private ArrayList<Notes> notesArrayList = new ArrayList<>();
 
@@ -72,37 +83,120 @@ public class XYPadActivity extends AppCompatActivity {
         Log.i("FYP" , gsonString2);
 
 
-        if(gsonString.length()>0){
-            listOfSynthData = gson.fromJson(gsonString,new TypeToken<ArrayList<SynthData>>(){}.getType());
-        }
 
 
         if(gsonString2.length()>0){
             listOfNoteData = gson.fromJson(gsonString2,new TypeToken<ArrayList<NotesArrayList>>(){}.getType());
         }
 
+        handler = new Handler();
+
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                ListOfRoomSynthData = RoomSingleton.db.roomDAO().getAll();
+               // ListOfRoomNotesArrayLists = RoomSingleton.db.roomDAO().getAllNotes();
+
+
+
+              synthDataTitles = new ArrayList<String>();
+              noteDataTitles = new ArrayList<String>();
+
+                String gsonString2 = sharedPref2.getString(getString(R.string.notes_array_list) , "");
+                listOfNoteData = gson.fromJson(gsonString2,new TypeToken<ArrayList<NotesArrayList>>(){}.getType());
+
+
+                Log.i("FYP" , "Size of db roomsynthdata is " + ListOfRoomSynthData.size());
+
+                for(int i = 0 ; i < ListOfRoomSynthData.size(); i++){
+
+                    // synthDataTitles.add(listOfSynthData.get(i).title);
+
+                    synthDataTitles.add(ListOfRoomSynthData.get(i).title);
+
+                    Log.i("FYP" , ListOfRoomSynthData.get(i).title);
+
+
+                }
+
+
+                for(int i = 0 ; i < listOfNoteData.size(); i++){
+
+                    noteDataTitles.add(listOfNoteData.get(i).name);
+
+
+                }
+
+
+
+                Log.i("FYP" , "size of listofnotedata is " + listOfNoteData.size());
+
+
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(XYPadActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
+                alertDialog.setView(convertView);
+                alertDialog.setTitle("Select Sound");
+                ListView lv = (ListView) convertView.findViewById(R.id.listView1);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(XYPadActivity.this,android.R.layout.simple_list_item_1,synthDataTitles);
+                lv.setAdapter(adapter);
+
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                        mSynth = new Synth(ListOfRoomSynthData.get(position));
+
+
+                    }
+                });
 
 
 
 
-        ArrayList<String> synthDataTitles = new ArrayList<String>();
-        ArrayList<String> noteDataTitles = new ArrayList<String>();
+                final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(XYPadActivity.this);
+                LayoutInflater inflater2 = getLayoutInflater();
+                View convertView2 = (View) inflater2.inflate(R.layout.list_for_xy, null);
+                alertDialog2.setView(convertView2);
+                alertDialog2.setTitle("Select Scale");
+                ListView lv2 = (ListView) convertView2.findViewById(R.id.listView1);
+                ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(XYPadActivity.this,android.R.layout.simple_list_item_1,noteDataTitles);
+                lv2.setAdapter(adapter2);
+                lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        for(int i = 0 ; i < listOfSynthData.size(); i++){
+                        Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                        notesArrayList = listOfNoteData.get(position).notesArrayList;
+                        setupNoteLayout();
 
-            synthDataTitles.add(listOfSynthData.get(i).title);
-
-
-        }
-
-        for(int i = 0 ; i < listOfNoteData.size(); i++){
-
-            noteDataTitles.add(listOfNoteData.get(i).name);
+                    }
+                });
 
 
-        }
 
-        Log.i("FYP" , "size of listofnotedata is " + listOfNoteData.size());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        alertDialog.show();
+                        alertDialog2.show();
+                    }
+                });
+
+
+            }
+        }).start();
+
+
+
+
+
 
 
 
@@ -121,49 +215,6 @@ public class XYPadActivity extends AppCompatActivity {
 
 
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
-        alertDialog.setView(convertView);
-        alertDialog.setTitle("Select Sound");
-        ListView lv = (ListView) convertView.findViewById(R.id.listView1);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,synthDataTitles);
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Log.i("FYP" , "CLICKED CLICKED CLICKED");
-                mSynth = new Synth(listOfSynthData.get(position));
-
-
-            }
-        });
-
-        alertDialog.show();
-
-
-
-        AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
-        LayoutInflater inflater2 = getLayoutInflater();
-        View convertView2 = (View) inflater2.inflate(R.layout.list_for_xy, null);
-        alertDialog2.setView(convertView2);
-        alertDialog2.setTitle("Select Scale");
-        ListView lv2 = (ListView) convertView2.findViewById(R.id.listView1);
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteDataTitles);
-        lv2.setAdapter(adapter2);
-        lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Log.i("FYP" , "CLICKED CLICKED CLICKED");
-                notesArrayList = listOfNoteData.get(position).notesArrayList;
-                setupNoteLayout();
-
-            }
-        });
-
-        alertDialog2.show();
 
 
 

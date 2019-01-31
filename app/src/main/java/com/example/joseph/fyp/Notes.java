@@ -91,7 +91,16 @@ public class Notes {
 
     public void copyNotesFrom(Notes source){
 
-        noteFreqs = source.noteFreqs;
+
+        for(int i = 0 ; i < source.noteFreqs.size() ; i++){
+
+            noteFreqs.add(source.noteFreqs.get(i));
+
+
+
+        }
+
+
 
 
     }

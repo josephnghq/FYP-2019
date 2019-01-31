@@ -35,6 +35,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfInt4;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -105,12 +106,20 @@ public class HandGestureActivity extends AppCompatActivity {
     private int currentYObj1 = -1; //used to track current obj 1 's y coordinate
 
     private boolean SHIFTED_UP  = false;
+    private boolean SHIFTED_DOWN  = false;
 
+    private int SHIFT_MODE = -1;
+
+
+    private int detectSize = 16;
 
     private Mat mIntermediateMat;
     private Mat mRgba;
     private Handler secondObjHandler;
     private Handler vibratoEnablerHandler;
+
+    private Handler handler;
+
 
     private boolean ENABLE_DELETE_CLOSE_OBJECTS = true;
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
@@ -119,6 +128,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private ArrayList<FingerMomentsXYData> thumbLeftSideVelocity = new ArrayList<FingerMomentsXYData>();
     private ArrayList<FingerMomentsXYData> thumbRightSideVelocity = new ArrayList<FingerMomentsXYData>();
+
+    private List<RoomSynthData> ListOfRoomSynthData;
+
 
     private int fingerCount = 0;
     private Timer fingerCounter;
@@ -188,6 +200,116 @@ public class HandGestureActivity extends AppCompatActivity {
             listOfNoteData = gson.fromJson(gsonString2, new TypeToken<ArrayList<NotesArrayList>>() {
             }.getType());
         }
+
+
+        handler = new Handler();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                ListOfRoomSynthData = RoomSingleton.db.roomDAO().getAll();
+                // ListOfRoomNotesArrayLists = RoomSingleton.db.roomDAO().getAllNotes();
+
+
+
+                synthDataTitles = new ArrayList<String>();
+                noteDataTitles = new ArrayList<String>();
+
+                String gsonString2 = sharedPref2.getString(getString(R.string.notes_array_list) , "");
+                listOfNoteData = gson.fromJson(gsonString2,new TypeToken<ArrayList<NotesArrayList>>(){}.getType());
+
+
+                Log.i("FYP" , "Size of db roomsynthdata is " + ListOfRoomSynthData.size());
+
+                for(int i = 0 ; i < ListOfRoomSynthData.size(); i++){
+
+                    // synthDataTitles.add(listOfSynthData.get(i).title);
+
+                    synthDataTitles.add(ListOfRoomSynthData.get(i).title);
+
+                    Log.i("FYP" , ListOfRoomSynthData.get(i).title);
+
+
+                }
+
+
+                for(int i = 0 ; i < listOfNoteData.size(); i++){
+
+                    noteDataTitles.add(listOfNoteData.get(i).name);
+
+
+                }
+
+
+
+                Log.i("FYP" , "size of listofnotedata is " + listOfNoteData.size());
+
+
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(HandGestureActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View convertView = (View) inflater.inflate(R.layout.list_for_xy, null);
+                alertDialog.setView(convertView);
+                alertDialog.setTitle("Select Sound");
+                ListView lv = (ListView) convertView.findViewById(R.id.listView1);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(HandGestureActivity.this,android.R.layout.simple_list_item_1,synthDataTitles);
+                lv.setAdapter(adapter);
+
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                        mSynth.destory();
+                        mSynth = new Synth(ListOfRoomSynthData.get(position));
+
+                        mSynth2.destory();
+                        mSynth2 = new Synth(ListOfRoomSynthData.get(position));
+
+
+                    }
+                });
+
+
+
+
+                final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(HandGestureActivity.this);
+                LayoutInflater inflater2 = getLayoutInflater();
+                View convertView2 = (View) inflater2.inflate(R.layout.list_for_xy, null);
+                alertDialog2.setView(convertView2);
+                alertDialog2.setTitle("Select Scale");
+                ListView lv2 = (ListView) convertView2.findViewById(R.id.listView1);
+                ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(HandGestureActivity.this,android.R.layout.simple_list_item_1,noteDataTitles);
+                lv2.setAdapter(adapter2);
+                lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        Log.i("FYP" , "CLICKED CLICKED CLICKED");
+                        notesArrayList = listOfNoteData.get(position).notesArrayList;
+                        setupNoteLayout();
+
+                    }
+                });
+
+
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        alertDialog.show();
+                        alertDialog2.show();
+                    }
+                });
+
+
+            }
+        }).start();
+
+
 
 
         btn_second_obj_func_btn = (Button) findViewById(R.id.hand_gesture_second_obj_func_btn);
@@ -287,8 +409,8 @@ public class HandGestureActivity extends AppCompatActivity {
         }
 
 
-        selectSound();
-        selectNotes();
+        /*selectSound();
+        selectNotes();*/
 
 
 //        Button btn = (Button)findViewById(R.id.button_mute_audio_open_CV);
@@ -349,6 +471,8 @@ public class HandGestureActivity extends AppCompatActivity {
                                                          // backgroundSubtractorMOG2.apply(inputFrame , mRgba);
 
 
+                                                          //Imgproc.blur(mRgba,mRgba,new Size(9.0, 9.0));
+
                                                           Core.flip(mRgba, mRgba, 1);
 
                                                           List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
@@ -379,10 +503,6 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           height = (int) sizeRgba.height;
                                                           width = (int) sizeRgba.width;
                                                           int firstHalf = width/2;
-
-
-                                                          Imgproc.line(mRgba , new Point(width/2 , height -1 ) , new Point ( width/2 , 0) , new Scalar(255,0,0,255)
-                                                          , 3);
 
 
 
@@ -811,13 +931,17 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           //find the right finger that would be used for 'cursor'
 
+
+                                                          //we determine cursor by selecting the point that has the largestY ( it is at the bottom most of the screen)
+
                                                           int largestY = 0;
+                                                          //int smallestX = 0;
                                                           FingerMomentsXYData selectedCursor = null ;
 
                                                           for(int i = 0; i < fingerMomentsXYDataArrayListRightSide.size(); i ++){
 
 
-                                                            if(fingerMomentsXYDataArrayListRightSide.get(i).FIRST_HALF == false && fingerMomentsXYDataArrayListRightSide.get(i).y > largestY){
+                                                            if(fingerMomentsXYDataArrayListRightSide.get(i).FIRST_HALF == false && fingerMomentsXYDataArrayListRightSide.get(i).y > largestY ){
 
                                                                 largestY = fingerMomentsXYDataArrayListRightSide.get(i).y;
                                                                 selectedCursor = fingerMomentsXYDataArrayListRightSide.get(i);
@@ -849,7 +973,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                 //  Log.i("FYP" , "HIT on " +  i);
 
 
-                                                                Boolean noteChanged =   Scales.chordPoint(0, i, notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
+                                                                Boolean noteChanged =   Scales.chordPoint(0, i, shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
 
                                                                   if (noteChanged) {
 
@@ -863,7 +987,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                                    //   Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
-                                                                      Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  notesArrayList, mSynth2 , fingerMomentsXYDataArrayListRightSide.size());
+                                                                      Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
                                                                   }
 
                                                                   int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
@@ -912,30 +1036,61 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           }
 
 
+                                                          // shift notes octave up if thumb is facing up
 
                                                           else if(thumbRightSide.size() == 1 /*&& !OCTAVE_DWN_LATCHER*/ && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y < fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size()-1).y) {
 
 
+                                                                    SHIFT_MODE = 1;
 
 
-
-                                                              if(!SHIFTED_UP) {
+                                                         /*     if(!SHIFTED_UP) {
                                                                   shiftNotes(12, 1);
                                                               }
                                                               OCTAVE_DWN_LATCHER = true;
                                                               OCTAVE_UP_LATCHER = false;
                                                           //    Log.i("FYP" , "GOING Down LATCHER ");
                                                               SHIFTED_UP = true;
+*/
+
+
+                                                          }
+
+                                                          else if(thumbRightSide.size() == 1 && !OCTAVE_DWN_LATCHER && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y > fingerMomentsXYDataArrayListRightSide.get(0).y) {
+
+
+                                                              SHIFT_MODE = 0;
+
+
+/*
+
+                                                              if(!SHIFTED_DOWN) {
+                                                                  shiftNotes(12, 0);
+                                                              }
+                                                              OCTAVE_DWN_LATCHER = true;
+                                                              OCTAVE_UP_LATCHER = false;
+                                                              //    Log.i("FYP" , "GOING Down LATCHER ");
+                                                              SHIFTED_DOWN = true;
+*/
 
 
 
                                                           }
+
                                                           else{
 
-                                                              if(SHIFTED_UP){
+                                                              /*if(SHIFTED_UP){
                                                                   shiftNotes(12,0);
                                                                   SHIFTED_UP = false;
-                                                              }
+                                                              }*/
+
+                                                              SHIFT_MODE = -1;
+
+
+                                                         /*     if(SHIFTED_DOWN){
+                                                                  shiftNotes(12,1);
+                                                                  SHIFTED_DOWN = false;
+                                                              }*/
 
                                                               startObjectLatchResetHandler();
 
@@ -943,9 +1098,11 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-                                                          //this is hull convex part, W.I.P
 
+                                                          //this is hull convex part, W.I.P
 /*
+
+                                                          List<MatOfInt4> ConvexityDefectsMatOfInt4  = new ArrayList<MatOfInt4>();
 
                                                           List<MatOfInt> hull = new ArrayList<MatOfInt>();
                                                           //List<MatOfInt> hull2 = new ArrayList<MatOfInt>();
@@ -958,12 +1115,20 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           // Convert MatOfInt to MatOfPoint for drawing convex hull
                                                           for(int i=0; i < contours.size(); i++){
                                                               Imgproc.convexHull(contours.get(i), hull.get(i));
-                                                          }
+                                                           }
+
+
 
                                                           // Loop over all contours
                                                            List<Point[]> hullpoints = new ArrayList<Point[]>();
+
                                                           for(int i=0; i < hull.size(); i++){
                                                               Point[] points = new Point[hull.get(i).rows()];
+
+                                                              //convex
+                                                              ConvexityDefectsMatOfInt4.add(new MatOfInt4());
+                                                              Imgproc.convexityDefects(contours.get(i),hull.get(i),ConvexityDefectsMatOfInt4.get(i));
+
 
                                                               // Loop over all points that need to be hulled in current contour
                                                               for(int j=0; j < hull.get(i).rows(); j++){
@@ -973,6 +1138,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               hullpoints.add(points);
                                                           }
+
+                                                          Log.i("FYP" , "Size of convex is " + ConvexityDefectsMatOfInt4.size());
+
 
 
                                                           // Convert Point arrays into MatOfPoint
@@ -1010,14 +1178,21 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               Imgproc.drawContours(mRgba, contours, -1, color);
                                                               Imgproc.drawContours(mRgba, hullmop, -1, color);
+
 */
 
 
 
 
 
+                                                       //  Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_RGB2HSV_FULL);
 
 
+
+
+
+                                                          Imgproc.line(mRgba , new Point(width/2 , height -1 ) , new Point ( width/2 , 0) , new Scalar(255,0,0,255)
+                                                                  , 3);
 
 
 
@@ -1189,11 +1364,11 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 Log.i("FYP", "CLICKED CLICKED CLICKED");
                 mSynth.destory();
-                mSynth = new Synth(listOfSynthData.get(position));
+                mSynth = new Synth(ListOfRoomSynthData.get(position));
 
                 // mSynth.playOsc();
                 mSynth2.destory();
-                mSynth2 = new Synth(listOfSynthData.get(position));
+                mSynth2 = new Synth(ListOfRoomSynthData.get(position));
                 // mSynth2.playOsc();
 
 
@@ -1232,6 +1407,34 @@ public class HandGestureActivity extends AppCompatActivity {
 
         return mGestureDetector.onTouchEvent(event);
 
+
+    }
+
+
+
+    private ArrayList<Notes> shiftNotes(int semitones, int mode, ArrayList<Notes> nal) {
+
+
+        ArrayList<Notes> tempnotes = new ArrayList<Notes>();
+
+        for(int p = 0 ; p < nal.size(); p ++){
+
+            tempnotes.add(new Notes());
+            tempnotes.get(p).copyNotesFrom(nal.get(p));
+
+
+        }
+
+
+        for (int i = 0; i < tempnotes.size(); i++) {
+
+
+            tempnotes.get(i).shiftSemitone(semitones, mode);
+
+
+        }
+
+        return tempnotes;
 
     }
 
@@ -1370,15 +1573,15 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 Rect touchedRect = new Rect();
 
-                touchedRect.x = (x > 8) ? x - 8 : 0;
-                touchedRect.y = (y > 8) ? y - 8 : 0;
+                touchedRect.x = (x > detectSize) ? x - detectSize : 0;
+                touchedRect.y = (y > detectSize) ? y - detectSize : 0;
 
 
-                touchedRect.width = (x + 8 < cols) ? x + 8 - touchedRect.x : cols - touchedRect.x;
-                touchedRect.height = (y + 8 < rows) ? y + 8 - touchedRect.y : rows - touchedRect.y;
+                touchedRect.width = (x + detectSize < cols) ? x + detectSize - touchedRect.x : cols - touchedRect.x;
+                touchedRect.height = (y + detectSize < rows) ? y + detectSize - touchedRect.y : rows - touchedRect.y;
 
-                touchedRect.width = touchedRect.width - 8;
-                touchedRect.height = touchedRect.height - 8;
+                touchedRect.width = touchedRect.width - detectSize;
+                touchedRect.height = touchedRect.height - detectSize;
 
                 Log.i("FYP", "Touch touchedRect coordinates: (" + touchedRect.width + ", " + touchedRect.height + ")");
 

@@ -11,17 +11,15 @@ import android.arch.persistence.room.PrimaryKey;
 
 
 @Entity()
-public class RoomEntity   {
+public class RoomSynthData {
 
 
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
-    @ColumnInfo(name = "first_name")
-    public String firstName;
+    @ColumnInfo(name = "title")
+    public String title;
 
-    @ColumnInfo(name = "last_name")
-    public String lastName;
 
     @ColumnInfo(name = "detuneValue")
     public double detuneValue;
@@ -110,6 +108,23 @@ public class RoomEntity   {
     @ColumnInfo(name = "enableHighPass")
     public boolean enableHighPass;
 
+    @ColumnInfo(name = "ENABLE_LFO")
+    public boolean ENABLE_LFO;
+
+    @ColumnInfo(name = "LFO_freq")
+    public double LFO_freq;
+
+    @ColumnInfo(name = "LFO_amp")
+    public double LFO_amp;
+
+    @ColumnInfo(name = "ENABLE_PM")
+    public boolean ENABLE_PM;
+
+    @ColumnInfo(name = "PM_freq")
+    public double PM_freq;
+
+    @ColumnInfo(name = "PM_amp")
+    public double PM_amp;
 
 
 

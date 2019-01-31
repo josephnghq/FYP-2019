@@ -26,7 +26,17 @@ public class Scales {
     //this function is used in the sliding feature
 
 
+
+
+
+    //for shift mode, 1 goes up one octave, 0 goes down one octave
+
     public static boolean chordPoint ( int amount , int x , ArrayList<Notes> notesArrayList , Synth mSynth , int noOfFingers){
+
+
+
+
+
 
 
 
@@ -46,9 +56,14 @@ public class Scales {
 
 
 
+
+
        if(x >= notesArrayList.size()){
 
+
            mSynth.setNotes(notesArrayList.get(notesArrayList.size()-1) , -1 , amount);
+
+
            currentNote = notesArrayList.size()-1;
 
        }

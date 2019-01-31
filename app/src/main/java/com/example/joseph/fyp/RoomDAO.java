@@ -16,22 +16,29 @@ import java.util.List;
 @Dao
 public interface RoomDAO {
 
-    @Query("SELECT * FROM RoomEntity")
-    List<RoomEntity> getAll();
+    @Query("SELECT * FROM RoomSynthData")
+    List<RoomSynthData> getAll();
 
-    @Query("SELECT * FROM RoomEntity WHERE uid IN (:userIds)")
-    List<RoomEntity> loadAllByIds(int[] userIds);
+
+    @Query("SELECT * FROM RoomNotesArrayList")
+    List<RoomNotesArrayList> getAllNotes();
+
+    @Query("SELECT * FROM RoomSynthData WHERE uid IN (:userIds)")
+    List<RoomSynthData> loadAllByIds(int[] userIds);
 
     @Insert
-    void insertAll(RoomEntity... users);
+    void insertAll(RoomSynthData... users);
+
+    @Insert
+    void insertAllNotes(RoomNotesArrayList... users);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertUsers(RoomEntity... users);
+    public void insertUsers(RoomSynthData... users);
 
 
 
     @Delete
-    void delete(RoomEntity user);
+    void delete(RoomSynthData user);
 
 
 
