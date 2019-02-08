@@ -954,73 +954,6 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           // processing of cursor to finger
                                                           //observerations so far is, 0 is pinky on left hand, 3 is second finger on left hand
 
-                                                          if(selectedCursor!=null) // there is a cursor
-                                                          for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size(); i ++){
-
-                                                              if(selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
-
-                                                              {
-                                                                    currentYObj1 = selectedCursor.y;
-
-                                                                  if (!SYNTH_PLAYING2) {
-                                                                      mSynth2.playOsc();
-                                                                      SYNTH_PLAYING2 = true;
-                                                                  }
-
-
-
-
-                                                                //  Log.i("FYP" , "HIT on " +  i);
-
-
-                                                                Boolean noteChanged =   Scales.chordPoint(0, i, shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
-
-                                                                  if (noteChanged) {
-
-                                                                      VIBRATO_ENABLE = false;
-                                                                      startVibratoHandler();
-
-
-                                                                  }
-
-                                                                  if (VIBRATO_ENABLE) {
-
-
-                                                                   //   Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
-                                                                      Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
-                                                                  }
-
-                                                                  int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
-
-                                                                  if (!mSynth2.isFilterEnvEnabled())
-                                                                      mSynth2.setFilterValue(distanceDifference * 10);
-
-
-
-                                                              }
-                                                              else{
-
-
-                                                              }
-
-                                                          }
-
-                                                          else{
-
-
-                                                              mSynth2.releaseOsc();
-                                                              SYNTH_PLAYING2 = false;
-
-
-                                                          }
-
-
-
-
-
-
-
-
                                                           if(thumbLeftSide.size() == 1 && !OCTAVE_UP_LATCHER &&  fingerMomentsXYDataArrayListLeftSide.size()> 3 /*&& thumbLeftSide.get(0).x < fingerMomentsXYDataArrayListLeftSide.get(3).x && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(2).y*/ && thumbLeftSide.get(0).y < fingerMomentsXYDataArrayListLeftSide.get(3).y){
 
 /*
@@ -1041,7 +974,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           else if(thumbRightSide.size() == 1 /*&& !OCTAVE_DWN_LATCHER*/ && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y < fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size()-1).y) {
 
 
-                                                                    SHIFT_MODE = 1;
+                                                              SHIFT_MODE = 1;
 
 
                                                          /*     if(!SHIFTED_UP) {
@@ -1095,6 +1028,80 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               startObjectLatchResetHandler();
 
                                                           }
+
+
+
+
+
+                                                          if(selectedCursor!=null) // there is a cursor
+
+
+                                                          for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size(); i ++){
+
+                                                              if(selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
+
+                                                              {
+                                                                    currentYObj1 = selectedCursor.y;
+
+                                                                  if (!SYNTH_PLAYING2) {
+                                                                      mSynth2.playOsc();
+                                                                      SYNTH_PLAYING2 = true;
+                                                                  }
+
+
+
+
+                                                                //  Log.i("FYP" , "HIT on " +  i);
+
+
+
+                                                                Boolean noteChanged =   Scales.chordPoint(0, i, shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
+
+                                                                  if (noteChanged) {
+
+                                                                      VIBRATO_ENABLE = false;
+                                                                      startVibratoHandler();
+
+
+                                                                  }
+
+                                                                  if (VIBRATO_ENABLE) {
+
+
+                                                                   //   Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
+                                                                      Scales.chordPoint((selectedCursor.y - startPointYObj1)/3 , i,  shiftNotes(12,SHIFT_MODE,notesArrayList), mSynth2 , fingerMomentsXYDataArrayListRightSide.size() );
+                                                                  }
+
+                                                                  int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
+
+                                                                  if (!mSynth2.isFilterEnvEnabled())
+                                                                      mSynth2.setFilterValue(distanceDifference * 10);
+
+
+
+                                                              }
+                                                              else{
+
+
+                                                              }
+
+                                                          }
+
+                                                          else{
+
+
+                                                              mSynth2.releaseOsc();
+                                                              SYNTH_PLAYING2 = false;
+
+
+                                                          }
+
+
+
+
+
+
+
 
 
 
