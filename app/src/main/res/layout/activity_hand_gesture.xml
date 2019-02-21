@@ -22,7 +22,7 @@
 
 
 
-        <org.opencv.android.JavaCameraView
+        <com.example.joseph.fyp.CustomJavaCameraView
 
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -62,33 +62,48 @@
             >
 
             <Button
+                android:id="@+id/hand_gesture_setRadius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="F Radius"/>
+            <Button
+                android:id="@+id/hand_gesture_setThumbRadius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="T Radius"/>
+            <Button
                 android:id="@+id/hand_gesture_second_obj_func_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2nd Obj Func"/>
+                android:text="HSV"/>
             <Button
                 android:id="@+id/hand_gesture_select_sound_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Sound"/>
+                android:text="Sound"/>
+            <Button
+                android:id="@+id/hand_gesture_exposure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Expo"/>
             <Button
                 android:id="@+id/hand_gesture_calibrate_first_obj"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Calibrate 1st Obj"/>
+                android:text="Cali  Obj"/>
             <ToggleButton
                 android:id="@+id/hand_gesture_select_thumbs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Select thumbs"
-                android:textOff="Select thumbs"/>
+                android:textOn="thumbs"
+                android:textOff="thumbs"/>
             />
             <ToggleButton
                 android:id="@+id/hand_gesture_select_fingers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Select fingers"
-                android:textOff="Select fingers"/>
+                android:textOn="fingers"
+                android:textOff="fingers"/>
 
             />
 

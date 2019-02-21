@@ -290,6 +290,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
         if (mListener instanceof CvCameraViewListenerAdapter) {
             CvCameraViewListenerAdapter adapter = (CvCameraViewListenerAdapter) mListener;
             adapter.setFrameFormat(mPreviewFormat);
+
         }
     }
 
