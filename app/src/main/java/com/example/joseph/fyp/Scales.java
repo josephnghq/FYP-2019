@@ -37,9 +37,6 @@ public class Scales {
 
 
 
-
-
-
        if(noOfFingers == 2){
 
            x = x + 4;

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -75,6 +77,7 @@ public class HandGestureActivity extends AppCompatActivity {
     private int mTouchChoice = 0;
     private Synth mSynth;
     private Synth mSynth2;
+
     private boolean SYNTH_PLAYING = true;
     private boolean SYNTH_PLAYING2 = true;
     private boolean SECOND_OBJ_OCTAVE = false;
@@ -87,6 +90,9 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean OCTAVE_DWN_LATCHER = false;
     private boolean SETUP_MASTER_AREA = true;
     private boolean SECOND_OBJ_DETECT_ONE_CONTOUR = false;
+    private boolean GLISSANDO_MODE = true;
+
+
     private int width = 864;
     private int height = 486;
     private GsonBuilder builder = new GsonBuilder();
@@ -136,7 +142,7 @@ public class HandGestureActivity extends AppCompatActivity {
     private Handler handler;
 
 
-    private boolean ENABLE_DELETE_CLOSE_OBJECTS = true;
+    private boolean ENABLE_DELETE_CLOSE_OBJECTS = false;
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
 
@@ -146,6 +152,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private List<RoomSynthData> ListOfRoomSynthData;
 
+    private ArrayList<Integer> leftHandFingerInBetweenDistance = new ArrayList<Integer>();
 
     private int fingerCount = 0;
     private Timer fingerCounter;
@@ -154,6 +161,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private double leftThumbSize = 0;
     private double rightThumbSize = 0;
+
+    private Scalar fingerScalarRadius;
+    private Scalar thumbScalarRadius;
 
 
     private double onCameraFrameStartTime;
@@ -189,6 +199,21 @@ public class HandGestureActivity extends AppCompatActivity {
         Log.i("FYP" , "Exposure max value is " + params.getMinExposureCompensation());
 
 
+
+
+        Camera camera = Camera.open(1);
+
+        List<android.hardware.Camera.Size> sizeList = params.getSupportedVideoSizes();
+
+
+        for(int i = 0 ; i <sizeList.size(); i ++ ){
+
+            android.hardware.Camera.Size s = sizeList.get(i);
+            Log.i("FYP" + String.valueOf(i) , String.valueOf(s.height));
+            Log.i("FYP" + String.valueOf(i) , String.valueOf(s.width));
+
+
+        }
 
 
 
@@ -434,7 +459,12 @@ public class HandGestureActivity extends AppCompatActivity {
         btn_calibrate_first_obj_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSynth.setMasterArea(first_obj_area);
+                //mSynth.setMasterArea(first_obj_area);
+                if(GLISSANDO_MODE)
+                    GLISSANDO_MODE = false;
+                else{
+                    GLISSANDO_MODE = true;
+                }
 
             }
         });
@@ -554,10 +584,6 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               int firstHalf = width / 2;
 
 
-                                                              Imgproc.rectangle(mRgba, new Point(0, 0), new Point(150, height * 0.3), new Scalar(0, 255, 0));
-                                                              Imgproc.rectangle(mRgba, new Point(0, height * 0.7), new Point(150, height), new Scalar(0, 255, 0));
-
-
                                                               if (mIsColorSelected) {
 
 
@@ -588,11 +614,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                              Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-                                                              colorLabel.setTo(mBlobColorRgba);
 
-                                                              Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-                                                              mSpectrum.copyTo(spectrumLabel);
 
 
                                                               //FIRST OBJECT
@@ -1130,23 +1152,129 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
+                                                              leftHandFingerInBetweenDistance.clear();
+
+
+                                                              // this one calculates the DISTANCE between each INDIVIUAL fingers
+                                                              /*for(int i = 0 ; i < fingerMomentsXYDataArrayListLeftSide.size();i++){
+
+                                                                  if(i+1 != fingerMomentsXYDataArrayListLeftSide.size()){
+
+                                                                      int x1 = fingerMomentsXYDataArrayListLeftSide.get(i).x;
+                                                                      int x2 = fingerMomentsXYDataArrayListLeftSide.get(i+1).x;
+                                                                      int y1 = fingerMomentsXYDataArrayListLeftSide.get(i).y;
+                                                                      int y2 = fingerMomentsXYDataArrayListLeftSide.get(i+1).y;
+
+                                                                      leftHandFingerInBetweenDistance.add((int)distanceOfXYPoints(x1,x2,y1,y2));
+
+                                                                      Log.i("FYP","distance between " + i + " and " + (i+1) + " is " + (int)distanceOfXYPoints(x1,x2,y1,y2) );
+
+
+                                                                  }
+
+                                                              }*/
+
+
+                                                              //the following lines calculate only the distance between first finger and last finger, assumption is that last element of the list is a finger
+                                                          if(fingerMomentsXYDataArrayListLeftSide.size()>1) {
+                                                              int x1 = fingerMomentsXYDataArrayListLeftSide.get(0).x;
+                                                              int x2 = fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size() - 1).x;
+                                                              int y1 = fingerMomentsXYDataArrayListLeftSide.get(0).y;
+                                                              int y2 = fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size() - 1).y;
+                                                              leftHandFingerInBetweenDistance.add((int) distanceOfXYPoints(x1, x2, y1, y2));
+                                                          }
+
+
+
+
                                                               if (selectedCursor != null) // there is a cursor
-
-
+                                                                    //assign notes based on right cursor to left fingers position
                                                                   for (int i = 0; i < fingerMomentsXYDataArrayListLeftSide.size(); i++) {
 
-                                                                      if (selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
+                                                                      currentYObj1 = selectedCursor.y;
 
-                                                                      {
-                                                                          currentYObj1 = selectedCursor.y;
+                                                                      if (!SYNTH_PLAYING2) {
+                                                                          mSynth2.playOsc();
+                                                                          SYNTH_PLAYING2 = true;
+                                                                      }
 
-                                                                          if (!SYNTH_PLAYING2) {
-                                                                              mSynth2.playOsc();
-                                                                              SYNTH_PLAYING2 = true;
+                                                                      //only works for single note
+                                                                      if(GLISSANDO_MODE){
+
+                                                                          if(fingerMomentsXYDataArrayListRightSide.size() == 1 && leftHandFingerInBetweenDistance.size()>0){
+
+
+                                                                                        //within sliding range
+                                                                                    if(selectedCursor.y <= fingerMomentsXYDataArrayListLeftSide.get(0).y && selectedCursor.y >= fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y){
+
+                                                                                        leftHandFingerInBetweenDistance.get(0);
+
+                                                                                        double glissAmount =fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y - selectedCursor.y;
+                                                                                        double frequencyTop = notesArrayList.get(3).noteFreqs.get(0);
+                                                                                        double frequencyBot = notesArrayList.get(0).noteFreqs.get(0);
+                                                                                        double freqDiff = frequencyTop - frequencyBot;
+                                                                                        glissAmount = Math.abs(glissAmount);
+                                                                                        Log.i("FYP" , "Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
+
+
+                                                                                        if(glissAmount!=0)
+                                                                                        glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * (int)freqDiff;
+
+                                                                                        Log.i("FYP" , "Final glissamount is " + glissAmount);
+
+                                                                                        Scales.chordPoint((int)-glissAmount, 3, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+                                                                                    }
+
+
+
+
+                                                                          }
+
+                                                                          else if(fingerMomentsXYDataArrayListRightSide.size() == 2)
+                                                                          {
+
+
+                                                                              //within sliding range
+                                                                              if(selectedCursor.y <= fingerMomentsXYDataArrayListLeftSide.get(0).y && selectedCursor.y >= fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y){
+
+                                                                                  leftHandFingerInBetweenDistance.get(0);
+
+                                                                                  double glissAmount =fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y - selectedCursor.y;
+                                                                                  double frequencyTop = notesArrayList.get(7).noteFreqs.get(0);
+                                                                                  double frequencyBot = notesArrayList.get(3).noteFreqs.get(0);
+                                                                                  double freqDiff = frequencyTop - frequencyBot;
+                                                                                  glissAmount = Math.abs(glissAmount);
+                                                                                  Log.i("FYP" , "Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
+
+
+                                                                                  if(glissAmount!=0)
+                                                                                      glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * (int)freqDiff;
+
+                                                                                  Log.i("FYP" , "Final glissamount is " + glissAmount);
+
+                                                                                  Scales.chordPoint((int)-glissAmount, 7, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+                                                                              }
+
+
+
+
                                                                           }
 
 
-                                                                          //  Log.i("FYP" , "HIT on " +  i);
+
+
+
+                                                                      }
+
+
+                                                                      if (!GLISSANDO_MODE && selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
+
+                                                                      {
+
 
 
                                                                           Boolean noteChanged = Scales.chordPoint(0, i, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
@@ -1160,19 +1288,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           }
 
                                                                           if (VIBRATO_ENABLE) {
-
-
-                                                                              //   Log.i("FYP" , "Vibratoing on finger point " + (selectedCursor.y - startPointYObj1));
-                                                                              Scales.chordPoint((selectedCursor.y - startPointYObj1) / 3, i, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+                                                                              Scales.chordPoint((selectedCursor.y - startPointYObj1) / 2, i, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
                                                                           }
 
                                                                           int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
 
                                                                           if (!mSynth2.isFilterEnvEnabled())
                                                                               mSynth2.setFilterValue(distanceDifference * 10);
-
-
-                                                                      } else {
 
 
                                                                       }
@@ -1275,6 +1397,18 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               //  Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_RGB2HSV_FULL);
 
 
+                                                          Imgproc.rectangle(mRgba, new Point(0, 0), new Point(150, height * 0.3), new Scalar(0, 255, 0));
+                                                          Imgproc.rectangle(mRgba, new Point(0, height * 0.7), new Point(150, height), new Scalar(0, 255, 0));
+
+
+
+                                                          Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+                                                          colorLabel.setTo(mBlobColorRgba);
+
+                                                          Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+                                                          mSpectrum.copyTo(spectrumLabel);
+
+
                                                               Imgproc.line(mRgba, new Point(width / 2, height - 1), new Point(width / 2, 0), new Scalar(255, 0, 0, 255)
                                                                       , 3);
 
@@ -1282,13 +1416,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               onCameraFrameEndTime = System.currentTimeMillis();
 
 
-                                                              Log.i("FYP", "Camera frame took " + (onCameraFrameEndTime - onCameraFrameStartTime));
 
 
 
                                                               if(HSVMode)
                                                                   Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_RGB2HSV_FULL);
 
+                                                          Log.i("FYP", "Camera frame took " + (onCameraFrameEndTime - onCameraFrameStartTime));
 
 
 
@@ -1552,6 +1686,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private void setExposure(){
 
+
+
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
 
@@ -1620,7 +1756,9 @@ public class HandGestureActivity extends AppCompatActivity {
                 int S = Integer.valueOf(etS.getText().toString());
                 int V = Integer.valueOf(etV.getText().toString());
 
-                mDetector2.setColorRadius(new Scalar(H,S,V,0));
+                fingerScalarRadius = new Scalar(H,S,V,0);
+
+                mDetector2.setColorRadius(fingerScalarRadius);
                 mDetector2.setHsvColor(mBlobColorHsv);
                 Imgproc.resize(mDetector2.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
 
@@ -1676,7 +1814,10 @@ public class HandGestureActivity extends AppCompatActivity {
                     int S = Integer.valueOf(etS.getText().toString());
                     int V = Integer.valueOf(etV.getText().toString());
 
-                    mDetector.setColorRadius(new Scalar(H,S,V,0));
+                    thumbScalarRadius = new Scalar(H,S,V,0);
+
+
+                    mDetector.setColorRadius(thumbScalarRadius);
                     mDetector.setHsvColor(mBlobColorHsv);
                     Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
 
@@ -1870,7 +2011,10 @@ public class HandGestureActivity extends AppCompatActivity {
 
                     //new Scalar(25,50,50,0);
                 if(mode == 0) {
+
+                    if(thumbScalarRadius == null)
                     mDetector.setColorRadius(new Scalar(12, 50, 25, 0));
+
                     mDetector.setHsvColor(mBlobColorHsv);
                     //mTouchChoice = 1;
                     Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
@@ -1878,7 +2022,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 if(mode == 1) {
 
+                    if(fingerScalarRadius == null)
                     mDetector2.setColorRadius(new Scalar(12, 100, 50, 0));
+
                     mDetector2.setHsvColor(mBlobColorHsv);
 
                     // mTouchChoice = 0;
@@ -1903,7 +2049,31 @@ public class HandGestureActivity extends AppCompatActivity {
     }
 
 
+    private android.graphics.Rect calculateTapArea(float x, float y, float coefficient) {
+        int areaSize = Float.valueOf(100 * coefficient).intValue();
 
+        Matrix matrix = new Matrix();
+
+        int left = clamp((int) x - areaSize / 2, 0, width - areaSize);
+        int top = clamp((int) y - areaSize / 2, 0, height - areaSize);
+
+        RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
+        matrix.mapRect(rectF);
+
+        return new android.graphics.Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
+    }
+
+
+
+    private int clamp(int x, int min, int max) {
+        if (x > max) {
+            return max;
+        }
+        if (x < min) {
+            return min;
+        }
+        return x;
+    }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -1945,9 +2115,14 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                 Rect touchedRect = new Rect();
+                android.graphics.Rect focusRect = new android.graphics.Rect(calculateTapArea(x,y,1.0f));
+
 
                 touchedRect.x = (x > detectSize) ? x - detectSize : 0;
                 touchedRect.y = (y > detectSize) ? y - detectSize : 0;
+
+
+                mOpenCvCameraView.setFocus(focusRect);
 
 
                 touchedRect.width = (x + detectSize < cols) ? x + detectSize - touchedRect.x : cols - touchedRect.x;
@@ -2007,7 +2182,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                     //new Scalar(25,50,50,0);
+                    if(thumbScalarRadius == null)
                     mDetector.setColorRadius(new Scalar(12,50,25,0));
+
                     mDetector.setHsvColor(mBlobColorHsv);
                     mTouchChoice = 1;
                     Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
@@ -2015,7 +2192,9 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 } else if (SELECT_FINGERS) {
 
+                    if(fingerScalarRadius == null)
                     mDetector2.setColorRadius(new Scalar(12,100,50,0));
+
                     mDetector2.setHsvColor(mBlobColorHsv);
 
                     mTouchChoice = 0;
