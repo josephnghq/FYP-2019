@@ -102,6 +102,18 @@ public class RoomSynthData {
     @ColumnInfo(name = "DisableTri")
     public boolean DisableTri;
 
+    @ColumnInfo(name = "DisableSaw2")
+    public boolean DisableSaw2;
+
+    @ColumnInfo(name = "DisableSine2")
+    public boolean DisableSine2;
+
+    @ColumnInfo(name = "DisableSqr2")
+    public boolean DisableSqr2;
+
+    @ColumnInfo(name = "DisableTri2")
+    public boolean DisableTri2;
+
     @ColumnInfo(name = "enableLowPass")
     public boolean enableLowPass;
 
@@ -125,6 +137,23 @@ public class RoomSynthData {
 
     @ColumnInfo(name = "PM_amp")
     public double PM_amp;
+
+    @ColumnInfo(name = "ENABLE_PHASER")
+    public boolean ENABLE_PHASER;
+
+    @ColumnInfo(name = "PHASER_feedback")
+    public double PHASER_feedback;
+
+    @ColumnInfo(name = "PHASER_freq")
+    public double PHASER_freq;
+
+    @ColumnInfo(name = "PHASER_amp")
+    public double PHASER_amp;
+
+    @ColumnInfo(name = "PHASER_depth")
+    public double PHASER_depth;
+
+
 
 
 

@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         RoomSingleton.buildDb(this);
 
+
         new Thread(new Runnable() {
             @Override
             public void run() {

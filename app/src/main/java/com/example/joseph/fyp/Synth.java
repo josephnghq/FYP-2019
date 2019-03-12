@@ -1,5 +1,6 @@
 package com.example.joseph.fyp;
 
+import android.arch.persistence.room.Room;
 import android.util.Log;
 
 import com.jsyn.JSyn;
@@ -8,6 +9,7 @@ import com.jsyn.unitgen.FilterHighPass;
 import com.jsyn.unitgen.FilterLowPass;
 import com.jsyn.unitgen.InterpolatingDelay;
 import com.jsyn.unitgen.LineOut;
+import com.jsyn.unitgen.PhaseShifter;
 import com.jsyn.unitgen.SineOscillator;
 import com.jsyn.unitgen.SineOscillatorPhaseModulated;
 import com.jsyn.unitgen.VariableRateMonoReader;
@@ -67,6 +69,7 @@ public class Synth
     private boolean ENABLE_LOW_PASS = true;
     private boolean ENABLE_HIGH_PASS = false;
     private boolean ENABLE_FILTER_ADSR = true;
+    private boolean ENABLE_PHASER = false;
 
     private boolean ENABLE_PM;
     private boolean ENABLE_LFO;
@@ -85,6 +88,8 @@ public class Synth
 
     private SineOscillator SinePMFeeder = new SineOscillator();
     private SineOscillator SineLFO = new SineOscillator();
+    private PhaseShifter phaseShifter = new PhaseShifter();
+    private SineOscillator phaseShifterLFO = new SineOscillator();
 
     private ArrayList<Oscs> mOscSawArray2;
     private ArrayList<Oscs> mOscSineArray2;
@@ -264,6 +269,8 @@ public class Synth
         mSynth.add(envPlayer);
         mSynth.add(envPlayerFilter);
         mSynth.add(mMasterFilter);
+        mSynth.add(phaseShifter);
+        mSynth.add(phaseShifterLFO);
          // mSynth.add(mDelayUnit);
 
 
@@ -456,16 +463,22 @@ public class Synth
         mSynth.add(SinePMFeeder);
         mSynth.add(SineLFO);
 
+        phaseShifterLFO.frequency.set(0.5);
+        phaseShifterLFO.output.connect(phaseShifter.offset);
+
+
 
 
         mLowPassFilter.frequency.set(20000);
         mLowPassFilter.Q.set(2.5);
-        mLowPassFilter.output.connect( mMasterFilter.input);
+        mLowPassFilter.output.connect( phaseShifter.input);
 
         mHighPassFilter.frequency.set(0);
         mHighPassFilter.Q.set(2.5);
-        mHighPassFilter.output.connect( mMasterFilter.input);
+        mHighPassFilter.output.connect( phaseShifter.input);
 
+
+        phaseShifter.output.connect(mMasterFilter.input);
 
         mMasterFilter.frequency.set(20000);
         mMasterFilter.Q.set(1);
@@ -729,6 +742,13 @@ public class Synth
             disableFilterEnv();
         }
 
+        if(ENABLE_PHASER){
+            enablePhaseShifter();
+        }
+        else{
+            disablePhaseShifter();
+        }
+
 
        /* envPlayer.output.connect(mOscSine.amplitude);
         envPlayer.output.connect(mOscSine2.amplitude);
@@ -809,7 +829,7 @@ public class Synth
 
         Log.i("FYP" , "LFO enabled");
 
-        SineLFO.output.connect(mMasterFilter.amplitude);
+        SineLFO.output.connect(mOut.input);
 
 
         SineLFO.setEnabled(true);
@@ -825,7 +845,7 @@ public class Synth
         Log.i("FYP" , "LFO disableLFO");
 
 
-        SineLFO.output.disconnect(mMasterFilter.amplitude);
+        SineLFO.output.disconnect(mOut.input);
 
         SineLFO.setEnabled(false);
         SineLFO.stop();
@@ -898,6 +918,44 @@ public class Synth
 
         SineLFO.amplitude.set(amp);
 
+
+    }
+
+    public void enablePhaseShifter(){
+
+        phaseShifter.output.connect(mMasterFilter.input);
+        phaseShifter.setEnabled(true);
+        phaseShifter.start();
+
+    }
+
+    public void disablePhaseShifter(){
+
+        phaseShifter.depth.set(0);
+
+    }
+
+    public void setPhaseShifterfeedback(double feedback){
+
+        phaseShifter.feedback.set(feedback);
+
+    }
+
+    public void setPhaserShifterdepth(double depth){
+
+        phaseShifter.depth.set(depth);
+
+    }
+
+    public void setPhaserShifterfreq(double freq){
+
+        phaseShifterLFO.frequency.set(freq);
+
+    }
+
+    public void setPhaseShifteramp(double amp){
+
+        phaseShifterLFO.amplitude.set(amp);
 
     }
 
@@ -2023,6 +2081,10 @@ public class Synth
             DisableSqr = RoomSynthData.DisableSqr;
             DisableTri = RoomSynthData.DisableTri;
 
+            DisableSaw2 = RoomSynthData.DisableSaw2;
+            DisableSine2 = RoomSynthData.DisableSine2;
+            DisableSqr2 = RoomSynthData.DisableSqr2;
+            DisableTri2 = RoomSynthData.DisableTri2;
 
             ENABLE_LOW_PASS = RoomSynthData.enableLowPass;
             ENABLE_HIGH_PASS = RoomSynthData.enableHighPass;
@@ -2036,6 +2098,13 @@ public class Synth
             ENABLE_PM = RoomSynthData.ENABLE_PM;
             SinePMFeeder.frequency.set(RoomSynthData.PM_freq);
             SinePMFeeder.amplitude.set(RoomSynthData.PM_amp);
+
+
+            ENABLE_PHASER = RoomSynthData.ENABLE_PHASER;
+            phaseShifterLFO.amplitude.set(RoomSynthData.PHASER_amp);
+            phaseShifter.depth.set(RoomSynthData.PHASER_depth);
+            phaseShifterLFO.frequency.set(RoomSynthData.PHASER_freq);
+            phaseShifter.feedback.set(RoomSynthData.PHASER_feedback);
 
 
 
@@ -2152,6 +2221,13 @@ public class Synth
         DisableSqr = RoomSynthData.DisableSqr;
         DisableTri = RoomSynthData.DisableTri;
 
+        DisableSaw2 = RoomSynthData.DisableSaw2;
+        DisableSine2 = RoomSynthData.DisableSine2;
+        DisableSqr2 = RoomSynthData.DisableSqr2;
+        DisableTri2 = RoomSynthData.DisableTri2;
+
+
+
 
         ENABLE_LOW_PASS = RoomSynthData.enableLowPass;
         ENABLE_HIGH_PASS = RoomSynthData.enableHighPass;
@@ -2166,6 +2242,11 @@ public class Synth
         SinePMFeeder.frequency.set(RoomSynthData.PM_freq);
         SinePMFeeder.amplitude.set(RoomSynthData.PM_amp);
 
+        ENABLE_PHASER = RoomSynthData.ENABLE_PHASER;
+        phaseShifterLFO.amplitude.set(RoomSynthData.PHASER_amp);
+        phaseShifter.depth.set(RoomSynthData.PHASER_depth);
+        phaseShifterLFO.frequency.set(RoomSynthData.PHASER_freq);
+        phaseShifter.feedback.set(RoomSynthData.PHASER_feedback);
 
 
 
@@ -2261,6 +2342,11 @@ public class Synth
         RoomSynthData.DisableSqr = DisableSqr;
         RoomSynthData.DisableTri = DisableTri;
 
+        RoomSynthData.DisableSaw2 = DisableSaw2;
+        RoomSynthData.DisableSine2 = DisableSine2;
+        RoomSynthData.DisableSqr2 = DisableSqr2;
+        RoomSynthData.DisableTri2 = DisableTri2;
+
         RoomSynthData.enableLowPass = mLowPassFilter.isEnabled();
         RoomSynthData.enableHighPass = mHighPassFilter.isEnabled();
 
@@ -2271,6 +2357,12 @@ public class Synth
         RoomSynthData.ENABLE_PM = ENABLE_PM;
         RoomSynthData.PM_freq = SinePMFeeder.frequency.get();
         RoomSynthData.PM_amp = SinePMFeeder.amplitude.get();
+
+        RoomSynthData.ENABLE_PHASER = ENABLE_PHASER;
+        RoomSynthData.PHASER_amp = phaseShifterLFO.amplitude.get();
+        RoomSynthData.PHASER_depth = phaseShifter.depth.get();
+        RoomSynthData.PHASER_freq = phaseShifterLFO.frequency.get();
+        RoomSynthData.PHASER_feedback = phaseShifter.feedback.get();
 
 
         new Thread(new Runnable() {

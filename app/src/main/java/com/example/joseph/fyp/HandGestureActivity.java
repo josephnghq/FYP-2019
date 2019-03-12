@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
@@ -35,7 +36,6 @@ import com.google.gson.reflect.TypeToken;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
@@ -91,6 +91,7 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean SETUP_MASTER_AREA = true;
     private boolean SECOND_OBJ_DETECT_ONE_CONTOUR = false;
     private boolean GLISSANDO_MODE = true;
+    private boolean VIRTUAL_CURSOR_LOCK = false;
 
 
     private int width = 864;
@@ -134,15 +135,20 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean thumbTimerLock = false;
     private Timer thumbTimerTask;
     private Timer fingerTimerTask;
+    private Handler virtualCursorTimer;
     private int thumbx;
     private int thumby;
     private int fingerx;
     private int fingery;
+    private int rightX;
+    private int rightY;
 
     private Handler handler;
 
 
     private boolean ENABLE_DELETE_CLOSE_OBJECTS = false;
+    private boolean ENABLE_DELETE_SMALL_OBJECTS = true;
+
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
 
@@ -173,6 +179,24 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean HSVMode = false;
 
     private Camera mCamera;
+
+    private int boxFirstLeftX = width-150;
+    private int boxFirstRightX = width;
+
+    private int boxSecondLeftX = width - 310;
+    private int boxSecondRightX = width - 160;
+
+    private double boxHeight = (height*0.2);
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
@@ -249,6 +273,7 @@ public class HandGestureActivity extends AppCompatActivity {
         handler = new Handler();
         thumbTimerTask = new Timer();
         fingerTimerTask = new Timer();
+        virtualCursorTimer = new Handler();
 
 
         new Thread(new Runnable() {
@@ -654,7 +679,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   startObjectLatchResetHandler();
                                                               }
 
-                                                              if (ENABLE_DELETE_CLOSE_OBJECTS)
+                                                              if (ENABLE_DELETE_SMALL_OBJECTS)
                                                                   for (int i = 0; i < mu.size(); i++) {
 
                                                                       Moments mom = mu.get(i);
@@ -663,12 +688,12 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       }
 
 
-
-
                                                                   }
 
+
+
                                                               //remove close points
-                                                        /*  if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
                                                           for(int i = 0 ; i < mu.size(); i ++){
 
                                                               for(int p = i; p < mu.size(); p++){
@@ -683,8 +708,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                   if ( dist < 20 && p != i ){
 
-                                                                      Log.e("FYP" , "Removing close points");
-                                                                     // mu.remove(p);
+                                                                      Logger.Log("Removing close points");
+                                                                       mu.remove(p);
                                                                       break;
 
                                                                   }
@@ -693,7 +718,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                          }*/
+                                                          }
 
 
                                                               //  Log.i("FYP","number of thumbs " + mu.size());
@@ -727,7 +752,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       public void run() {
 
                                                                           //selectColorOnPoint(0);
-                                                                          Log.i("FYP" , "SELECTING POINT " + thumbx + " " + thumby);
+                                                                          Logger.Log("SELECTING POINT " + thumbx + " " + thumby);
 
 
                                                                       }
@@ -871,7 +896,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                               //remove close objects
-                                                              if (ENABLE_DELETE_CLOSE_OBJECTS)
+                                                              if (ENABLE_DELETE_SMALL_OBJECTS)
                                                                   for (int i = 0; i < mu2.size(); i++) {
 
                                                                       Moments mom = mu2.get(i);
@@ -884,7 +909,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                               //remove close objects
-                                                       /*   if(ENABLE_DELETE_CLOSE_OBJECTS)
+                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
                                                           for(int i = 0 ; i < mu2.size(); i ++){
 
                                                               for(int p = i; p < mu2.size(); p++){
@@ -899,7 +924,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                   if ( dist < 20 && p != i ){
 
-                                                                      Log.e("FYP" , "Removing close points");
+                                                                      Logger.Log("Removing close points");
+
                                                                      // mu2.remove(p);
                                                                       break;
 
@@ -908,7 +934,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                          }*/
+                                                          }
 
 
                                                               final int a = mu2.size();
@@ -963,7 +989,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                   if(!fingerTimerLock){
 
-                                                                      fingerTimerTask.schedule(new TimerTask() {
+                                                                      /*fingerTimerTask.schedule(new TimerTask() {
                                                                           @Override
                                                                           public void run() {
 
@@ -972,7 +998,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                                           }
-                                                                      },3000,3000);
+                                                                      },3000,3000);*/
 
                                                                       fingerTimerLock = true;
 
@@ -1117,7 +1143,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               } else if (thumbRightSide.size() == 1 && !OCTAVE_DWN_LATCHER && fingerMomentsXYDataArrayListRightSide.size() > 0 && thumbRightSide.get(0).y > fingerMomentsXYDataArrayListRightSide.get(0).y) {
 
 
-                                                                  SHIFT_MODE = 0;
+                                                                 // SHIFT_MODE = 0;
 
 
 /*
@@ -1175,18 +1201,118 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }*/
 
 
+
+
+                                                              //virtual cursor, thumb
+
+                                                          if(thumbRightSide.size() == 1){
+
+
+
+
+                                                                rightX = thumbRightSide.get(0).x;
+                                                                rightY = thumbRightSide.get(0).y;
+
+
+
+
+                                                                if(rightX > boxFirstLeftX && rightX < boxFirstRightX && rightY < boxHeight ){
+
+
+                                                                    Logger.Log("box First");
+
+
+                                                                    if(!VIRTUAL_CURSOR_LOCK) {
+                                                                        VIRTUAL_CURSOR_LOCK = true;
+                                                                        virtualCursorTimer.postDelayed(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+
+
+                                                                                if (rightX > boxFirstLeftX && rightX < boxFirstRightX && rightY < boxHeight) {
+                                                                                    shiftNotes(12, 1);
+                                                                                    runOnUiThread(new Runnable() {
+                                                                                        @Override
+                                                                                        public void run() {
+
+                                                                                            Toast.makeText(getApplicationContext(), "Shifted Up 1 Oct", Toast.LENGTH_SHORT).show();
+
+                                                                                        }
+                                                                                    });
+
+                                                                                }
+                                                                                VIRTUAL_CURSOR_LOCK = false;
+
+                                                                            }
+                                                                        }, 1500);
+                                                                    }
+
+                                                                }
+
+                                                              else if(rightX > boxSecondLeftX && rightX < boxSecondRightX && rightY < boxHeight ){
+
+
+                                                                    Logger.Log("box Second");
+                                                                     if(!VIRTUAL_CURSOR_LOCK) {
+                                                                        VIRTUAL_CURSOR_LOCK = true;
+                                                                        virtualCursorTimer.postDelayed(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+
+
+                                                                                if (rightX > boxSecondLeftX && rightX < boxSecondRightX && rightY < boxHeight) {
+                                                                                    shiftNotes(12, 0);
+                                                                                    runOnUiThread(new Runnable() {
+                                                                                        @Override
+                                                                                        public void run() {
+
+                                                                                            Toast.makeText(getApplicationContext(), "Shifted Dwn 1 Oct", Toast.LENGTH_SHORT).show();
+
+                                                                                        }
+                                                                                    });
+
+                                                                                }
+                                                                                VIRTUAL_CURSOR_LOCK = false;
+
+                                                                            }
+                                                                        }, 1500);
+                                                                    }
+
+                                                              }
+                                                              else{
+
+
+                                                                  virtualCursorTimer.removeCallbacksAndMessages(null);
+                                                                  VIRTUAL_CURSOR_LOCK = false;
+                                                              }
+
+
+
+
+
+
+
+
+
+
+                                                          }
+
+
+
+
                                                               //the following lines calculate only the distance between first finger and last finger, assumption is that last element of the list is a finger
                                                           if(fingerMomentsXYDataArrayListLeftSide.size()>1) {
                                                               int x1 = fingerMomentsXYDataArrayListLeftSide.get(0).x;
                                                               int x2 = fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size() - 1).x;
                                                               int y1 = fingerMomentsXYDataArrayListLeftSide.get(0).y;
                                                               int y2 = fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size() - 1).y;
-                                                              leftHandFingerInBetweenDistance.add((int) distanceOfXYPoints(x1, x2, y1, y2));
+                                                              leftHandFingerInBetweenDistance.add(y1-y2);
                                                           }
 
 
 
 
+                                                          //PLAY NOTES HERE
                                                               if (selectedCursor != null) // there is a cursor
                                                                     //assign notes based on right cursor to left fingers position
                                                                   for (int i = 0; i < fingerMomentsXYDataArrayListLeftSide.size(); i++) {
@@ -1198,7 +1324,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           SYNTH_PLAYING2 = true;
                                                                       }
 
-                                                                      //only works for single note
+                                                                      //only works for single note slide here
                                                                       if(GLISSANDO_MODE){
 
                                                                           if(fingerMomentsXYDataArrayListRightSide.size() == 1 && leftHandFingerInBetweenDistance.size()>0){
@@ -1214,15 +1340,28 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                                         double frequencyBot = notesArrayList.get(0).noteFreqs.get(0);
                                                                                         double freqDiff = frequencyTop - frequencyBot;
                                                                                         glissAmount = Math.abs(glissAmount);
-                                                                                        Log.i("FYP" , "Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
+                                                                                        Logger.Log("Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
+
 
 
                                                                                         if(glissAmount!=0)
-                                                                                        glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * (int)freqDiff;
+                                                                                        glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * freqDiff;
 
-                                                                                        Log.i("FYP" , "Final glissamount is " + glissAmount);
+                                                                                        if(frequencyTop - glissAmount < frequencyBot)
+                                                                                            glissAmount = frequencyTop - frequencyBot;
 
-                                                                                        Scales.chordPoint((int)-glissAmount, 3, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+                                                                                        Logger.Log("Final glissamount is " + glissAmount);
+
+
+                                                                                        Scales.chordPoint(-glissAmount, 3, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+                                                                                    }
+                                                                                    else if (selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(0).y){
+
+                                                                                        Scales.chordPoint(0, 0, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
 
 
                                                                                     }
@@ -1243,18 +1382,27 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                                   double glissAmount =fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y - selectedCursor.y;
                                                                                   double frequencyTop = notesArrayList.get(7).noteFreqs.get(0);
-                                                                                  double frequencyBot = notesArrayList.get(3).noteFreqs.get(0);
+                                                                                  double frequencyBot = notesArrayList.get(4).noteFreqs.get(0);
                                                                                   double freqDiff = frequencyTop - frequencyBot;
                                                                                   glissAmount = Math.abs(glissAmount);
-                                                                                  Log.i("FYP" , "Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
+                                                                                  Log.i("FYP" , "Freq2 diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
 
 
                                                                                   if(glissAmount!=0)
-                                                                                      glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * (int)freqDiff;
+                                                                                      glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * freqDiff;
 
-                                                                                  Log.i("FYP" , "Final glissamount is " + glissAmount);
+                                                                                  if(frequencyTop - glissAmount < frequencyBot)
+                                                                                      glissAmount = frequencyTop - frequencyBot;
 
-                                                                                  Scales.chordPoint((int)-glissAmount, 7, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+                                                                                  Log.i("FYP" , "Final2 glissamount is " + glissAmount);
+
+                                                                                  Scales.chordPoint(-glissAmount, 7, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+                                                                              }
+                                                                              else if (selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(0).y){
+
+                                                                                  Scales.chordPoint(0, 0, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
 
 
                                                                               }
@@ -1397,8 +1545,13 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               //  Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_RGB2HSV_FULL);
 
 
-                                                          Imgproc.rectangle(mRgba, new Point(0, 0), new Point(150, height * 0.3), new Scalar(0, 255, 0));
-                                                          Imgproc.rectangle(mRgba, new Point(0, height * 0.7), new Point(150, height), new Scalar(0, 255, 0));
+
+                                                          // this section is responsible for drawing all the lines and rectangles
+
+
+
+                                                          Imgproc.rectangle(mRgba, new Point(boxFirstLeftX, 0), new Point(boxFirstRightX, boxHeight), new Scalar(0, 255, 0));
+                                                          Imgproc.rectangle(mRgba, new Point(boxSecondLeftX, 0), new Point(boxSecondRightX, boxHeight), new Scalar(0, 255, 0));
 
 
 
@@ -2122,6 +2275,7 @@ public class HandGestureActivity extends AppCompatActivity {
                 touchedRect.y = (y > detectSize) ? y - detectSize : 0;
 
 
+                if(!SELECT_FINGERS && !SELECT_THUMB)
                 mOpenCvCameraView.setFocus(focusRect);
 
 

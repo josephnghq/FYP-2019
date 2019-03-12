@@ -42,6 +42,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
     private CheckBox enablePM;
     private CheckBox enableLFO;
+    private CheckBox enablePhaseShifter;
 
 
 
@@ -62,12 +63,17 @@ public class EditSoundActivity extends AppCompatActivity {
     private SeekBar seekBarSustain;
     private SeekBar seekBarRelease;
 
-
     private SeekBar PMfreq;
     private SeekBar PMamp;
 
     private SeekBar LFOfreq;
     private SeekBar LFOamp;
+
+    private SeekBar phaseShifterFreq;
+    private SeekBar phaseShifterAmp;
+    private SeekBar phaseShifterFeedback;
+    private SeekBar phaseShifterDepth;
+
 
     private SeekBar seekBarAttackLevel;
     private SeekBar seekBarDecayLevel;
@@ -421,6 +427,26 @@ public class EditSoundActivity extends AppCompatActivity {
             }
         });
 
+        enablePhaseShifter = (CheckBox)findViewById(R.id.phaser);
+        enablePhaseShifter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean checked = enablePhaseShifter.isChecked();
+
+                if(checked){
+
+
+                    mSynth.enablePhaseShifter();
+
+                }
+                else{
+                    mSynth.disablePhaseShifter();
+                }
+
+            }
+        });
+
 
         filterADSRCheckbox = (CheckBox)findViewById(R.id.enable_filter_adsr);
         filterADSRCheckbox.setOnClickListener(new View.OnClickListener() {
@@ -663,7 +689,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
         LFOamp = (SeekBar) findViewById(R.id.LFO_1_amp);
-        LFOamp.setMax(100);
+        LFOamp.setMax(200);
         LFOamp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -683,6 +709,101 @@ public class EditSoundActivity extends AppCompatActivity {
 
             }
         });
+
+        phaseShifterFreq = (SeekBar) findViewById(R.id.phaser_freq);
+        phaseShifterFreq.setMax(100);
+        phaseShifterFreq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setPhaserShifterfreq(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        phaseShifterAmp = (SeekBar) findViewById(R.id.phaser_amp);
+        phaseShifterAmp.setMax(200);
+        phaseShifterAmp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setPhaseShifteramp(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        phaseShifterFeedback = (SeekBar) findViewById(R.id.phaser_feedback);
+        phaseShifterFeedback.setMax(100);
+        phaseShifterFeedback.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setPhaseShifterfeedback(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        phaseShifterDepth = (SeekBar) findViewById(R.id.phaser_depth);
+        phaseShifterDepth.setMax(100);
+        phaseShifterDepth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                double value = (double)progress/100;
+                mSynth.setPhaserShifterdepth(value);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+
+
+
+
 
         seekBarAttack = (SeekBar)findViewById(R.id.env_attack);
         seekBarAttack.setMax(400);
@@ -1081,8 +1202,16 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
+
+
     }
 
+    @Override
+    protected void onDestroy() {
+
+        mSynth.destory();
+        super.onDestroy();
+    }
 
     public void buildAlertDialog(){
 
@@ -1096,8 +1225,7 @@ public class EditSoundActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 
                 title = et.getText().toString();
-                SynthData sd;
-                mSynth.title = title;
+                 mSynth.title = title;
                 mSynth.saveData();
 /*                d = mSynth.saveData();
                 sd.title = title;

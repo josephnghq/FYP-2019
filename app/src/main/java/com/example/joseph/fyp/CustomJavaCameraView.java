@@ -65,7 +65,7 @@ public class CustomJavaCameraView extends JavaCameraView {
 
         Log.i("FYP","max is " + params.getMaxNumMeteringAreas());
 
-        List<Camera.Area> are = params.getMeteringAreas();
+        /* List<Camera.Area> are = params.getMeteringAreas();
 
         if(are!=null)
         for(int i = 0 ; i < are.size(); i++){
@@ -76,7 +76,7 @@ public class CustomJavaCameraView extends JavaCameraView {
 
 
         }
-
+*/
 
 
 
