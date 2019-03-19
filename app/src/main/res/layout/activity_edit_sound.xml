@@ -9,93 +9,110 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        >
 
 
-
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Osc 1 ( PM Sine )" />
-
-
-                <GridLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <CheckBox
-                        android:id="@+id/osc_sawtooth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sawtooth" />
-
-                    <CheckBox
-                        android:id="@+id/osc_sine"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sine" />
-
-                    <CheckBox
-                        android:id="@+id/osc_square"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Square" />
-
-                    <CheckBox
-                        android:id="@+id/osc_triangle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Triangle" />
-                </GridLayout>
-
-
-
-
-
-
-
-            </LinearLayout>
-
-
-
-
-
-
-
-
-        <View
-            android:layout_width="fill_parent"
-            android:paddingLeft="100dp"
-            android:paddingRight="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Osc 2"/>
 
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                 >
+
+                <LinearLayout
+                    android:id="@+id/first_osc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/synth_rec"
+                    android:paddingBottom="4dp"
+                    android:paddingTop="4dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:orientation="vertical">
+
+                    <GridLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <CheckBox
+                            android:id="@+id/osc_sawtooth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sawtooth" />
+
+                        <CheckBox
+                            android:id="@+id/osc_sine"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sine" />
+
+                        <CheckBox
+                            android:id="@+id/osc_square"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Square" />
+
+                        <CheckBox
+                            android:id="@+id/osc_triangle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Triangle" />
+                    </GridLayout>
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="15dp"
+                        android:visibility="invisible"
+                        />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:background="#fffafafa"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="44dp"
+                    android:layout_marginLeft="30dp"
+                     android:text="Osc 1 ( PM Sine )" />
+
+
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                >
+
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/synth_rec"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+            android:orientation="vertical">
 
             <GridLayout
                 android:layout_width="wrap_content"
@@ -157,26 +174,50 @@
                 android:layout_height="wrap_content"
                 />
 
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="15dp"
+                    android:visibility="invisible"
+                    />
 
         </LinearLayout>
 
 
 
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#fffafafa"
+                    android:layout_marginTop="151dp"
+                    android:layout_marginLeft="30dp"
+                    android:text="Osc 2"/>
+
+            </RelativeLayout>
 
 
-        <View
-            android:layout_width="fill_parent"
-            android:paddingLeft="100dp"
-            android:paddingRight="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
 
-
-        <TextView
+        <RelativeLayout
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volume Envelope"/>
+            android:layout_height="wrap_content">
+
+
+
+            <LinearLayout
+                android:background="@drawable/synth_rec"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:orientation="vertical">
+
+
 
         <GridLayout
             android:layout_width="match_parent"
@@ -331,27 +372,47 @@
                 android:layout_height="wrap_content"
                 />
 
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:visibility="invisible"
+                />
 
         </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#fffafafa"
+                android:layout_marginTop="102dp"
+                android:layout_marginLeft="30dp"
+                android:text="Volume Envelope"/>
 
 
-        <View
-            android:layout_width="fill_parent"
-            android:paddingLeft="100dp"
-            android:paddingRight="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+        </RelativeLayout>
+
+
+            <RelativeLayout
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:background="@drawable/synth_rec"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LFO"/>
+
 
 
 
@@ -384,31 +445,50 @@
                 android:layout_height="wrap_content"
                 />
 
-
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:visibility="invisible"
+                />
 
 
         </LinearLayout>
 
 
-        <View
-            android:layout_width="fill_parent"
-            android:paddingLeft="100dp"
-            android:paddingRight="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#fffafafa"
+                    android:layout_marginTop="118dp"
+                    android:layout_marginLeft="30dp"
+                    android:text="LFO"/>
+
+            </RelativeLayout>
 
 
 
+
+
+            <RelativeLayout
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:background="@drawable/synth_rec"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Filter"/>
+
 
 
             <GridLayout
@@ -601,40 +681,48 @@
                      android:layout_height="wrap_content"
                      android:layout_row="4"/>
 
+                 <View
+                     android:layout_width="wrap_content"
+                     android:layout_height="15dp"
+                     android:visibility="invisible"
+                     />
 
              </LinearLayout>
 
 
-
-
-
-
-            <View
-                android:layout_width="fill_parent"
-                android:paddingLeft="100dp"
-                android:paddingRight="100dp"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"/>
-
-
-
-
-
-
         </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#fffafafa"
+                    android:layout_marginTop="255dp"
+                    android:layout_marginLeft="30dp"
+                    android:text="Filter"/>
 
+
+
+            </RelativeLayout>
+
+
+
+            <RelativeLayout
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:background="@drawable/synth_rec"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phaser"/>
-
 
 
             <CheckBox
@@ -688,19 +776,24 @@
                 android:layout_height="wrap_content"
                 />
 
-
-
-
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:visibility="invisible"
+                />
 
         </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#fffafafa"
+                    android:layout_marginTop="191dp"
+                    android:layout_marginLeft="30dp"
+                    android:text="Phaser"/>
 
-        <View
-            android:layout_width="fill_parent"
-            android:paddingLeft="100dp"
-            android:paddingRight="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+            </RelativeLayout>
+
 
 
 
@@ -724,24 +817,44 @@
             android:layout_height="wrap_content">>
 
             <Button
+                android:background="@drawable/custombutton2"
+                android:shadowColor="#A8A8A8"
+                android:shadowDx="3"
+                android:shadowDy="2"
+                android:shadowRadius="9"
                 android:id="@+id/play_test_pitch_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Play Test Pitch" />
+                android:text="Play Sound" />
 
             <Button
+                android:background="@drawable/custombutton2"
+                android:shadowColor="#A8A8A8"
+                android:shadowDx="3"
+                android:shadowDy="2"
+                android:shadowRadius="9"
                 android:id="@+id/play_osc_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Play" />
 
             <Button
+                android:background="@drawable/custombutton2"
+                android:shadowColor="#A8A8A8"
+                android:shadowDx="3"
+                android:shadowDy="2"
+                android:shadowRadius="9"
                 android:id="@+id/end_osc_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Stop" />
 
             <Button
+                android:background="@drawable/custombutton2"
+                android:shadowColor="#A8A8A8"
+                android:shadowDx="3"
+                android:shadowDy="2"
+                android:shadowRadius="9"
                 android:id="@+id/save_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

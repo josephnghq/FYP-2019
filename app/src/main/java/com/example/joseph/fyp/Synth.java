@@ -926,6 +926,7 @@ public class Synth
         phaseShifter.output.connect(mMasterFilter.input);
         phaseShifter.setEnabled(true);
         phaseShifter.start();
+        ENABLE_PHASER = true;
 
     }
 

@@ -1,0 +1,93 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="none"
+        android:inputType="number"
+        android:defaultValue="12"
+        android:key="fingers_hue"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Finger Radius Hue" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="number"
+        android:key="fingers_sat"
+        android:defaultValue="50"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Finger Radius Saturation" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="number"
+        android:key="fingers_value"
+        android:defaultValue="50"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Finger Radius Value" />
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:inputType="number"
+        android:defaultValue="12"
+        android:key="thumb_hue"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Thumb Radius Hue" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="number"
+        android:defaultValue="50"
+        android:key="thumb_sat"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Thumb Radius Saturation" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="number"
+        android:defaultValue="50"
+        android:key="thumb_value"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Thumb Radius Value" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="numberSigned|numberDecimal"
+        android:defaultValue="0"
+        android:key="hand_gesture_exposure"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Exposure (From -12 to 12)" />
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="hand_gesture_hsv_view"
+        android:summary="mRgb converts to HSV"
+        android:title="Enable HSV View" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="hand_gesture_same_color_thumb_mode"
+        android:summary="Thumb and fingers are same color"
+        android:title="Enable singular color detection" />
+
+
+</PreferenceScreen>

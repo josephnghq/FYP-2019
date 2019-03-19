@@ -37,7 +37,15 @@
         <activity android:name=".HandGestureActivity" />
         <activity android:name=".CreateChordFragmentActivity" />
         <activity android:name=".PlayOptionsActivity" />
-        <activity android:name=".CreateOptionsActivity"></activity>
+        <activity android:name=".CreateOptionsActivity" />
+        <activity
+            android:name=".HandGestureSettings"
+            android:label="@string/title_activity_hand_gesture_settings"
+            android:parentActivityName=".HandGestureActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.joseph.fyp.HandGestureActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -22,7 +23,9 @@ dependencies {
     def room_version = "1.1.1"
 
     implementation "android.arch.persistence.room:runtime:$room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$room_version" // use kapt for Kotlin
+    implementation 'com.android.support:support-vector-drawable:26.1.0'
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    // use kapt for Kotlin
 
     // optional - RxJava support for Room
     implementation "android.arch.persistence.room:rxjava2:$room_version"

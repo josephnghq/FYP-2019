@@ -3,12 +3,14 @@ package com.example.joseph.fyp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -61,6 +63,8 @@ public class HandGestureActivity extends AppCompatActivity {
     CustomJavaCameraView mOpenCvCameraView;
     SharedPreferences sharedPref;
     SharedPreferences sharedPref2;
+    SharedPreferences defaultPrefs;
+
     ArrayList<String> synthDataTitles = new ArrayList<String>();
     ArrayList<String> noteDataTitles = new ArrayList<String>();
     private BaseLoaderCallback mLoaderCallback;
@@ -92,7 +96,7 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean SECOND_OBJ_DETECT_ONE_CONTOUR = false;
     private boolean GLISSANDO_MODE = true;
     private boolean VIRTUAL_CURSOR_LOCK = false;
-
+    private boolean PERFORMANCE_MODE = false;
 
     private int width = 864;
     private int height = 486;
@@ -107,6 +111,8 @@ public class HandGestureActivity extends AppCompatActivity {
     private Button btn_calibrate_first_obj_btn;
     private Button btn_hand_gesture_setRadius;
     private Button btn_hand_gesture_setThumbRadius;
+    private Button btn_perf_mode;
+
     private ToggleButton toggle_select_thumbs;
     private ToggleButton toggle_select_fingers;
     private double first_obj_area = 0;
@@ -148,6 +154,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private boolean ENABLE_DELETE_CLOSE_OBJECTS = false;
     private boolean ENABLE_DELETE_SMALL_OBJECTS = true;
+    private boolean SAME_THUMB_COLOR_MODE = true;
 
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
@@ -225,6 +232,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
+
         Camera camera = Camera.open(1);
 
         List<android.hardware.Camera.Size> sizeList = params.getSupportedVideoSizes();
@@ -245,12 +253,21 @@ public class HandGestureActivity extends AppCompatActivity {
         mGestureDetector = new GestureDetector(this, new MyGestureListener());
 
 
+
         sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
         sharedPref2 = this.getSharedPreferences(
                 getString(R.string.notes_array_list), Context.MODE_PRIVATE);
+
+        defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+        HSVMode = defaultPrefs.getBoolean("hand_gesture_hsv_view" , false);
+        SAME_THUMB_COLOR_MODE = defaultPrefs.getBoolean("hand_gesture_same_color_thumb_mode" , false);
+
+
 
         gson = builder.create();
 
@@ -359,7 +376,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                         Log.i("FYP" , "CLICKED CLICKED CLICKED");
                         notesArrayList = listOfNoteData.get(position).notesArrayList;
-                        setupNoteLayout();
+                      //  setupNoteLayout();
 
                     }
                 });
@@ -390,6 +407,7 @@ public class HandGestureActivity extends AppCompatActivity {
         btn_calibrate_first_obj_btn = (Button) findViewById(R.id.hand_gesture_calibrate_first_obj);
         toggle_select_thumbs = (ToggleButton) findViewById(R.id.hand_gesture_select_thumbs);
         toggle_select_fingers = (ToggleButton) findViewById(R.id.hand_gesture_select_fingers);
+        btn_perf_mode = (Button) findViewById(R.id.hand_gesture_perf_btn);
 
         toggle_select_thumbs.setChecked(true);
 
@@ -461,11 +479,21 @@ public class HandGestureActivity extends AppCompatActivity {
 
                // selectSecondObject();
 
-                if(!HSVMode)
+               /* if(!HSVMode)
                 HSVMode = true;
                 else{
                     HSVMode = false;
-                }
+                }*/
+
+               fingerScalarRadius = null;
+               thumbScalarRadius = null;
+                Intent i = new Intent(getApplicationContext(),HandGestureSettings.class);
+                startActivity(i);
+
+
+
+
+
 
             }
         });
@@ -490,6 +518,26 @@ public class HandGestureActivity extends AppCompatActivity {
                 else{
                     GLISSANDO_MODE = true;
                 }
+
+            }
+        });
+
+        btn_perf_mode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(PERFORMANCE_MODE) {
+                    PERFORMANCE_MODE = false;
+                    showButtonGroup();
+                }
+
+                else {
+                    PERFORMANCE_MODE = true;
+                    hideButtonGroup();
+                }
+
+
+
 
             }
         });
@@ -551,6 +599,8 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           mDetector = new ColorBlobDetector();
                                                           mDetector2 = new ColorBlobDetector();
 
+
+
                                                           mSpectrum = new Mat();
                                                           mBlobColorRgba = new Scalar(255);
                                                           mBlobColorHsv = new Scalar(255);
@@ -558,6 +608,8 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           CONTOUR_COLOR = new Scalar(255, 0, 0, 255);
                                                           CONTOUR_COLOR2 = new Scalar(200, 200, 200, 200);
                                                           backgroundSubtractorMOG2 = Video.createBackgroundSubtractorMOG2();
+                                                          mOpenCvCameraView.setExposureCompensation(Integer.parseInt(defaultPrefs.getString("hand_gesture_exposure" , "0")));
+
 
                                                       }
 
@@ -611,8 +663,10 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               if (mIsColorSelected) {
 
-
+                                                                  if(!SAME_THUMB_COLOR_MODE)
                                                                   mDetector.process(mRgba);
+
+
                                                                   mDetector2.process(mRgba);
 
 
@@ -631,8 +685,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       SYNTH_PLAYING2 = false;
                                                                   }
 
-
+                                                                  if(!SAME_THUMB_COLOR_MODE)
                                                                   Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+
+
                                                                   Imgproc.drawContours(mRgba, contours2, -1, CONTOUR_COLOR2);
 
 
@@ -658,7 +714,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
-
+                                                          if(!SAME_THUMB_COLOR_MODE) {
                                                               for (int i = 0; i < contours.size(); i++) {
                                                                   mu.add(i, Imgproc.moments(contours.get(i), false));
                                                                  /* Moments p = mu.get(i);
@@ -691,34 +747,33 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   }
 
 
-
                                                               //remove close points
-                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
-                                                          for(int i = 0 ; i < mu.size(); i ++){
+                                                              if (ENABLE_DELETE_CLOSE_OBJECTS)
+                                                                  for (int i = 0; i < mu.size(); i++) {
 
-                                                              for(int p = i; p < mu.size(); p++){
+                                                                      for (int p = i; p < mu.size(); p++) {
 
-                                                                  Moments mom = mu.get(i);
-                                                                  Moments momToCompare = mu.get(p);
-
-
-                                                                  double dist = distanceOfXYPoints(mom.get_m10()/mom.get_m00() , momToCompare.get_m10()/momToCompare.get_m00() ,
-                                                                          mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
+                                                                          Moments mom = mu.get(i);
+                                                                          Moments momToCompare = mu.get(p);
 
 
-                                                                  if ( dist < 20 && p != i ){
+                                                                          double dist = distanceOfXYPoints(mom.get_m10() / mom.get_m00(), momToCompare.get_m10() / momToCompare.get_m00(),
+                                                                                  mom.get_m01() / momToCompare.get_m00(), momToCompare.get_m01() / momToCompare.get_m00());
 
-                                                                      Logger.Log("Removing close points");
-                                                                       mu.remove(p);
-                                                                      break;
+
+                                                                          if (dist < 20 && p != i) {
+
+                                                                              Logger.Log("Removing close points");
+                                                                              mu.remove(p);
+                                                                              break;
+
+                                                                          }
+
+
+                                                                      }
+
 
                                                                   }
-
-
-                                                              }
-
-
-                                                          }
 
 
                                                               //  Log.i("FYP","number of thumbs " + mu.size());
@@ -737,31 +792,30 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                              /* mu.add(i, Imgproc.moments(contours.get(i), false));*/
                                                                   Moments p = mu.get(i);
-                                                                   int x = (int) (p.get_m10() / p.get_m00());
-                                                                   int y = (int) (p.get_m01() / p.get_m00());
+                                                                  int x = (int) (p.get_m10() / p.get_m00());
+                                                                  int y = (int) (p.get_m01() / p.get_m00());
                                                                   currentXObj1 = x;
 
                                                                   thumbx = x;
                                                                   thumby = y;
 
 
-                                                                  if(!thumbTimerLock){
+                                                                  if (!thumbTimerLock) {
 
-                                                                  thumbTimerTask.schedule(new TimerTask() {
-                                                                      @Override
-                                                                      public void run() {
+                                                                      thumbTimerTask.schedule(new TimerTask() {
+                                                                          @Override
+                                                                          public void run() {
 
-                                                                          //selectColorOnPoint(0);
-                                                                          Logger.Log("SELECTING POINT " + thumbx + " " + thumby);
+                                                                              //selectColorOnPoint(0);
+                                                                              Logger.Log("SELECTING POINT " + thumbx + " " + thumby);
 
 
-                                                                      }
-                                                                  },3000,3000);
+                                                                          }
+                                                                      }, 3000, 3000);
 
-                                                                  thumbTimerLock = true;
+                                                                      thumbTimerLock = true;
 
                                                                   }
-
 
 
                                                                   if (x < firstHalf) {
@@ -875,7 +929,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                               }
-
+                                                          }
 
                                                               //SECOND OBJECT
                                                               //SECOND OBJECT
@@ -895,7 +949,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                              //remove close objects
+                                                              //remove small objects
                                                               if (ENABLE_DELETE_SMALL_OBJECTS)
                                                                   for (int i = 0; i < mu2.size(); i++) {
 
@@ -1092,6 +1146,28 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               //int smallestX = 0;
                                                               FingerMomentsXYData selectedCursor = null;
 
+                                                              //same color thumb mode, this detects thumb
+                                                          if(fingerMomentsXYDataArrayListRightSide.size() > 1 && SAME_THUMB_COLOR_MODE){
+
+                                                              int lastItemCount = fingerMomentsXYDataArrayListRightSide.size() - 1;
+                                                              int lastItemX = fingerMomentsXYDataArrayListRightSide.get(lastItemCount).x;
+                                                              int firstItemX = fingerMomentsXYDataArrayListRightSide.get(0).x;
+
+                                                              if ((lastItemX-firstItemX )> 100 ){
+                                                                  thumbRightSide.add(fingerMomentsXYDataArrayListRightSide.get(lastItemCount));
+                                                                  fingerMomentsXYDataArrayListRightSide.remove(lastItemCount);
+                                                                  Logger.Log("Adding thumb , y position is " + fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size() - 1).y + " size of " +
+                                                                          "thumbRightSize is " + thumbRightSide.size());
+
+                                                              }
+
+
+
+
+
+
+                                                          }
+
                                                               for (int i = 0; i < fingerMomentsXYDataArrayListRightSide.size(); i++) {
 
 
@@ -1205,7 +1281,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                               //virtual cursor, thumb
 
-                                                          if(thumbRightSide.size() == 1){
+                                                          if(thumbRightSide.size() == 1 && PERFORMANCE_MODE){
 
 
 
@@ -1548,11 +1624,10 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           // this section is responsible for drawing all the lines and rectangles
 
-
-
-                                                          Imgproc.rectangle(mRgba, new Point(boxFirstLeftX, 0), new Point(boxFirstRightX, boxHeight), new Scalar(0, 255, 0));
-                                                          Imgproc.rectangle(mRgba, new Point(boxSecondLeftX, 0), new Point(boxSecondRightX, boxHeight), new Scalar(0, 255, 0));
-
+                                                          if(PERFORMANCE_MODE) {
+                                                              Imgproc.rectangle(mRgba, new Point(boxFirstLeftX, 0), new Point(boxFirstRightX, boxHeight), new Scalar(0, 255, 0));
+                                                              Imgproc.rectangle(mRgba, new Point(boxSecondLeftX, 0), new Point(boxSecondRightX, boxHeight), new Scalar(0, 255, 0));
+                                                          }
 
 
                                                           Mat colorLabel = mRgba.submat(4, 68, 4, 68);
@@ -1870,6 +1945,44 @@ public class HandGestureActivity extends AppCompatActivity {
     }
 
 
+
+    private void selectFingersRangeNoAlert(){
+
+
+
+        int H = Integer.parseInt(defaultPrefs.getString("fingers_hue" , "12"));
+        int S = Integer.parseInt(defaultPrefs.getString("fingers_sat" , "50"));
+        int V = Integer.parseInt(defaultPrefs.getString("fingers_value" , "50"));
+
+        Logger.Log("Hue is now  " + H);
+
+
+        fingerScalarRadius = new Scalar(H,S,V,0);
+
+        mDetector2.setColorRadius(fingerScalarRadius);
+        mDetector2.setHsvColor(mBlobColorHsv);
+        Imgproc.resize(mDetector2.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+    }
+
+    private void selectThumbRangeNoAlert() {
+
+        int H = Integer.parseInt(defaultPrefs.getString("thumb_hue" , "12"));
+        int S = Integer.parseInt(defaultPrefs.getString("thumb_sat" , "50"));
+        int V = Integer.parseInt(defaultPrefs.getString("thumb_value" , "50"));
+
+
+
+
+        thumbScalarRadius = new Scalar(H, S, V, 0);
+
+
+       mDetector.setColorRadius(thumbScalarRadius);
+       mDetector.setHsvColor(mBlobColorHsv);
+       Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
+
+   }
+
     private void selectFingersRange(){
 
 
@@ -2019,7 +2132,21 @@ public class HandGestureActivity extends AppCompatActivity {
 
     }
 
+    private void hideButtonGroup(){
 
+        LinearLayout ll = (LinearLayout)findViewById(R.id.hand_gesture_button_group);
+        ll.setVisibility(View.GONE);
+
+
+    }
+
+    private void showButtonGroup(){
+
+        LinearLayout ll = (LinearLayout)findViewById(R.id.hand_gesture_button_group);
+        ll.setVisibility(View.VISIBLE);
+
+
+    }
 
 
 
@@ -2069,6 +2196,9 @@ public class HandGestureActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0, this, mLoaderCallback);
+
+
+
     }
 
 
@@ -2337,7 +2467,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
                     //new Scalar(25,50,50,0);
                     if(thumbScalarRadius == null)
-                    mDetector.setColorRadius(new Scalar(12,50,25,0));
+                        selectThumbRangeNoAlert();
+                    //mDetector.setColorRadius(new Scalar(12,50,25,0));
 
                     mDetector.setHsvColor(mBlobColorHsv);
                     mTouchChoice = 1;
@@ -2346,8 +2477,14 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 } else if (SELECT_FINGERS) {
 
-                    if(fingerScalarRadius == null)
-                    mDetector2.setColorRadius(new Scalar(12,100,50,0));
+                    if(fingerScalarRadius == null) {
+                        selectFingersRangeNoAlert();
+                        Logger.Log("Fingers are null!!!!!!!!!!");
+
+                    }
+
+
+                    Logger.Log("Fingers are not null");
 
                     mDetector2.setHsvColor(mBlobColorHsv);
 
