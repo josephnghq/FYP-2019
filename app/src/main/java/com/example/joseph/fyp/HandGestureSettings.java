@@ -197,6 +197,8 @@ public class HandGestureSettings extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("thumb_sat"));
             bindPreferenceSummaryToValue(findPreference("thumb_value"));
             bindPreferenceSummaryToValue(findPreference("hand_gesture_exposure"));
+            bindPreferenceSummaryToValue(findPreference("hand_gesture_thumb_finger_distance"));
+
 
 
         }

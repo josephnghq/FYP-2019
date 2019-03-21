@@ -46,29 +46,38 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <CheckBox
+                        <RadioGroup
+                            android:id="@+id/osc_1_radiogroup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+
+                        <RadioButton
                             android:id="@+id/osc_sawtooth"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Sawtooth" />
 
-                        <CheckBox
+                        <RadioButton
                             android:id="@+id/osc_sine"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Sine" />
 
-                        <CheckBox
+                        <RadioButton
                             android:id="@+id/osc_square"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Square" />
 
-                        <CheckBox
+                        <RadioButton
                             android:id="@+id/osc_triangle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Triangle" />
+
+                        </RadioGroup>
                     </GridLayout>
 
                     <View
@@ -118,29 +127,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <CheckBox
+
+                <RadioGroup
+                    android:id="@+id/osc_2_radiogroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                <RadioButton
                     android:id="@+id/osc_sawtooth2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sawtooth" />
 
-                <CheckBox
+                <RadioButton
                     android:id="@+id/osc_sine2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sine" />
 
-                <CheckBox
+                <RadioButton
                     android:id="@+id/osc_square2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Square" />
 
-                <CheckBox
+                <RadioButton
                     android:id="@+id/osc_triangle2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Triangle" />
+                </RadioGroup>
             </GridLayout>
 
             <CheckBox

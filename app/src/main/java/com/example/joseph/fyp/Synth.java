@@ -1656,8 +1656,8 @@ public class Synth
                 mLowPassFilter.frequency.set(0);
                 mHighPassFilter.frequency.set(0);
             }
-            envPlayerFilter.dataQueue.clear();
 
+            envPlayerFilter.dataQueue.clear();
            envPlayerFilter.dataQueue.queue(envForFilter,0,envForFilter.getNumFrames());
          //  envPlayerFilter.start();
 

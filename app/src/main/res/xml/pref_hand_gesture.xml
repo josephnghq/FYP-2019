@@ -73,6 +73,16 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="Exposure (From -12 to 12)" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="number"
+        android:defaultValue="100"
+        android:key="hand_gesture_thumb_finger_distance"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="X distance from finger to thumb" />
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->

@@ -28,6 +28,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -98,8 +99,12 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean VIRTUAL_CURSOR_LOCK = false;
     private boolean PERFORMANCE_MODE = false;
 
+   /* private int width = 864;
+    private int height = 486;
+*/
     private int width = 864;
     private int height = 486;
+
     private GsonBuilder builder = new GsonBuilder();
     private Gson gson;
     private ArrayList<SynthData> listOfSynthData = new ArrayList<SynthData>();
@@ -195,11 +200,25 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private double boxHeight = (height*0.2);
 
+    private int currentFingersColorH = -1;
+    private int currentFingersColorS = -1;
+    private int currentFingersColorV = -1;
 
+    private int currentThumbColorH = -1;
+    private int currentThumbColorS = -1;
+    private int currentThumbColorV = -1;
 
+    private SeekBar currentColorH;
+    private SeekBar currentColorS;
+    private SeekBar currentColorV;
 
+    private int newH = -1;
+    private int newS = -1;
+    private int newV = -1;
 
+    private LinearLayout seekBarLayout;
 
+    private int thumbFingerDistance;
 
 
 
@@ -238,12 +257,21 @@ public class HandGestureActivity extends AppCompatActivity {
         List<android.hardware.Camera.Size> sizeList = params.getSupportedVideoSizes();
 
 
+
         for(int i = 0 ; i <sizeList.size(); i ++ ){
 
             android.hardware.Camera.Size s = sizeList.get(i);
             Log.i("FYP" + String.valueOf(i) , String.valueOf(s.height));
             Log.i("FYP" + String.valueOf(i) , String.valueOf(s.width));
 
+
+        }
+
+        List<int[]>  list = params.getSupportedPreviewFpsRange();
+
+        for(int i = 0 ; i < list.size(); i++ ){
+
+            Log.i("FYP" , "Supported camera FPS mode " + list.get(i)[0]);
 
         }
 
@@ -266,6 +294,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
         HSVMode = defaultPrefs.getBoolean("hand_gesture_hsv_view" , false);
         SAME_THUMB_COLOR_MODE = defaultPrefs.getBoolean("hand_gesture_same_color_thumb_mode" , false);
+        thumbFingerDistance = Integer.parseInt(defaultPrefs.getString("hand_gesture_thumb_finger_distance" , "100"));
 
 
 
@@ -409,6 +438,10 @@ public class HandGestureActivity extends AppCompatActivity {
         toggle_select_fingers = (ToggleButton) findViewById(R.id.hand_gesture_select_fingers);
         btn_perf_mode = (Button) findViewById(R.id.hand_gesture_perf_btn);
 
+        currentColorH = (SeekBar)findViewById(R.id.hand_gesture_color_H);
+        currentColorS = (SeekBar)findViewById(R.id.hand_gesture_color_S);
+        currentColorV = (SeekBar)findViewById(R.id.hand_gesture_color_V);
+        seekBarLayout = (LinearLayout)findViewById(R.id.hand_gesture_seekbars);
         toggle_select_thumbs.setChecked(true);
 
         toggle_select_thumbs.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -584,6 +617,7 @@ public class HandGestureActivity extends AppCompatActivity {
         mSynth2.selectHighPass();
         mSynth2.setfreqQ(6);
 
+        setUpSeekBarsForHSV();
 
         // mSynth.playOsc();
 
@@ -1153,7 +1187,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               int lastItemX = fingerMomentsXYDataArrayListRightSide.get(lastItemCount).x;
                                                               int firstItemX = fingerMomentsXYDataArrayListRightSide.get(0).x;
 
-                                                              if ((lastItemX-firstItemX )> 100 ){
+                                                              if ((lastItemX-firstItemX )> thumbFingerDistance ){
                                                                   thumbRightSide.add(fingerMomentsXYDataArrayListRightSide.get(lastItemCount));
                                                                   fingerMomentsXYDataArrayListRightSide.remove(lastItemCount);
                                                                   Logger.Log("Adding thumb , y position is " + fingerMomentsXYDataArrayListRightSide.get(fingerMomentsXYDataArrayListRightSide.size() - 1).y + " size of " +
@@ -1401,7 +1435,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       }
 
                                                                       //only works for single note slide here
-                                                                      if(GLISSANDO_MODE){
+                                                                      if(GLISSANDO_MODE && notesArrayList.size() == 8){
 
                                                                           if(fingerMomentsXYDataArrayListRightSide.size() == 1 && leftHandFingerInBetweenDistance.size()>0){
 
@@ -2272,6 +2306,7 @@ public class HandGestureActivity extends AppCompatActivity {
                 Mat touchedRegionRgba = mRgba.submat(touchedRect);
 
                 Mat touchedRegionHsv = new Mat();
+
                 Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
 
                 // Calculate average color of touched region
@@ -2279,6 +2314,8 @@ public class HandGestureActivity extends AppCompatActivity {
                 int pointCount = touchedRect.width * touchedRect.height;
                 for (int i = 0; i < mBlobColorHsv.val.length; i++)
                     mBlobColorHsv.val[i] /= pointCount;
+
+
 
                 mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
 
@@ -2346,6 +2383,155 @@ public class HandGestureActivity extends AppCompatActivity {
         return new android.graphics.Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
     }
 
+
+    private void setUpSeekBarsForHSV(){
+
+
+        currentColorH.setMax(40);
+        currentColorS.setMax(40);
+        currentColorV.setMax(40);
+
+
+
+
+        currentColorH.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                updateSelectedColorHSV();
+            }
+        });
+
+        currentColorS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                updateSelectedColorHSV();
+
+            }
+        });
+
+        currentColorV.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                updateSelectedColorHSV();
+
+            }
+        });
+    }
+    private void updateSelectedColorHSV(){
+
+        if(currentFingersColorH + currentColorH.getProgress() < 179){
+
+            newH = currentFingersColorH + currentColorH.getProgress();
+
+        }
+        else{
+
+            newH = 179;
+
+        }
+
+        if(currentFingersColorS + currentColorS.getProgress() < 254){
+
+            newS = currentFingersColorS + currentColorS.getProgress();
+
+        }
+        else{
+
+            newS = 254;
+
+        }
+
+        if(currentFingersColorV + currentColorV.getProgress() < 254){
+
+            newV = currentFingersColorV + currentColorV.getProgress();
+
+        }
+        else{
+
+            newV = 254;
+
+        }
+
+        if(newH == -1){
+            newH = currentFingersColorH;
+        }
+        if(newS == -1){
+            newS = currentFingersColorS;
+        }
+        if(newV == -1){
+            newV = currentFingersColorV;
+        }
+
+        Logger.Log("New values are " + newH + " " + newS + " " + newV);
+
+
+
+
+            if(SELECT_FINGERS){
+
+                mBlobColorHsv.val[0] = newH;
+                mBlobColorHsv.val[1] = newS;
+                mBlobColorHsv.val[2] = newV;
+                mDetector2.setHsvColor(mBlobColorHsv);
+
+
+            }
+
+        mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
+
+
+
+    }
+
+    private void toggleSeekbars(){
+
+        if (seekBarLayout.getVisibility() == View.VISIBLE)
+            seekBarLayout.setVisibility(View.GONE);
+
+        else if(seekBarLayout.getVisibility() == View.GONE)
+            seekBarLayout.setVisibility(View.VISIBLE);
+
+
+    }
 
 
     private int clamp(int x, int min, int max) {
@@ -2429,7 +2615,12 @@ public class HandGestureActivity extends AppCompatActivity {
                 for (int i = 0; i < mBlobColorHsv.val.length; i++)
                     mBlobColorHsv.val[i] /= pointCount;
 
+                // need this for image label at top left
                 mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
+
+
+
+
 
                 Log.i("FYP", "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
                         ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
@@ -2437,8 +2628,17 @@ public class HandGestureActivity extends AppCompatActivity {
 
                 //touch the square to raise/lower octave
 
+
+
+
                 if (!SELECT_FINGERS && !SELECT_THUMB) {
 
+                    if (y < 68 && x < 68){
+
+                        toggleSeekbars();
+
+
+                    }
 
                     double upperBound = height * 0.7;
                     double lowerBound = height * 0.4;
@@ -2470,6 +2670,11 @@ public class HandGestureActivity extends AppCompatActivity {
                         selectThumbRangeNoAlert();
                     //mDetector.setColorRadius(new Scalar(12,50,25,0));
 
+                    currentThumbColorH = (int)mBlobColorHsv.val[0];
+                    currentThumbColorS = (int)mBlobColorHsv.val[1];
+                    currentThumbColorV = (int)mBlobColorHsv.val[2];
+
+
                     mDetector.setHsvColor(mBlobColorHsv);
                     mTouchChoice = 1;
                     Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE, 0, 0, Imgproc.INTER_LINEAR_EXACT);
@@ -2483,8 +2688,11 @@ public class HandGestureActivity extends AppCompatActivity {
 
                     }
 
-
                     Logger.Log("Fingers are not null");
+
+                    currentFingersColorH = (int)mBlobColorHsv.val[0];
+                    currentFingersColorS = (int)mBlobColorHsv.val[1];
+                    currentFingersColorV = (int)mBlobColorHsv.val[2];
 
                     mDetector2.setHsvColor(mBlobColorHsv);
 

@@ -8,27 +8,20 @@
     tools:context="com.example.joseph.fyp.OpenCVTestActivity">
 
 
-
-
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-
-
-
-
-
-
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="107dp">
 
 
         <com.example.joseph.fyp.CustomJavaCameraView
 
             xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
             xmlns:opencv="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/HelloOpenCvView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -37,136 +30,143 @@
             opencv:show_fps="true" />
 
 
-
-
-
-
         <LinearLayout
             android:id="@+id/hand_gesture__linear_layout_notes"
-            android:divider="@drawable/ss"
-            android:showDividers="middle"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            >
-
+            android:layout_height="match_parent"
+            android:divider="@drawable/ss"
+            android:orientation="horizontal"
+            android:showDividers="middle">
 
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
+            android:id="@+id/hand_gesture_button_group_full"
+
 
             >
+
             <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
                 android:id="@+id/hand_gesture_perf_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Perf"/>
+                android:background="@drawable/custombutton2"
+                android:shadowColor="#A8A8A8"
+                android:shadowDx="3"
+                android:shadowDy="2"
+                android:shadowRadius="9"
+                android:text="Perf" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/hand_gesture_button_group">
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_setRadius"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="F Radius"/>
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_setThumbRadius"
-                android:layout_width="wrap_content"
-                android:visibility="gone"
+                android:id="@+id/hand_gesture_button_group"
 
-                android:layout_height="wrap_content"
-                android:text="T Radius"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/hand_gesture_setRadius"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:text="F Radius"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/hand_gesture_setThumbRadius"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+
+                    android:text="T Radius"
+                    android:visibility="gone" />
 
 
+                <Button
+                    android:id="@+id/hand_gesture_second_obj_func_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:text="Settings" />
 
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_second_obj_func_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Settings"/>
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_select_sound_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sound"/>
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_exposure"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Expo"/>
-            <Button
-                android:background="@drawable/custombutton2"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_calibrate_first_obj"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Glissan"/>
-            <ToggleButton
-                android:background="@drawable/toggle_button_selector"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_select_thumbs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textOn="thumbs"
-                android:textOff="thumbs"/>
-            />
-            <ToggleButton
-                android:background="@drawable/toggle_button_selector"
-                android:shadowColor="#A8A8A8"
-                android:shadowDx="3"
-                android:shadowDy="2"
-                android:shadowRadius="9"
-                android:id="@+id/hand_gesture_select_fingers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textOn="fingers"
-                android:textOff="fingers"/>
+                <Button
+                    android:id="@+id/hand_gesture_select_sound_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:text="Sound" />
+
+                <Button
+                    android:id="@+id/hand_gesture_exposure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:text="Expo"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/hand_gesture_calibrate_first_obj"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custombutton2"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:text="Glissan" />
+
+                <ToggleButton
+                    android:id="@+id/hand_gesture_select_thumbs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/toggle_button_selector"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:textOff="thumbs"
+                    android:textOn="thumbs" />
+                />
+
+                <ToggleButton
+                    android:id="@+id/hand_gesture_select_fingers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/toggle_button_selector"
+                    android:shadowColor="#A8A8A8"
+                    android:shadowDx="3"
+                    android:shadowDy="2"
+                    android:shadowRadius="9"
+                    android:textOff="fingers"
+                    android:textOn="fingers" />
 
             </LinearLayout>
 
@@ -175,6 +175,49 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/hand_gesture_seekbars"
+            android:layout_below="@id/hand_gesture_button_group_full"
+            android:orientation="vertical"
+
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hue"
+                />
+            <SeekBar
+                android:id="@+id/hand_gesture_color_H"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Saturation"
+                />
+            <SeekBar
+                android:id="@+id/hand_gesture_color_S"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Value"
+                />
+            <SeekBar
+                android:id="@+id/hand_gesture_color_V"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+
+        </RelativeLayout>
 
 
     </FrameLayout>

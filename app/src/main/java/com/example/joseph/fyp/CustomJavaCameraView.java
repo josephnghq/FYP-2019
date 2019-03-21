@@ -40,12 +40,32 @@ public class CustomJavaCameraView extends JavaCameraView {
 
     }
 
+
+    public void setFPS(){
+
+
+        Camera.Parameters params = mCamera.getParameters();
+        List<int[]>  list = params.getSupportedPreviewFpsRange();
+
+        for(int i = 0 ; i < list.size(); i++ ){
+
+            Log.i("FYP" , "Supported camera FPS mode " + list.get(i)[0]);
+
+        }
+
+
+
+
+    }
+
     public void setExposureCompensation(int value){
 
 
         Camera.Parameters params = mCamera.getParameters();
         params.setExposureCompensation(value);
         mCamera.setParameters(params);
+
+
 
 
     }

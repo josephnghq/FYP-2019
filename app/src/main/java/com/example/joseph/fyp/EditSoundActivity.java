@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 
 import com.google.gson.Gson;
@@ -27,18 +28,22 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
-    private CheckBox oscSawRadioButton;
-    private CheckBox oscSineRadioButton;
-    private CheckBox oscTriRadioButton;
-    private CheckBox oscSqrRadioButton;
+    private RadioButton oscSawRadioButton;
+    private RadioButton oscSineRadioButton;
+    private RadioButton oscTriRadioButton;
+    private RadioButton oscSqrRadioButton;
+
     private CheckBox delayCheckbox;
     private CheckBox filterADSRCheckbox;
 
 
-    private CheckBox oscSawRadioButton2;
-    private CheckBox oscSineRadioButton2;
-    private CheckBox oscTriRadioButton2;
-    private CheckBox oscSqrRadioButton2;
+    private RadioButton oscSawRadioButton2;
+    private RadioButton oscSineRadioButton2;
+    private RadioButton oscTriRadioButton2;
+    private RadioButton oscSqrRadioButton2;
+
+    private RadioGroup osc1RadioGroup;
+    private RadioGroup osc2RadioGroup;
 
     private CheckBox enablePM;
     private CheckBox enableLFO;
@@ -184,7 +189,115 @@ public class EditSoundActivity extends AppCompatActivity {
 
 
 
+        osc1RadioGroup = (RadioGroup)findViewById(R.id.osc_1_radiogroup);
+        osc2RadioGroup = (RadioGroup)findViewById(R.id.osc_2_radiogroup);
 
+        osc1RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+
+            RadioButton rb = findViewById(checkedId);
+            String choice = rb.getText().toString();
+
+                if(choice.equals("Sine")){
+
+                mSynth.enableSine();
+                mSynth.disableSaw();
+                mSynth.disableTri();
+                mSynth.disableSqr();
+
+                }
+
+                if(choice.equals("Square")){
+
+                    mSynth.enableSqr();
+                    mSynth.disableSaw();
+                    mSynth.disableTri();
+                    mSynth.disableSine();
+
+                }
+
+                if(choice.equals("Triangle")){
+
+                    mSynth.enableTri();
+                    mSynth.disableSaw();
+                    mSynth.disableSine();
+                    mSynth.disableSqr();
+
+                }
+
+                if(choice.equals("Sawtooth")){
+
+                    mSynth.enableSaw();
+                    mSynth.disableSine();
+                    mSynth.disableTri();
+                    mSynth.disableSqr();
+
+                }
+
+
+
+            }
+        });
+
+        osc2RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+
+                RadioButton rb = findViewById(checkedId);
+                String choice = rb.getText().toString();
+
+                if(choice.equals("Sine")){
+
+                    mSynth.enableSine2();
+                    mSynth.disableSaw2();
+                    mSynth.disableTri2();
+                    mSynth.disableSqr2();
+
+                }
+
+                if(choice.equals("Square")){
+
+                    mSynth.enableSqr2();
+                    mSynth.disableSaw2();
+                    mSynth.disableTri2();
+                    mSynth.disableSine2();
+
+                }
+
+                if(choice.equals("Triangle")){
+
+                    mSynth.enableTri2();
+                    mSynth.disableSaw2();
+                    mSynth.disableSine2();
+                    mSynth.disableSqr2();
+
+                }
+
+                if(choice.equals("Sawtooth")){
+
+                    mSynth.enableSaw2();
+                    mSynth.disableSine2();
+                    mSynth.disableTri2();
+                    mSynth.disableSqr2();
+
+                }
+
+
+
+
+            }
+        });
+
+
+
+
+
+
+
+/*
         oscSawRadioButton = (CheckBox)findViewById(R.id.osc_sawtooth);
         oscSawRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -359,6 +472,7 @@ public class EditSoundActivity extends AppCompatActivity {
 
             }
         });
+*/
 
         delayCheckbox = (CheckBox)findViewById(R.id.delay_enable);
         delayCheckbox.setOnClickListener(new View.OnClickListener() {
