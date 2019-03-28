@@ -78,7 +78,13 @@ public class ColorBlobDetector {
         Imgproc.cvtColor(mPyrDownMat, mHsvMat, Imgproc.COLOR_RGB2HSV_FULL);
 
         Core.inRange(mHsvMat, mLowerBound, mUpperBound, mMask);
+
+
         Imgproc.dilate(mMask, mDilatedMask, new Mat());
+
+        Imgproc.equalizeHist(mDilatedMask,mDilatedMask);
+
+
 
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
@@ -109,4 +115,7 @@ public class ColorBlobDetector {
     public List<MatOfPoint> getContours() {
         return mContours;
     }
+
+
+
 }

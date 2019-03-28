@@ -49,12 +49,14 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgproc.CLAHE;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -160,6 +162,9 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean ENABLE_DELETE_CLOSE_OBJECTS = false;
     private boolean ENABLE_DELETE_SMALL_OBJECTS = true;
     private boolean SAME_THUMB_COLOR_MODE = true;
+    private boolean CONTRAST_BACKGROUND_MODE = false;
+    private boolean ADAPTIVE_DIVIDER_MODE = true;
+    private boolean ADAPTIVE_FINGER_BOUNDING_BOX_MODE = true;
 
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
@@ -220,6 +225,10 @@ public class HandGestureActivity extends AppCompatActivity {
 
     private int thumbFingerDistance;
 
+    private int DIVIDER_X = width/2;
+
+    private int BOUNDING_X_LEFT = -1;
+    private int BOUNDING_X_RIGHT = 9999;
 
 
 
@@ -664,6 +673,44 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           mRgba = inputFrame;
                                                           Core.flip(mRgba, mRgba, 1);
 
+                                                          Mat inputHSV = new Mat();
+
+                                                          if(CONTRAST_BACKGROUND_MODE) {
+
+                                                              CLAHE cache = Imgproc.createCLAHE();
+                                                              cache.setClipLimit(3);
+                                                               Imgproc.cvtColor(mRgba, inputHSV, Imgproc.COLOR_RGB2HSV_FULL);
+
+                                                              Scalar mLowerBound = new Scalar(0);
+                                                              Scalar mUpperBound = new Scalar(0);
+
+
+                                                              List<Mat> inputHSVChannels = new ArrayList<Mat>();
+
+
+                                                              Core.split(inputHSV, inputHSVChannels);
+
+
+                                                              //Core.inRange(inputHSVChannels.get(2) , mLowerBound ,mUpperBound , inputHSVChannels.get(2) );
+
+
+                                                              //  Imgproc.equalizeHist(inputHSVChannels.get(1) , inputHSVChannels.get(1));
+                                                              //Imgproc.equalizeHist(inputHSVChannels.get(2) , inputHSVChannels.get(2));
+
+                                                              // Imgproc.adaptiveThreshold(inputHSVChannels.get(2) , inputHSVChannels.get(2), 254 , Imgproc.ADAPTIVE_THRESH_MEAN_C
+                                                              // ,Imgproc.THRESH_BINARY , 7 , 0);
+                                                              //   cache.apply(inputHSVChannels.get(2) , inputHSVChannels.get(2));
+                                                              // cache.apply(inputHSVChannels.get(1) , inputHSVChannels.get(1));
+
+
+                                                              Core.merge(inputHSVChannels, mRgba);
+                                                              Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_HSV2RGB_FULL);
+
+
+                                                          }
+
+
+
 
 
 
@@ -694,6 +741,10 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               width = (int) sizeRgba.width;
                                                               int firstHalf = width / 2;
 
+                                                              if(ADAPTIVE_DIVIDER_MODE){
+                                                                  firstHalf = DIVIDER_X;
+                                                              }
+
 
                                                               if (mIsColorSelected) {
 
@@ -701,7 +752,11 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   mDetector.process(mRgba);
 
 
+
+
                                                                   mDetector2.process(mRgba);
+
+
 
 
 
@@ -721,8 +776,6 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                                   if(!SAME_THUMB_COLOR_MODE)
                                                                   Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-
-
                                                                   Imgproc.drawContours(mRgba, contours2, -1, CONTOUR_COLOR2);
 
 
@@ -983,46 +1036,48 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
+
+                                                              Iterator itr = mu2.iterator();
                                                               //remove small objects
                                                               if (ENABLE_DELETE_SMALL_OBJECTS)
-                                                                  for (int i = 0; i < mu2.size(); i++) {
+                                                                  while(itr.hasNext()) {
 
-                                                                      Moments mom = mu2.get(i);
+                                                                      Moments mom = (Moments)itr.next();
+
+                                                                      int x = (int) (mom.get_m10() / mom.get_m00());
+                                                                      int y = (int) (mom.get_m01() / mom.get_m00());
+
                                                                       if (mom.get_m00() < 500) {
-                                                                          mu2.remove(i);
+                                                                          itr.remove();
                                                                       }
+
 
 
                                                                   }
 
 
-                                                              //remove close objects
-                                                          if(ENABLE_DELETE_CLOSE_OBJECTS)
-                                                          for(int i = 0 ; i < mu2.size(); i ++){
-
-                                                              for(int p = i; p < mu2.size(); p++){
-
-                                                                  Moments mom = mu2.get(i);
-                                                                  Moments momToCompare = mu2.get(p);
 
 
-                                                                  double dist = distanceOfXYPoints(mom.get_m10()/mom.get_m00() , momToCompare.get_m10()/momToCompare.get_m00() ,
-                                                                          mom.get_m01()/momToCompare.get_m00() , momToCompare.get_m01()/momToCompare.get_m00());
+                                                          if(ADAPTIVE_FINGER_BOUNDING_BOX_MODE){
+                                                              itr = mu2.iterator();
 
+                                                              while(itr.hasNext()) {
 
-                                                                  if ( dist < 20 && p != i ){
+                                                                  Moments mom = (Moments)itr.next();
 
-                                                                      Logger.Log("Removing close points");
+                                                                  int x = (int) (mom.get_m10() / mom.get_m00());
+                                                                  int y = (int) (mom.get_m01() / mom.get_m00());
 
-                                                                     // mu2.remove(p);
-                                                                      break;
-
+                                                                  if (x < BOUNDING_X_LEFT || x > BOUNDING_X_RIGHT) {
+                                                                      itr.remove();
                                                                   }
 
                                                               }
 
-
                                                           }
+
+
+
 
 
                                                               final int a = mu2.size();
@@ -1069,6 +1124,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   Moments p = mu2.get(i);
                                                                   int x = (int) (p.get_m10() / p.get_m00());
                                                                   int y = (int) (p.get_m01() / p.get_m00());
+
 
 
                                                                   fingerx = x;
@@ -1410,6 +1466,8 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
 
+
+
                                                               //the following lines calculate only the distance between first finger and last finger, assumption is that last element of the list is a finger
                                                           if(fingerMomentsXYDataArrayListLeftSide.size()>1) {
                                                               int x1 = fingerMomentsXYDataArrayListLeftSide.get(0).x;
@@ -1418,6 +1476,25 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               int y2 = fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size() - 1).y;
                                                               leftHandFingerInBetweenDistance.add(y1-y2);
                                                           }
+
+
+                                                          //set new value for adaptive divider
+                                                          if(fingerMomentsXYDataArrayListLeftSide.size() >0 && fingerMomentsXYDataArrayListRightSide.size() >0){
+
+                                                              DIVIDER_X = (fingerMomentsXYDataArrayListLeftSide.get(0).x + fingerMomentsXYDataArrayListRightSide.get(0).x )/ 2;
+                                                              BOUNDING_X_LEFT = fingerMomentsXYDataArrayListLeftSide.get(0).x - 100;
+                                                              if (BOUNDING_X_LEFT < 0)
+                                                                  BOUNDING_X_LEFT = 0;
+
+                                                              BOUNDING_X_RIGHT = fingerMomentsXYDataArrayListRightSide.get(0).x + 100 + thumbFingerDistance;
+                                                              if(BOUNDING_X_RIGHT > width){
+                                                                  BOUNDING_X_RIGHT = width-1;
+                                                              }
+
+
+                                                          }
+
+
 
 
 
@@ -1434,47 +1511,47 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           SYNTH_PLAYING2 = true;
                                                                       }
 
-                                                                      //only works for single note slide here
+                                                                      //only works for single note slide here, slide mode
                                                                       if(GLISSANDO_MODE && notesArrayList.size() == 8){
 
                                                                           if(fingerMomentsXYDataArrayListRightSide.size() == 1 && leftHandFingerInBetweenDistance.size()>0){
 
 
-                                                                                        //within sliding range
-                                                                                    if(selectedCursor.y <= fingerMomentsXYDataArrayListLeftSide.get(0).y && selectedCursor.y >= fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y){
+                                                                              //within sliding range
+                                                                              if(selectedCursor.y <= fingerMomentsXYDataArrayListLeftSide.get(0).y && selectedCursor.y >= fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y){
 
-                                                                                        leftHandFingerInBetweenDistance.get(0);
+                                                                                  leftHandFingerInBetweenDistance.get(0);
 
-                                                                                        double glissAmount =fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y - selectedCursor.y;
-                                                                                        double frequencyTop = notesArrayList.get(3).noteFreqs.get(0);
-                                                                                        double frequencyBot = notesArrayList.get(0).noteFreqs.get(0);
-                                                                                        double freqDiff = frequencyTop - frequencyBot;
-                                                                                        glissAmount = Math.abs(glissAmount);
-                                                                                        Logger.Log("Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
-
-
-
-                                                                                        if(glissAmount!=0)
-                                                                                        glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * freqDiff;
-
-                                                                                        if(frequencyTop - glissAmount < frequencyBot)
-                                                                                            glissAmount = frequencyTop - frequencyBot;
-
-
-                                                                                        Logger.Log("Final glissamount is " + glissAmount);
-
-
-                                                                                        Scales.chordPoint(-glissAmount, 3, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
-
-
-                                                                                    }
-                                                                                    else if (selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(0).y){
-
-                                                                                        Scales.chordPoint(0, 0, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+                                                                                  double glissAmount =fingerMomentsXYDataArrayListLeftSide.get(fingerMomentsXYDataArrayListLeftSide.size()-1).y - selectedCursor.y;
+                                                                                  double frequencyTop = notesArrayList.get(3).noteFreqs.get(0);
+                                                                                  double frequencyBot = notesArrayList.get(0).noteFreqs.get(0);
+                                                                                  double freqDiff = frequencyTop - frequencyBot;
+                                                                                  glissAmount = Math.abs(glissAmount);
+                                                                                  Logger.Log("Freq diff is " + freqDiff + " , glissAmount is " + glissAmount + " leftHandFingerInBetweenDistance.get(0) " + leftHandFingerInBetweenDistance.get(0));
 
 
 
-                                                                                    }
+                                                                                  if(glissAmount!=0)
+                                                                                      glissAmount = (glissAmount / leftHandFingerInBetweenDistance.get(0) ) * freqDiff;
+
+                                                                                  if(frequencyTop - glissAmount < frequencyBot)
+                                                                                      glissAmount = frequencyTop - frequencyBot;
+
+
+                                                                                  Logger.Log("Final glissamount is " + glissAmount);
+
+
+                                                                                  Scales.chordPoint(-glissAmount, 3, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+                                                                              }
+                                                                              else if (selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(0).y){
+
+                                                                                  Scales.chordPoint(0, 0, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
+
+
+
+                                                                              }
 
 
 
@@ -1529,6 +1606,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                       }
 
 
+                                                                      //normal mode
                                                                       if (!GLISSANDO_MODE && selectedCursor.y < fingerMomentsXYDataArrayListLeftSide.get(i).y + 15 && selectedCursor.y > fingerMomentsXYDataArrayListLeftSide.get(i).y - 15)
 
                                                                       {
@@ -1549,6 +1627,8 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                               Scales.chordPoint((selectedCursor.y - startPointYObj1) / 2, i, shiftNotes(12, SHIFT_MODE, notesArrayList), mSynth2, fingerMomentsXYDataArrayListRightSide.size());
                                                                           }
 
+
+                                                                          // set distance
                                                                           int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
 
                                                                           if (!mSynth2.isFilterEnvEnabled())
@@ -1569,90 +1649,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
 
 
-                                                              //this is hull convex part, W.I.P
-/*
 
-                                                          List<MatOfInt4> ConvexityDefectsMatOfInt4  = new ArrayList<MatOfInt4>();
-
-                                                          List<MatOfInt> hull = new ArrayList<MatOfInt>();
-                                                          //List<MatOfInt> hull2 = new ArrayList<MatOfInt>();
-
-                                                          // Find the convex hull
-                                                          for(int i=0; i < contours.size(); i++){
-                                                              hull.add(new MatOfInt());
-                                                          }
-
-                                                          // Convert MatOfInt to MatOfPoint for drawing convex hull
-                                                          for(int i=0; i < contours.size(); i++){
-                                                              Imgproc.convexHull(contours.get(i), hull.get(i));
-                                                           }
-
-
-
-                                                          // Loop over all contours
-                                                           List<Point[]> hullpoints = new ArrayList<Point[]>();
-
-                                                          for(int i=0; i < hull.size(); i++){
-                                                              Point[] points = new Point[hull.get(i).rows()];
-
-                                                              //convex
-                                                              ConvexityDefectsMatOfInt4.add(new MatOfInt4());
-                                                              Imgproc.convexityDefects(contours.get(i),hull.get(i),ConvexityDefectsMatOfInt4.get(i));
-
-
-                                                              // Loop over all points that need to be hulled in current contour
-                                                              for(int j=0; j < hull.get(i).rows(); j++){
-                                                                  int index = (int)hull.get(i).get(j, 0)[0];
-                                                                  points[j] = new Point(contours.get(i).get(index, 0)[0], contours.get(i).get(index, 0)[1]);
-                                                              }
-
-                                                              hullpoints.add(points);
-                                                          }
-
-                                                          Log.i("FYP" , "Size of convex is " + ConvexityDefectsMatOfInt4.size());
-
-
-
-                                                          // Convert Point arrays into MatOfPoint
-                                                          List<MatOfPoint> hullmop = new ArrayList<MatOfPoint>();
-                                                          for(int i=0; i < hullpoints.size(); i++){
-
-                                                               MatOfPoint mop = new MatOfPoint();
-                                                              mop.fromArray(hullpoints.get(i));
-                                                              hullmop.add(mop);
-
-
-                                                          }
-
-
-                                                          for(int i = 0 ; i < hullmop.size(); i ++){
-
-
-
-                                                              MatOfPoint points = hullmop.get(i);
-                                                              Point[] point = points.toArray();
-
-                                                              Log.i("FYP" , "For iter " + i + " Size of point is " + point.length );
-
-
-                                                              for(int p = 0 ; p < point.length; p ++)
-                                                              Imgproc.putText(mRgba ,String.valueOf(p) , new Point(point[p].x,point[p].y) , Core.FONT_HERSHEY_SIMPLEX,1,new Scalar(192, 222, 162, 255),4);
-
-
-                                                          }
-
-
-                                                          // Draw contours + hull results
-                                                          //Mat overlay = new Mat(mRgba.size(), CvType.CV_8UC3);
-                                                          Scalar color = new Scalar(0, 255, 0);   // Green
-
-                                                              Imgproc.drawContours(mRgba, contours, -1, color);
-                                                              Imgproc.drawContours(mRgba, hullmop, -1, color);
-
-*/
-
-
-                                                              //  Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_RGB2HSV_FULL);
 
 
 
@@ -1671,8 +1668,18 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           mSpectrum.copyTo(spectrumLabel);
 
 
-                                                              Imgproc.line(mRgba, new Point(width / 2, height - 1), new Point(width / 2, 0), new Scalar(255, 0, 0, 255)
-                                                                      , 3);
+                                                          Imgproc.line(mRgba, new Point(DIVIDER_X, height - 1), new Point(DIVIDER_X, 0), new Scalar(255, 0, 0, 255), 3);
+
+
+                                                          if(ADAPTIVE_FINGER_BOUNDING_BOX_MODE){
+
+                                                              Imgproc.line(mRgba, new Point(BOUNDING_X_LEFT, height - 1), new Point(BOUNDING_X_LEFT, 0), new Scalar(155, 0, 0, 255), 2);
+                                                              Imgproc.line(mRgba, new Point(BOUNDING_X_RIGHT, height - 1), new Point(BOUNDING_X_RIGHT, 0), new Scalar(155, 0, 0, 255), 2);
+
+
+
+                                                          }
+
 
 
                                                               onCameraFrameEndTime = System.currentTimeMillis();
@@ -1686,6 +1693,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           Log.i("FYP", "Camera frame took " + (onCameraFrameEndTime - onCameraFrameStartTime));
 
+                                                          inputHSV.release();
 
 
                                                           return mRgba;

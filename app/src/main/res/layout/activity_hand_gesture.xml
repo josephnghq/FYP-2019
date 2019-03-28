@@ -141,7 +141,7 @@
                     android:shadowDx="3"
                     android:shadowDy="2"
                     android:shadowRadius="9"
-                    android:text="Glissan" />
+                    android:text="Slide" />
 
                 <ToggleButton
                     android:id="@+id/hand_gesture_select_thumbs"
