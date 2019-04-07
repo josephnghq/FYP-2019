@@ -45,6 +45,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -163,8 +164,9 @@ public class HandGestureActivity extends AppCompatActivity {
     private boolean ENABLE_DELETE_SMALL_OBJECTS = true;
     private boolean SAME_THUMB_COLOR_MODE = true;
     private boolean CONTRAST_BACKGROUND_MODE = false;
-    private boolean ADAPTIVE_DIVIDER_MODE = true;
-    private boolean ADAPTIVE_FINGER_BOUNDING_BOX_MODE = true;
+    private boolean ADAPTIVE_DIVIDER_MODE = true; // make settings
+    private boolean ADAPTIVE_FINGER_BOUNDING_BOX_MODE = true; //make settings
+    private boolean DETECT_THUMB_BY_BOUNDING_BOX = true;
 
     private BackgroundSubtractorMOG2 backgroundSubtractorMOG2;
 
@@ -666,8 +668,6 @@ public class HandGestureActivity extends AppCompatActivity {
                                                       public Mat onCameraFrame(Mat inputFrame) {
 
 
-
-
                                                           onCameraFrameStartTime = System.currentTimeMillis();
 
                                                           mRgba = inputFrame;
@@ -675,11 +675,11 @@ public class HandGestureActivity extends AppCompatActivity {
 
                                                           Mat inputHSV = new Mat();
 
-                                                          if(CONTRAST_BACKGROUND_MODE) {
+                                                          if (CONTRAST_BACKGROUND_MODE) {
 
                                                               CLAHE cache = Imgproc.createCLAHE();
                                                               cache.setClipLimit(3);
-                                                               Imgproc.cvtColor(mRgba, inputHSV, Imgproc.COLOR_RGB2HSV_FULL);
+                                                              Imgproc.cvtColor(mRgba, inputHSV, Imgproc.COLOR_RGB2HSV_FULL);
 
                                                               Scalar mLowerBound = new Scalar(0);
                                                               Scalar mUpperBound = new Scalar(0);
@@ -710,51 +710,45 @@ public class HandGestureActivity extends AppCompatActivity {
                                                           }
 
 
+                                                          // mIntermediateMat = new Mat();
+
+                                                          // used to keep track of object 1's x value
+
+                                                          // mRgba = inputFrame;
+                                                          // backgroundSubtractorMOG2.apply(inputFrame , mRgba);
 
 
+                                                          //Imgproc.blur(mRgba,mRgba,new Size(9.0, 9.0));
+
+                                                          // Core.flip(mRgba, mRgba, 1);
+
+                                                          List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
+                                                          List<MatOfPoint> contours2 = mDetector2.getContours(); // anaylse contours
 
 
-                                                              // mIntermediateMat = new Mat();
-
-                                                              // used to keep track of object 1's x value
-
-                                                             // mRgba = inputFrame;
-                                                              // backgroundSubtractorMOG2.apply(inputFrame , mRgba);
+                                                          // for all the contours, delete away contours that are near to each other, to avoid situations whereby two points are detected
+                                                          // for the same object
 
 
-                                                              //Imgproc.blur(mRgba,mRgba,new Size(9.0, 9.0));
-
-                                                             // Core.flip(mRgba, mRgba, 1);
-
-                                                              List<MatOfPoint> contours = mDetector.getContours(); // anaylse contours
-                                                              List<MatOfPoint> contours2 = mDetector2.getContours(); // anaylse contours
+                                                          Size sizeRgba = mRgba.size();
 
 
-                                                              // for all the contours, delete away contours that are near to each other, to avoid situations whereby two points are detected
-                                                              // for the same object
+                                                          height = (int) sizeRgba.height;
+                                                          width = (int) sizeRgba.width;
+                                                          int firstHalf = width / 2;
+
+                                                          if (ADAPTIVE_DIVIDER_MODE) {
+                                                              firstHalf = DIVIDER_X;
+                                                          }
 
 
-                                                              Size sizeRgba = mRgba.size();
+                                                          if (mIsColorSelected) {
 
-
-                                                              height = (int) sizeRgba.height;
-                                                              width = (int) sizeRgba.width;
-                                                              int firstHalf = width / 2;
-
-                                                              if(ADAPTIVE_DIVIDER_MODE){
-                                                                  firstHalf = DIVIDER_X;
-                                                              }
-
-
-                                                              if (mIsColorSelected) {
-
-                                                                  if(!SAME_THUMB_COLOR_MODE)
+                                                              if (!SAME_THUMB_COLOR_MODE)
                                                                   mDetector.process(mRgba);
 
 
-
-
-                                                                  mDetector2.process(mRgba);
+                                                              mDetector2.process(mRgba);
 
 
 
@@ -768,40 +762,36 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }*/
 
 
-                                                                  if (contours2.size() == 0 && SYNTH_PLAYING2) {
+                                                              if (contours2.size() == 0 && SYNTH_PLAYING2) {
 
-                                                                      mSynth2.releaseOsc();
-                                                                      SYNTH_PLAYING2 = false;
-                                                                  }
-
-                                                                  if(!SAME_THUMB_COLOR_MODE)
-                                                                  Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-                                                                  Imgproc.drawContours(mRgba, contours2, -1, CONTOUR_COLOR2);
-
-
+                                                                  mSynth2.releaseOsc();
+                                                                  SYNTH_PLAYING2 = false;
                                                               }
 
+                                                              if (!SAME_THUMB_COLOR_MODE)
+                                                                  Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+                                                              Imgproc.drawContours(mRgba, contours2, -1, CONTOUR_COLOR2);
 
 
+                                                          }
 
 
-                                                              //FIRST OBJECT
-                                                              //FIRST OBJECT
-                                                              //FIRST OBJECT
-                                                              //FIRST OBJECT
+                                                          //FIRST OBJECT
+                                                          //FIRST OBJECT
+                                                          //FIRST OBJECT
+                                                          //FIRST OBJECT
 
-                                                              //THIS IS THUMB
-
-
-                                                              ArrayList<FingerMomentsXYData> thumbLeftSide = new ArrayList<FingerMomentsXYData>();
-                                                              ArrayList<FingerMomentsXYData> thumbRightSide = new ArrayList<FingerMomentsXYData>();
+                                                          //THIS IS THUMB
 
 
-                                                              List<Moments> mu = new ArrayList<Moments>(contours.size());
+                                                          ArrayList<FingerMomentsXYData> thumbLeftSide = new ArrayList<FingerMomentsXYData>();
+                                                          ArrayList<FingerMomentsXYData> thumbRightSide = new ArrayList<FingerMomentsXYData>();
 
 
+                                                          List<Moments> mu = new ArrayList<Moments>(contours.size());
 
-                                                          if(!SAME_THUMB_COLOR_MODE) {
+
+                                                          if (!SAME_THUMB_COLOR_MODE) {
                                                               for (int i = 0; i < contours.size(); i++) {
                                                                   mu.add(i, Imgproc.moments(contours.get(i), false));
                                                                  /* Moments p = mu.get(i);
@@ -1018,23 +1008,100 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               }
                                                           }
 
-                                                              //SECOND OBJECT
-                                                              //SECOND OBJECT
-                                                              //SECOND OBJECT
-                                                              //SECOND OBJECT
-                                                              //THIS IS FINGERS
+                                                          //SECOND OBJECT
+                                                          //SECOND OBJECT
+                                                          //SECOND OBJECT
+                                                          //SECOND OBJECT
+                                                          //THIS IS FINGERS
 
 
-                                                              List<Moments> mu2 = new ArrayList<Moments>(contours2.size());
-                                                              ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListLeftSide = new ArrayList<FingerMomentsXYData>();
-                                                              ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListRightSide = new ArrayList<FingerMomentsXYData>();
+                                                          List<Moments> mu2 = new ArrayList<Moments>(contours2.size());
+                                                          ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListLeftSide = new ArrayList<FingerMomentsXYData>();
+                                                          ArrayList<FingerMomentsXYData> fingerMomentsXYDataArrayListRightSide = new ArrayList<FingerMomentsXYData>();
 
 
-                                                              for (int i = 0; i < contours2.size(); i++) {
-                                                                  mu2.add(i, Imgproc.moments(contours2.get(i), false));
+                                                          for (int i = 0; i < contours2.size(); i++) {
+                                                              mu2.add(i, Imgproc.moments(contours2.get(i), false));
+                                                          }
+
+
+                                                          if (DETECT_THUMB_BY_BOUNDING_BOX){
+
+                                                              MatOfPoint2f[] contoursPoly = new MatOfPoint2f[contours2.size()];
+                                                          Rect[] boundRect = new Rect[contours2.size()];
+                                                          for (int i = 0; i < contours2.size(); i++) {
+
+                                                              //get the current moment to get x
+
+
+                                                              contoursPoly[i] = new MatOfPoint2f();
+                                                              Imgproc.approxPolyDP(new MatOfPoint2f(contours2.get(i).toArray()), contoursPoly[i], 3, true);
+                                                              boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
+
+                                                          }
+
+
+                                                          for (int i = 0; i < contours2.size(); i++) {
+
+                                                              Scalar color = new Scalar(123, 123, 123);
+                                                              Imgproc.rectangle(mRgba, boundRect[i].tl(), boundRect[i].br(), color, 2);
+                                                          }
+
+                                                          int largeid = 0;
+                                                          int shortid = 0;
+                                                          int largestHeight = 0;
+                                                          int shortestHeight = 999999999;
+                                                          for (int i = 0; i < boundRect.length; i++) {
+
+
+                                                              //perform operations on right side of screen
+                                                              if (boundRect[i].x > firstHalf) {
+
+                                                                  if (boundRect[i].height > largestHeight) {
+                                                                      largestHeight = boundRect[i].height;
+                                                                      largeid = i;
+                                                                  }
+                                                                  if (boundRect[i].height < shortestHeight) {
+
+                                                                      shortestHeight = boundRect[i].height;
+                                                                      shortid = i;
+                                                                  }
 
                                                               }
 
+                                                          }
+
+                                                          Logger.Log("ID largeid is " + largeid);
+                                                          Logger.Log("ID shortid is " + shortid);
+
+                                                          if(boundRect.length!= 0){
+
+                                                              Logger.Log("ID largeid height is " + boundRect[largeid].height);
+                                                              Logger.Log("ID shortid height is " + boundRect[shortid].height);
+
+                                                          }
+
+
+                                                              if(boundRect.length!= 0 && (boundRect[largeid].height >( boundRect[shortid].height * 1.3))){
+
+
+
+                                                              Moments mom = mu2.get(largeid);
+
+                                                                  Logger.Log("ID added thumb to  " + shortid);
+
+                                                              int x = (int) (mom.get_m10() / mom.get_m00());
+                                                              int y = (int) (mom.get_m01() / mom.get_m00());
+                                                               thumbRightSide.add(new FingerMomentsXYData(0,x,y,false));
+
+
+                                                          }
+
+
+
+
+
+                                                      }
 
 
                                                               Iterator itr = mu2.iterator();
@@ -1165,6 +1232,14 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                   }
 
 
+
+
+
+
+
+
+
+
                                                                   double area = p.get_m00();
 
 
@@ -1237,7 +1312,7 @@ public class HandGestureActivity extends AppCompatActivity {
                                                               FingerMomentsXYData selectedCursor = null;
 
                                                               //same color thumb mode, this detects thumb
-                                                          if(fingerMomentsXYDataArrayListRightSide.size() > 1 && SAME_THUMB_COLOR_MODE){
+                                                          if(fingerMomentsXYDataArrayListRightSide.size() > 1 && SAME_THUMB_COLOR_MODE && !DETECT_THUMB_BY_BOUNDING_BOX){
 
                                                               int lastItemCount = fingerMomentsXYDataArrayListRightSide.size() - 1;
                                                               int lastItemX = fingerMomentsXYDataArrayListRightSide.get(lastItemCount).x;
@@ -1511,6 +1586,11 @@ public class HandGestureActivity extends AppCompatActivity {
                                                                           SYNTH_PLAYING2 = true;
                                                                       }
 
+                                                                      int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
+
+                                                                      if (!mSynth2.isFilterEnvEnabled())
+                                                                          mSynth2.setFilterValue(distanceDifference * 10);
+
                                                                       //only works for single note slide here, slide mode
                                                                       if(GLISSANDO_MODE && notesArrayList.size() == 8){
 
@@ -1629,10 +1709,7 @@ public class HandGestureActivity extends AppCompatActivity {
 
 
                                                                           // set distance
-                                                                          int distanceDifference = selectedCursor.x - fingerMomentsXYDataArrayListLeftSide.get(i).x;
 
-                                                                          if (!mSynth2.isFilterEnvEnabled())
-                                                                              mSynth2.setFilterValue(distanceDifference * 10);
 
 
                                                                       }
