@@ -30,6 +30,8 @@ To create a simple C major scale
 
 You should have some sort of apparatus that you can wear on some fingers, that are colored differently than the rest of you and the background. I used colored fingertip gloves. 
 
+REMEMBER TO GIVE THE APPLICATION CAMERA PERMISSIONS, OR THE APPLICATION WILL CRASH.
+
 Once that is acquired, simply go to PLAY -> OPENCV. 
  
  - Select the scale and sound, it should be the first thing that you see on the screen. (NOTE: If a duplicate scale exists, choose the one on top of the list)
