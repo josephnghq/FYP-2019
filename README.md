@@ -25,6 +25,17 @@ To create a simple C major scale
  - Press Enter, and type in a name for the scale
  
  To create a simple synth patch, simply go to NEW SOUND and press 'SAVE', and type in the patch name. This will use the default synth parameters as a synth patch.
+ 
+# Playing instructions
+
+You should have some sort of apparatus that you can wear on some fingers, that are colored differently than the rest of you and the background. I used colored fingertip gloves. 
+
+Once that is acquired, simply go to PLAY -> OPENCV. 
+ 
+ - Select the scale and sound, it should be the first thing that you see on the screen. (NOTE: If a duplicate scale exists, choose the one on top of the list)
+ - On the screen, tap the glove. The application should now detect the glove's color. 
+
+ 
 
 
 
