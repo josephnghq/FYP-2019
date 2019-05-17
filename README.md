@@ -9,6 +9,9 @@ A min SDK version of 15 is needed for this Android project, with the target SDK 
 
 This project was written using the Android SDK, using Java. Android Studio was used as the IDE.
 
+It's good to have some knowledge of music theory when using this application. A quick knowledge of OpenCV concepts and subtractive synthesizers concept are helpful as well. 
+
+For any enquiries, you can either message me at Github, or email me at josephnghq@gmail.com
 
 # Using the application
 
@@ -24,11 +27,16 @@ To create a simple C major scale
  To create a simple synth patch, simply go to NEW SOUND and press 'SAVE', and type in the patch name. This will use the default synth parameters as a synth patch.
 
 
+
 # Important class files 
 
 MainActivity - The application starts of in the MainActivity, and it includes a menu screen to enter playing mode, or to create a new sound or scale
 
 EditSoundActivity - The activity responsible for creating a new synthesizer patch. In this activity, the parameters of the synthesizers are displayed on screen. To hear the sound of the synthesizer, simply press "PLAY SOUND". To save the patch, simply press "SAVE". (Ignore the buttons "PLAY" and "STOP", they are bugged buttons that don't really do anything.)
+
+HandGestureActivity - This is the activity that is the core of the entire project, all the codes regarding gesture detection and recognition is inside here. Majority of the functionality code is in the mOpenCvCameraView's listener, under the onCameraViewStarted function. 
+
+Synth - This activity is responsible for the underlying code of the application's synthesizer. (The application uses JSyn library as the core synthesizer)
 
 
 
