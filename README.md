@@ -36,7 +36,8 @@ Once that is acquired, simply go to PLAY -> OPENCV.
  
  - Select the scale and sound, it should be the first thing that you see on the screen. (NOTE: If a duplicate scale exists, choose the one on top of the list)
  - On the screen, tap the glove. The application should now detect the glove's color. 
-
+ 
+Detailed playing explanation can be found in the FYP Report. 
  
 
 
