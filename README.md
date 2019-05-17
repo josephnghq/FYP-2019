@@ -10,6 +10,19 @@ A min SDK version of 15 is needed for this Android project, with the target SDK 
 This project was written using the Android SDK, using Java. Android Studio was used as the IDE.
 
 
+# Using the application
+
+To enter playing mode, you must first at least have ONE scale saved into the database, and ONE synth patch.
+
+To create a simple C major scale 
+ - Go to Create -> Notes/Chords
+ - Type in 8 for 'number of chords', swipe right.
+ - On the ADD NEW buttons, press them once, and you will see a dropdown menu with the Note name.
+ - Select the notes that form the C major scale, whereby the first ADD NEW button should correspond to lowest note, and the bottom ADD NEW button corresponding to the highest note.
+ - Press Enter, and type in a name for the scale
+ 
+ To create a simple synth patch, simply go to NEW SOUND and press 'SAVE', and type in the patch name. This will use the default synth parameters as a synth patch.
+
 
 # Important class files 
 
