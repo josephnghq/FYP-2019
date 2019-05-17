@@ -9,7 +9,7 @@ A min SDK version of 15 is needed for this Android project, with the target SDK 
 
 This project was written using the Android SDK, using Java. Android Studio was used as the IDE.
 
-It's good to have some knowledge of music theory when using this application. A quick knowledge of OpenCV concepts and subtractive synthesizers concept are helpful as well. 
+It's good to have some knowledge of music theory when using this application. A quick knowledge of OpenCV concepts and subtractive synthesizers concept are helpful as well. The OpenCV packages comes with a lot of sample codes that demonstrates the features of the libraries, and is also where I referenced a lot of the code that were used in the project. I had to modify the code to introduce additional features for the project, such as a variable color detection range, discarding of irrelevant color blobs and thumb detection.
 
 For any enquiries, you can either message me at Github, or email me at josephnghq@gmail.com
 
